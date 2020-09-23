@@ -53,3 +53,5 @@ elseif(WIN32)
         WIN32_LEAN_AND_MEAN
     )
 endif()
+
+add_subdirectory(cxxopts)
