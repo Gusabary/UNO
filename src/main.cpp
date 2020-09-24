@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cxxopts.hpp>
 
-#include "server.h"
-#include "client.h"
+#include "network/server.h"
+#include "network/client.h"
 #include "player.h"
 
 using namespace UNO;

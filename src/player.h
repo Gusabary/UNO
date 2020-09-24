@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "client.h"
+#include "network/client.h"
 
 namespace UNO { namespace Game {
 
