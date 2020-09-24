@@ -12,12 +12,12 @@ Client::Client(std::string host, std::string port)
     tcp::resolver resolver(mContext);
     auto endpoints = resolver.resolve(host, port);
 
-    memset(mBuffer, 0, 100);
-
     asio::async_connect(mSocket, endpoints,
         [this](std::error_code ec, tcp::endpoint) {
             if (!ec) {
-                Write("12345678");
+                std::string username = "tbc";
+                reinterpret_cast<JoinGameMsg *>(mBuffer)->Gear(username);
+                Write();
             }
         }
     );
@@ -26,21 +26,38 @@ Client::Client(std::string host, std::string port)
     t.join();
 }
 
-void Client::Read() 
+void Client::ReadHeader()
 {
-    mSocket.async_read_some(asio::buffer(mBuffer, 100),
+    asio::async_read(mSocket, asio::buffer(mBuffer, sizeof(Msg)),
         [this](std::error_code ec, std::size_t) {
-            if (!ec || ec.message() == "End of file") {
+            if (!ec) {
+                ReadBody();
             }
         }
     );
 }
 
-void Client::Write(const std::string &msg) 
+void Client::ReadBody()
 {
-    asio::async_write(mSocket, asio::buffer(msg), 
+    int len = reinterpret_cast<Msg *>(mBuffer)->mLen;
+    asio::async_read(mSocket, asio::buffer(mBuffer + sizeof(Msg), len),
+        [this](std::error_code ec, std::size_t) {
+            if (!ec) {
+                // TODO: handle different conditions
+                JoinGameMsg *msg = reinterpret_cast<JoinGameMsg *>(mBuffer);
+                ReadHeader();
+            }
+        }
+    );
+}
+
+void Client::Write() 
+{
+    Msg *msg = reinterpret_cast<Msg *>(mBuffer);
+    int len = sizeof(Msg) + msg->mLen;
+    asio::async_write(mSocket, asio::buffer(msg, len), 
         [this](std::error_code, std::size_t) {
-            Read();
+            ReadHeader();
         }
     );
 }

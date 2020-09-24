@@ -3,6 +3,8 @@
 #include <memory>
 #include <asio.hpp>
 
+#include "msg.h"
+
 namespace UNO { namespace Network {
 
 using asio::ip::tcp;
@@ -15,14 +17,18 @@ public:
 
     void Start();
 
-    void Read();
+    void ReadHeader();
+    
+    void ReadBody();
 
-    void Write(const std::string &msg);
+    void Write(Msg *msg);
 
 private:
+    constexpr static int MAX_BUFFER_SIZE = 256;
+
     tcp::socket mSocket;
     Server &mServer;
-    char mBuffer[100];
+    uint8_t mBuffer[MAX_BUFFER_SIZE];
 };
 
 class Server {
@@ -31,7 +37,7 @@ public:
 
     void Join(const std::shared_ptr<Session> &session);
     
-    void Deliver(const std::string &msg);
+    void Deliver(uint8_t *buffer);
 
 private:
     void Accept();

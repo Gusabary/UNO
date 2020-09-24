@@ -19,3 +19,5 @@
 + when using `async_read` instead of `async_read_some`, it will block if the current read stream cannot fill the `asio::buffer`. that is to say, if the length of the `asio::buffer` is too large, the `async_read` may block until an EOF.
 
 + in the implementation of asio's `async_` functions, it seems that you cannot capture a char* in the lambda of callback. instead, a `self` got from `shared_from_this()` should be captured.
+
++ `bad_weak_ptr` could happen if using `shared_from_this()` on an object which has no `shared_ptr` pointing to it yet.

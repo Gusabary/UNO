@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "server.h"
-#include "msg.hpp"
 
 namespace UNO { namespace Network {
 
@@ -14,28 +13,41 @@ Session::Session(tcp::socket socket, Server &server)
 void Session::Start() 
 {
     mServer.Join(shared_from_this());
-    Read();
+    ReadHeader();
 }
 
-void Session::Read() 
+void Session::ReadHeader()
 {
-    auto self(shared_from_this());
-    mSocket.async_read_some(asio::buffer(mBuffer, 100),
-        [this, self](std::error_code ec, std::size_t size) {
-            if (!ec || ec.message() == "End of file") {
-                mServer.Deliver(mBuffer);
+    asio::async_read(mSocket, asio::buffer(mBuffer, sizeof(Msg)),
+        [this](std::error_code ec, std::size_t) {
+            if (!ec) {
+                ReadBody();
             }
         }
     );
 }
 
-void Session::Write(const std::string &msg)
+void Session::ReadBody()
 {
-    auto self(shared_from_this());
-    asio::async_write(mSocket, asio::buffer(msg),
-        [this, msg](std::error_code ec, std::size_t size) {
+    int len = reinterpret_cast<Msg *>(mBuffer)->mLen;
+    asio::async_read(mSocket, asio::buffer(mBuffer + sizeof(Msg), len),
+        [this](std::error_code ec, std::size_t) {
             if (!ec) {
+                // TODO: handle different conditions
+                JoinGameMsg *msg = reinterpret_cast<JoinGameMsg *>(mBuffer);
+                mServer.Deliver(mBuffer);
+                // ReadHeader();
             }
+        }
+    );
+}
+
+void Session::Write(Msg *msg) 
+{
+    int len = sizeof(Msg) + msg->mLen;
+    asio::async_write(mSocket, asio::buffer(msg, len), 
+        [this](std::error_code, std::size_t) {
+            ReadHeader();
         }
     );
 }
@@ -55,10 +67,10 @@ void Server::Join(const std::shared_ptr<Session> &session)
     mSessions.push_back(session);
 }
 
-void Server::Deliver(const std::string &msg) 
+void Server::Deliver(uint8_t *buffer) 
 {
     // TODO: deliver to all sessions
-    std::cout << "deliver: " << msg << std::endl;
+    Msg *msg = reinterpret_cast<Msg *>(buffer);
     std::for_each(mSessions.begin(), mSessions.end(), 
         [msg](const std::shared_ptr<Session> &session) {
             session->Write(msg);
