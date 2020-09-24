@@ -1,14 +1,21 @@
 #include <iostream>
 #include <cxxopts.hpp>
 
+#include "server.h"
+#include "client.h"
+#include "player.h"
+
+using namespace UNO;
+
 struct ArgInfo {
-    bool mIsRoomOwner{false};
+    bool mIsServer;
     std::string mHost;
     std::string mPort;
     std::string mUsername;
 };
 
-ArgInfo parseArgs(int argc, const char **argv) {
+ArgInfo parseArgs(int argc, const char **argv) 
+{
     cxxopts::Options options("uno", "uno card game");
     options.add_options()
         ("l, listen", "the port number that server will listen on", cxxopts::value<std::string>())
@@ -16,8 +23,7 @@ ArgInfo parseArgs(int argc, const char **argv) {
         ("u, username", "the username of the player", cxxopts::value<std::string>());
 
     ArgInfo argInfo;
-    try
-    {
+    try {
         auto result = options.parse(argc, argv);
 
         // check options
@@ -33,13 +39,14 @@ ArgInfo parseArgs(int argc, const char **argv) {
 
         // -l
         if (result.count("listen")) {
-            argInfo.mIsRoomOwner = true;
+            argInfo.mIsServer = true;
+            // argInfo.mHost = "localhost";
             argInfo.mPort = result["listen"].as<std::string>();
         }
 
         // -c
         if (result.count("connect")) {
-            argInfo.mIsRoomOwner = false;
+            argInfo.mIsServer = false;
             std::string endpoint = result["connect"].as<std::string>();
             int pos = endpoint.find(":");
             argInfo.mHost = endpoint.substr(0, pos);
@@ -62,9 +69,12 @@ int main(int argc, char **argv)
 {
     const ArgInfo argInfo = parseArgs(argc, const_cast<const char **>(argv));
 
-    std::cout << argInfo.mHost << std::endl;
-    std::cout << argInfo.mPort << std::endl;
-    std::cout << argInfo.mUsername << std::endl;
+    if (argInfo.mIsServer) {
+        Network::Server server(argInfo.mPort);
+    }
+    else {
+        Game::Player player(argInfo.mUsername, argInfo.mHost, argInfo.mPort);
+    }
 
     return 0;
 }
