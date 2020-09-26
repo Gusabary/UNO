@@ -13,22 +13,29 @@ class Server;
 
 class Session : public std::enable_shared_from_this<Session> {
 public:
-    explicit Session(tcp::socket socket, Server &server);
+    explicit Session(tcp::socket socket, Server &server, int index);
 
     void Start();
 
-    void ReadHeader();
-    
-    void ReadBody();
+    JoinGameInfo ReceiveJoinGameInfo();
 
-    void Write(Msg *msg);
+    void DeliverGameStartInfo(const GameStartInfo &info);
+
+private:
+    // read from mSocket to mReadBuffer
+    void Read();
+
+    // write from mWriteBuffer to mSocket
+    void Write();
 
 private:
     constexpr static int MAX_BUFFER_SIZE = 256;
 
     tcp::socket mSocket;
     Server &mServer;
-    uint8_t mBuffer[MAX_BUFFER_SIZE];
+    const int mIndex;
+    uint8_t mReadBuffer[MAX_BUFFER_SIZE];
+    uint8_t mWriteBuffer[MAX_BUFFER_SIZE];
 };
 
 class Server {
@@ -37,12 +44,20 @@ public:
 
     void Join(const std::shared_ptr<Session> &session);
     
-    void Deliver(uint8_t *buffer);
+    void DeliverGameStartInfo(int index, const GameStartInfo &info);
+
+    void Run();
 
 private:
     void Accept();
 
+public:
+    // callbacks in server side should always take index of session as the first parameter
+    std::function<void(int, const JoinGameInfo &)> OnReceiveJoinGameInfo;
+
 private:
+    const std::string mPort;
+    
     asio::io_context mContext;
     std::unique_ptr<tcp::acceptor> mAcceptor;
     std::vector<std::shared_ptr<Session>> mSessions;

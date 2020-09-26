@@ -1,4 +1,6 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include "server.h"
 
@@ -6,55 +8,54 @@ namespace UNO { namespace Network {
 
 using asio::ip::tcp;
 
-Session::Session(tcp::socket socket, Server &server)  
-    : mSocket(std::move(socket)), mServer(server) 
+Session::Session(tcp::socket socket, Server &server, int index)  
+    : mSocket(std::move(socket)), mServer(server), mIndex(index)
 {}
 
 void Session::Start() 
 {
     mServer.Join(shared_from_this());
-    ReadHeader();
+    JoinGameInfo info = ReceiveJoinGameInfo();
+    mServer.OnReceiveJoinGameInfo(mIndex, info);
 }
 
-void Session::ReadHeader()
+JoinGameInfo Session::ReceiveJoinGameInfo()
 {
-    asio::async_read(mSocket, asio::buffer(mBuffer, sizeof(Msg)),
-        [this](std::error_code ec, std::size_t) {
-            if (!ec) {
-                ReadBody();
-            }
-        }
-    );
+    Read();
+    return reinterpret_cast<JoinGameMsg *>(mReadBuffer)->ToInfo();
 }
 
-void Session::ReadBody()
+void Session::DeliverGameStartInfo(const GameStartInfo &info)
 {
-    int len = reinterpret_cast<Msg *>(mBuffer)->mLen;
-    asio::async_read(mSocket, asio::buffer(mBuffer + sizeof(Msg), len),
-        [this](std::error_code ec, std::size_t) {
-            if (!ec) {
-                // TODO: handle different conditions
-                JoinGameMsg *msg = reinterpret_cast<JoinGameMsg *>(mBuffer);
-                mServer.Deliver(mBuffer);
-                // ReadHeader();
-            }
-        }
-    );
+    reinterpret_cast<GameStartMsg *>(mWriteBuffer)->FromInfo(info);
+    Write();
 }
 
-void Session::Write(Msg *msg) 
+void Session::Read()
 {
+    // read header
+    asio::read(mSocket, asio::buffer(mReadBuffer, sizeof(Msg)));
+
+    // read body
+    int len = reinterpret_cast<Msg *>(mReadBuffer)->mLen;
+    asio::read(mSocket, asio::buffer(mReadBuffer + sizeof(Msg), len));
+}
+
+void Session::Write() 
+{
+    Msg *msg = reinterpret_cast<Msg *>(mWriteBuffer);
     int len = sizeof(Msg) + msg->mLen;
     asio::async_write(mSocket, asio::buffer(msg, len), 
-        [this](std::error_code, std::size_t) {
-            ReadHeader();
-        }
+        [this](std::error_code, std::size_t) {}
     );
 }
 
-Server::Server(std::string port) 
+Server::Server(std::string port) : mPort(port)
+{}
+
+void Server::Run()
 {
-    tcp::endpoint endpoint(tcp::v4(), std::atoi(port.c_str()));
+    tcp::endpoint endpoint(tcp::v4(), std::atoi(mPort.c_str()));
 
     mAcceptor = std::make_unique<tcp::acceptor>(mContext, endpoint);
     Accept();
@@ -67,15 +68,9 @@ void Server::Join(const std::shared_ptr<Session> &session)
     mSessions.push_back(session);
 }
 
-void Server::Deliver(uint8_t *buffer) 
+void Server::DeliverGameStartInfo(int index, const GameStartInfo &info)
 {
-    // TODO: deliver to all sessions
-    Msg *msg = reinterpret_cast<Msg *>(buffer);
-    std::for_each(mSessions.begin(), mSessions.end(), 
-        [msg](const std::shared_ptr<Session> &session) {
-            session->Write(msg);
-        }
-    );
+    mSessions[index]->DeliverGameStartInfo(info);
 }
 
 void Server::Accept() 
@@ -83,8 +78,9 @@ void Server::Accept()
     mAcceptor->async_accept([this](std::error_code ec, tcp::socket socket) {
         if (!ec) {
             // a new player joins in
-            std::cout << "a new player joins in" << std::endl;
-            std::make_shared<Session>(std::move(socket), *this)->Start();
+            int index = mSessions.size();
+            std::cout << "a new player joins in, index : " << index << std::endl;
+            std::make_shared<Session>(std::move(socket), *this, index)->Start();
         }
         Accept();
     });

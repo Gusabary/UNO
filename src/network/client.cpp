@@ -7,17 +7,18 @@ namespace UNO { namespace Network {
 using asio::ip::tcp;
 
 Client::Client(std::string host, std::string port) 
-    : mSocket(mContext)
+    : mHost(host), mPort(port), mSocket(mContext)
+{}
+
+void Client::Connect()
 {
     tcp::resolver resolver(mContext);
-    auto endpoints = resolver.resolve(host, port);
+    auto endpoints = resolver.resolve(mHost, mPort);
 
     asio::async_connect(mSocket, endpoints,
         [this](std::error_code ec, tcp::endpoint) {
             if (!ec) {
-                std::string username = "tbc";
-                reinterpret_cast<JoinGameMsg *>(mBuffer)->Gear(username);
-                Write();
+                OnConnect();
             }
         }
     );
@@ -26,39 +27,34 @@ Client::Client(std::string host, std::string port)
     t.join();
 }
 
-void Client::ReadHeader()
+void Client::DeliverJoinGameInfo(const JoinGameInfo &info)
 {
-    asio::async_read(mSocket, asio::buffer(mBuffer, sizeof(Msg)),
-        [this](std::error_code ec, std::size_t) {
-            if (!ec) {
-                ReadBody();
-            }
-        }
-    );
+    reinterpret_cast<JoinGameMsg *>(mWriteBuffer)->FromInfo(info);
+    Write();
 }
 
-void Client::ReadBody()
+GameStartInfo Client::ReceiveGameStartInfo()
 {
-    int len = reinterpret_cast<Msg *>(mBuffer)->mLen;
-    asio::async_read(mSocket, asio::buffer(mBuffer + sizeof(Msg), len),
-        [this](std::error_code ec, std::size_t) {
-            if (!ec) {
-                // TODO: handle different conditions
-                JoinGameMsg *msg = reinterpret_cast<JoinGameMsg *>(mBuffer);
-                ReadHeader();
-            }
-        }
-    );
+    Read();
+    return reinterpret_cast<GameStartMsg *>(mReadBuffer)->ToInfo();
+}
+
+void Client::Read()
+{
+    // read header
+    asio::read(mSocket, asio::buffer(mReadBuffer, sizeof(Msg)));
+
+    // read body
+    int len = reinterpret_cast<Msg *>(mReadBuffer)->mLen;
+    asio::read(mSocket, asio::buffer(mReadBuffer + sizeof(Msg), len));
 }
 
 void Client::Write() 
 {
-    Msg *msg = reinterpret_cast<Msg *>(mBuffer);
+    Msg *msg = reinterpret_cast<Msg *>(mWriteBuffer);
     int len = sizeof(Msg) + msg->mLen;
     asio::async_write(mSocket, asio::buffer(msg, len), 
-        [this](std::error_code, std::size_t) {
-            ReadHeader();
-        }
+        [this](std::error_code, std::size_t) {}
     );
 }
 }}

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "network/client.h"
+#include "../network/client.h"
 
 namespace UNO { namespace Game {
 
@@ -11,6 +11,7 @@ public:
     explicit Player(std::string username, std::string host, std::string port);
 
 private:
+    void JoinGame();
 
 private:
     std::string mUsername;

@@ -3,7 +3,8 @@
 
 #include "network/server.h"
 #include "network/client.h"
-#include "player.h"
+#include "game/game_board.h"
+#include "game/player.h"
 
 using namespace UNO;
 
@@ -70,7 +71,7 @@ int main(int argc, char **argv)
     const ArgInfo argInfo = parseArgs(argc, const_cast<const char **>(argv));
 
     if (argInfo.mIsServer) {
-        Network::Server server(argInfo.mPort);
+        Game::GameBoard gameBoard(argInfo.mPort);
     }
     else {
         Game::Player player(argInfo.mUsername, argInfo.mHost, argInfo.mPort);

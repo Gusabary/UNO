@@ -2,21 +2,11 @@
 
 #include <iostream>
 
+#include "../game/info.h"
+
 namespace UNO { namespace Network {
 
-enum class CardColor : uint8_t {
-    RED, YELLOW, GREEN, BLUE, BLACK
-};
-
-enum class CardText : uint8_t {
-    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, 
-    EIGHT, NINE, SKIP, REVERSE, DRAW_TWO, WILD, DRAW_FOUR
-};
-
-struct Card {
-    CardColor mColor;
-    CardText mText;
-};
+using namespace Game;
 
 enum class MsgType : uint8_t {
     JOIN_GAME,
@@ -37,10 +27,14 @@ struct Msg {
 struct JoinGameMsg : public Msg {
     char mUsername[];
 
-    void Gear(const std::string &username) {
+    void FromInfo(const JoinGameInfo &info) {
         mType = MsgType::JOIN_GAME;
-        mLen = username.size();  // XXX: need +1? consider the terminated null?
-        std::strcpy(mUsername, username.c_str());
+        mLen = info.mUsername.size();  // XXX: need +1? consider the terminated null?
+        std::strcpy(mUsername, info.mUsername.c_str());
+    }
+
+    JoinGameInfo ToInfo() {
+        return JoinGameInfo(mUsername);
     }
 };
 
@@ -51,6 +45,41 @@ struct GameStartMsg : public Msg {
     // usernames of all players, not including player himself, ' ' as delimiter
     // and the order is from left side of the player to right side
     char mUsernames[];
+
+    void FromInfo(const GameStartInfo &info) {
+        mType = MsgType::GAME_START;
+
+        std::string usernames{};
+        std::for_each(info.mUsernames.begin(), info.mUsernames.end(),
+            [&usernames](const std::string &username) {
+                // ' ' as delimiter of usernames
+                usernames.append(username).push_back(' ');
+            }
+        );
+        mLen = sizeof(Card) * 8 + sizeof(int) + usernames.size();
+
+        std::copy(info.mInitHandCards.begin(), info.mInitHandCards.end(), mInitHandCards);
+        mFlippedCard = info.mFlippedCard;
+        mFirstPlayer = info.mFirstPlayer;
+        std::strcpy(mUsernames, usernames.c_str());
+    }
+
+    GameStartInfo ToInfo() {
+        GameStartInfo info;
+        std::copy(std::begin(mInitHandCards), std::end(mInitHandCards),
+                  info.mInitHandCards.begin());
+        info.mFlippedCard = mFlippedCard;
+        info.mFirstPlayer = mFirstPlayer;
+
+        std::string usernames(mUsernames);
+        while (!usernames.empty()) {
+            int pos = usernames.find(' ');
+            info.mUsernames.emplace_back(usernames, pos);
+            usernames.erase(0, pos + 1);
+        }
+
+        return info;
+    }
 };
 
 struct DrawMsg : public Msg {
