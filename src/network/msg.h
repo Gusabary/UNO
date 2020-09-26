@@ -25,6 +25,8 @@ struct Msg {
 };
 
 struct JoinGameMsg : public Msg {
+    using InfoT = JoinGameInfo;
+
     char mUsername[];
 
     void FromInfo(const JoinGameInfo &info) {
@@ -39,6 +41,8 @@ struct JoinGameMsg : public Msg {
 };
 
 struct GameStartMsg : public Msg {
+    using InfoT = GameStartInfo;
+
     Card mInitHandCards[7];
     Card mFlippedCard;  // indicating the first card that should be played
     int mFirstPlayer;  // the index of the first player to play a card

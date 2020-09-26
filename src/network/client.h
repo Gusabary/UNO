@@ -3,6 +3,7 @@
 #include <memory>
 #include <asio.hpp>
 
+#include "session.h"
 #include "msg.h"
 
 namespace UNO { namespace Network {
@@ -16,29 +17,24 @@ public:
 
     void Connect();
 
-    void DeliverJoinGameInfo(const JoinGameInfo &info);
+    template <typename MsgT>
+    typename MsgT::InfoT ReceiveInfo() {
+        return mSession->ReceiveInfo<MsgT>();
+    }
 
-    GameStartInfo ReceiveGameStartInfo();
-
-private:
-    // read from mSocket to mReadBuffer
-    void Read();
-
-    // write from mWriteBuffer to mSocket
-    void Write();
+    template <typename MsgT>
+    void DeliverInfo(const typename MsgT::InfoT &info) {
+        mSession->DeliverInfo<MsgT>(info);
+    }
 
 public:
     std::function<void()> OnConnect;
 
 private:
-    constexpr static int MAX_BUFFER_SIZE = 256;
-
     const std::string mHost;
     const std::string mPort;
 
     asio::io_context mContext;
-    tcp::socket mSocket;
-    uint8_t mReadBuffer[MAX_BUFFER_SIZE];
-    uint8_t mWriteBuffer[MAX_BUFFER_SIZE];
+    std::unique_ptr<Session> mSession;
 };
 }}

@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include "../network/msg.h"
+
 namespace UNO { namespace Game {
 
 Player::Player(std::string username, std::string host, std::string port)
@@ -13,8 +15,8 @@ Player::Player(std::string username, std::string host, std::string port)
 void Player::JoinGame()
 {
     std::cout << "connect success, sending username to server" << std::endl;
-    mClient.DeliverJoinGameInfo(JoinGameInfo(mUsername));
-    GameStartInfo info = mClient.ReceiveGameStartInfo();
+    mClient.DeliverInfo<Network::JoinGameMsg>(JoinGameInfo(mUsername));
+    GameStartInfo info = mClient.ReceiveInfo<Network::GameStartMsg>();
     std::cout << "game start info received: " << info.mFirstPlayer << std::endl;
 }
 }}

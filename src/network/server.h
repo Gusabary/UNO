@@ -3,50 +3,28 @@
 #include <memory>
 #include <asio.hpp>
 
+#include "session.h"
 #include "msg.h"
 
 namespace UNO { namespace Network {
 
 using asio::ip::tcp;
 
-class Server;
-
-class Session : public std::enable_shared_from_this<Session> {
-public:
-    explicit Session(tcp::socket socket, Server &server, int index);
-
-    void Start();
-
-    JoinGameInfo ReceiveJoinGameInfo();
-
-    void DeliverGameStartInfo(const GameStartInfo &info);
-
-private:
-    // read from mSocket to mReadBuffer
-    void Read();
-
-    // write from mWriteBuffer to mSocket
-    void Write();
-
-private:
-    constexpr static int MAX_BUFFER_SIZE = 256;
-
-    tcp::socket mSocket;
-    Server &mServer;
-    const int mIndex;
-    uint8_t mReadBuffer[MAX_BUFFER_SIZE];
-    uint8_t mWriteBuffer[MAX_BUFFER_SIZE];
-};
-
 class Server {
 public:
     explicit Server(std::string port);
 
-    void Join(const std::shared_ptr<Session> &session);
-    
-    void DeliverGameStartInfo(int index, const GameStartInfo &info);
-
     void Run();
+
+    template <typename MsgT>
+    typename MsgT::InfoT ReceiveInfo(int index) {
+        return mSessions[index]->ReceiveInfo<MsgT>();
+    }
+
+    template <typename MsgT>
+    void DeliverInfo(int index, const typename MsgT::InfoT &info) {
+        mSessions[index]->DeliverInfo<MsgT>(info);
+    }
 
 private:
     void Accept();
@@ -60,6 +38,6 @@ private:
     
     asio::io_context mContext;
     std::unique_ptr<tcp::acceptor> mAcceptor;
-    std::vector<std::shared_ptr<Session>> mSessions;
+    std::vector<std::unique_ptr<Session>> mSessions;
 };
 }}
