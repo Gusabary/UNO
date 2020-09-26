@@ -4,7 +4,6 @@
 #include <asio.hpp>
 
 #include "session.h"
-#include "msg.h"
 
 namespace UNO { namespace Network {
 
@@ -17,14 +16,14 @@ public:
 
     void Connect();
 
-    template <typename MsgT>
-    typename MsgT::InfoT ReceiveInfo() {
-        return mSession->ReceiveInfo<MsgT>();
+    template <typename InfoT>
+    InfoT ReceiveInfo() {
+        return mSession->ReceiveInfo<InfoT>();
     }
 
-    template <typename MsgT>
-    void DeliverInfo(const typename MsgT::InfoT &info) {
-        mSession->DeliverInfo<MsgT>(info);
+    template <typename InfoT>
+    void DeliverInfo(const InfoT &info) {
+        mSession->DeliverInfo<InfoT>(info);
     }
 
 public:

@@ -4,11 +4,11 @@
 #include <asio.hpp>
 
 #include "session.h"
-#include "msg.h"
 
 namespace UNO { namespace Network {
 
 using asio::ip::tcp;
+using namespace Game;
 
 class Server {
 public:
@@ -16,14 +16,14 @@ public:
 
     void Run();
 
-    template <typename MsgT>
-    typename MsgT::InfoT ReceiveInfo(int index) {
-        return mSessions[index]->ReceiveInfo<MsgT>();
+    template <typename InfoT>
+    InfoT ReceiveInfo(int index) {
+        return mSessions[index]->ReceiveInfo<InfoT>();
     }
 
-    template <typename MsgT>
-    void DeliverInfo(int index, const typename MsgT::InfoT &info) {
-        mSessions[index]->DeliverInfo<MsgT>(info);
+    template <typename InfoT>
+    void DeliverInfo(int index, const InfoT &info) {
+        mSessions[index]->DeliverInfo<InfoT>(info);
     }
 
 private:

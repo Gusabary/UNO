@@ -1,8 +1,10 @@
 #pragma once
 
+#include <iostream>
 #include <asio.hpp>
 
 #include "msg.h"
+#include "../game/info.h"
 
 namespace UNO { namespace Network {
 
@@ -12,15 +14,15 @@ class Session {
 public:
     explicit Session(tcp::socket socket);
 
-    template <typename MsgT>
-    typename MsgT::InfoT ReceiveInfo() {
+    template <typename InfoT>
+    InfoT ReceiveInfo() {
         Read();
-        return reinterpret_cast<MsgT *>(mReadBuffer)->ToInfo();
+        return InfoT::Deserialize(mReadBuffer);
     }
 
-    template <typename MsgT>
-    void DeliverInfo(const typename MsgT::InfoT &info) {
-        reinterpret_cast<MsgT *>(mWriteBuffer)->FromInfo(info);
+    template <typename InfoT>
+    void DeliverInfo(const InfoT &info) {
+        info.Serialize(mWriteBuffer);
         Write();
     }
 

@@ -3,22 +3,14 @@
 #include <iostream>
 #include <array>
 #include <vector>
+#include <cstring>
+#include <algorithm>
+
+#include "../network/msg.h"
 
 namespace UNO { namespace Game {
 
-enum class CardColor : uint8_t {
-    RED, YELLOW, GREEN, BLUE, BLACK
-};
-
-enum class CardText : uint8_t {
-    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, 
-    EIGHT, NINE, SKIP, REVERSE, DRAW_TWO, WILD, DRAW_FOUR
-};
-
-struct Card {
-    CardColor mColor;
-    CardText mText;
-};
+using namespace Network;
 
 struct Info
 {};
@@ -26,8 +18,11 @@ struct Info
 struct JoinGameInfo : public Info {
     std::string mUsername;
 
-    JoinGameInfo(const char *username) : mUsername(username) {}
+    JoinGameInfo() {}
     JoinGameInfo(const std::string &username) : mUsername(username) {}
+
+    void Serialize(uint8_t *buffer) const;
+    static JoinGameInfo Deserialize(const uint8_t *buffer);
 };
 
 struct GameStartInfo : public Info {
@@ -35,5 +30,8 @@ struct GameStartInfo : public Info {
     Card mFlippedCard;
     int mFirstPlayer;
     std::vector<std::string> mUsernames;
+
+    void Serialize(uint8_t *buffer) const;
+    static GameStartInfo Deserialize(const uint8_t *buffer);
 };
 }}

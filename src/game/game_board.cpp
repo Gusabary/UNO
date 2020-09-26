@@ -1,7 +1,5 @@
 #include "game_board.h"
 
-#include "../network/msg.h"
-
 namespace UNO { namespace Game {
 
 GameBoard::GameBoard(std::string port)
@@ -19,7 +17,7 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
     std::cout << "receive, index: " << index << ", username: " << username << std::endl;
     GameStartInfo info;
     info.mFirstPlayer = 999;
-    mServer.DeliverInfo<Network::GameStartMsg>(index, info);
+    mServer.DeliverInfo<GameStartInfo>(index, info);
 }
 
 }}
