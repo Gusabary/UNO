@@ -8,7 +8,7 @@ void JoinGameInfo::Serialize(uint8_t *buffer) const
 {
     JoinGameMsg *msg = reinterpret_cast<JoinGameMsg *>(buffer);
     msg->mType = MsgType::JOIN_GAME;
-    msg->mLen = mUsername.size();  // XXX: need +1? consider the terminated null?
+    msg->mLen = mUsername.size();
     std::strcpy(msg->mUsername, mUsername.c_str());
 }
 
