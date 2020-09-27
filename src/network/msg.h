@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cassert>
 
 namespace UNO { namespace Network {
 
@@ -16,6 +17,11 @@ enum class CardText : uint8_t {
 struct Card {
     CardColor mColor;
     CardText mText;
+
+    Card() {}
+    Card(CardColor color, CardText text) : mColor(color), mText(text) {}
+
+    friend std::ostream& operator<<(std::ostream& os, const Card& card);
 };
 
 enum class MsgType : uint8_t {

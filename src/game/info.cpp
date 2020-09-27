@@ -52,11 +52,30 @@ GameStartInfo GameStartInfo::Deserialize(const uint8_t *buffer)
     std::string usernames(msg->mUsernames);
     while (!usernames.empty()) {
         int pos = usernames.find(' ');
-        info.mUsernames.emplace_back(usernames, pos);
+        info.mUsernames.emplace_back(usernames, 0, pos);
         usernames.erase(0, pos + 1);
     }
 
     return info;
 }
 
+std::ostream& operator<<(std::ostream& os, const GameStartInfo& info)
+{
+    os << "mInitHandCards: [";
+    for (int i = 0; i < 6; i++) {
+        os << info.mInitHandCards[i] << ", ";
+    }
+    os << info.mInitHandCards[6] << "]" << std::endl;
+
+    os << "mFlippedCard: " << info.mFlippedCard << std::endl;
+    os << "mFirstPlayer: " << info.mFirstPlayer << std::endl;
+
+    os << "mUsernames: [";
+    for (int i = 0; i < info.mUsernames.size() - 1; i++) {
+        os << info.mUsernames[i] << ", ";
+    }
+    os << info.mUsernames.back() << "]" << std::endl;
+    
+    return os;
+}
 }}

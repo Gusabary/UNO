@@ -14,7 +14,9 @@ void Player::JoinGame()
 {
     std::cout << "connect success, sending username to server" << std::endl;
     mClient.DeliverInfo<JoinGameInfo>(JoinGameInfo(mUsername));
+
+    // wait for game start
     GameStartInfo info = mClient.ReceiveInfo<GameStartInfo>();
-    std::cout << "game start info received: " << info.mFirstPlayer << std::endl;
+    std::cout << "game start info received: " << std::endl << info << std::endl;
 }
 }}

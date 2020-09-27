@@ -31,7 +31,16 @@ struct GameStartInfo : public Info {
     int mFirstPlayer;
     std::vector<std::string> mUsernames;
 
+    GameStartInfo() {}
+    GameStartInfo(const std::array<Card, 7> &initHandCards,
+        Card flippedCard, int firstPlayer,
+        const std::vector<std::string> &usernames) 
+        : mInitHandCards(initHandCards), mFlippedCard(flippedCard),
+        mFirstPlayer(firstPlayer), mUsernames(usernames) {}
+
     void Serialize(uint8_t *buffer) const;
     static GameStartInfo Deserialize(const uint8_t *buffer);
+
+    friend std::ostream& operator<<(std::ostream& os, const GameStartInfo& info);
 };
 }}
