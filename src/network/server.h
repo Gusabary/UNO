@@ -17,7 +17,7 @@ public:
     void Run();
 
     template <typename InfoT>
-    InfoT ReceiveInfo(int index) {
+    std::unique_ptr<InfoT> ReceiveInfo(int index) {
         return mSessions[index]->ReceiveInfo<InfoT>();
     }
 

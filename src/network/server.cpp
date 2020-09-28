@@ -28,8 +28,8 @@ void Server::Accept()
             std::cout << "a new player joins in, index : " << index << std::endl;
 
             mSessions.push_back(std::make_unique<Session>(std::move(socket)));
-            JoinGameInfo info = mSessions.back()->ReceiveInfo<JoinGameInfo>();
-            OnReceiveJoinGameInfo(index, info);
+            std::unique_ptr<JoinGameInfo> info = mSessions.back()->ReceiveInfo<JoinGameInfo>();
+            OnReceiveJoinGameInfo(index, *info);
         }
         Accept();
     });

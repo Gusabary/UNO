@@ -37,9 +37,98 @@ void GameBoard::StartGame()
     std::vector<std::string> tmpUsernames(mUsernames);
     for (int player = 0; player < PLAYER_NUM; player++) {
         mServer.DeliverInfo<GameStartInfo>(player, 
-            GameStartInfo(initHandCards[player], flippedCard, WrapWithPlayerNum(firstPlayer, player), tmpUsernames));
+            GameStartInfo(initHandCards[player], flippedCard, WrapWithPlayerNum(firstPlayer - player), tmpUsernames));
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
+    }
+
+    mCurrentPlayer = firstPlayer;
+    // TODO: handle condition that flipped card is reverse
+    mIsInClockwise = true;
+    GameLoop();
+}
+
+void GameBoard::GameLoop()
+{
+    while (true) {
+        std::unique_ptr<ActionInfo> info = mServer.ReceiveInfo<ActionInfo>(mCurrentPlayer);
+        switch (info->mActionType) {
+            case ActionType::DRAW:
+                HandleDraw(std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release())));
+                break;
+            case ActionType::SKIP:
+                HandleSkip(std::unique_ptr<SkipInfo>(dynamic_cast<SkipInfo *>(info.release())));
+                break;
+            case ActionType::PLAY:
+                HandlePlay(std::unique_ptr<PlayInfo>(dynamic_cast<PlayInfo *>(info.release())));
+                break;
+            default:
+                assert(0);
+        }
+
+        // update mCurrentPlayer
+        mCurrentPlayer = mIsInClockwise ? WrapWithPlayerNum(mCurrentPlayer + 1) : WrapWithPlayerNum(mCurrentPlayer - 1);
+    }
+}
+
+void GameBoard::HandleDraw(std::unique_ptr<DrawInfo> info)
+{
+    std::cout << *info << std::endl;
+
+    // draw from deck
+    std::vector<Card> cardsToDraw(info->mNumber);
+    for (auto &cardToDraw : cardsToDraw) {
+        cardToDraw = mDeck.front();
+        mDeck.pop_front();
+    }
+    
+    // respond to the deliverer
+    mServer.DeliverInfo<DrawRspInfo>(mCurrentPlayer, DrawRspInfo(info->mNumber, cardsToDraw));
+
+    // broadcast to other players
+    for (int i = 0; i < PLAYER_NUM; i++) {
+        if (i != mCurrentPlayer) {
+            info->mPlayerIndex = WrapWithPlayerNum(mCurrentPlayer - i);
+            mServer.DeliverInfo<DrawInfo>(i, *info);
+        }
+    }
+}
+
+void GameBoard::HandleSkip(std::unique_ptr<SkipInfo> info)
+{
+    std::cout << *info << std::endl;
+
+    // no response to the deliverer
+
+    // broadcast to other players
+    for (int i = 0; i < PLAYER_NUM; i++) {
+        if (i != mCurrentPlayer) {
+            info->mPlayerIndex = WrapWithPlayerNum(mCurrentPlayer - i);
+            mServer.DeliverInfo<SkipInfo>(i, *info);
+        }
+    }
+}
+
+void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
+{
+    std::cout << *info << std::endl;
+    
+    // update local state:
+    // add the card just played into discard pile
+    // and reverse mIsInClockwise if necessary
+    mDiscardPile.push_front(info->mCard);
+    if (info->mCard.mText == CardText::REVERSE) {
+        mIsInClockwise = !mIsInClockwise;
+    }
+
+    // no response to the deliverer
+
+    // broadcast to other players
+    for (int i = 0; i < PLAYER_NUM; i++) {
+        if (i != mCurrentPlayer) {
+            info->mPlayerIndex = WrapWithPlayerNum(mCurrentPlayer - i);
+            mServer.DeliverInfo<PlayInfo>(i, *info);
+        }
     }
 }
 
@@ -90,9 +179,9 @@ std::vector<std::array<Card, 7>> GameBoard::DealInitHandCards()
     return initHandCards;
 }
 
-int GameBoard::WrapWithPlayerNum(int numToWrap, int player)
+int GameBoard::WrapWithPlayerNum(int numToWrap)
 {
-    int ret = numToWrap - player;
+    int ret = numToWrap % PLAYER_NUM;
     if (ret < 0) {
         ret += PLAYER_NUM;
     }

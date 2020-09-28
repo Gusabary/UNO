@@ -32,9 +32,39 @@ std::ostream& operator<<(std::ostream& os, const Card& card)
         case CardText::DRAW_TWO:    text = "+2"; break;
         case CardText::WILD:        text = "W";  break;
         case CardText::DRAW_FOUR:   text = "+4"; break;
+        default: assert(0);
     }
 
     os << color << text;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const CardColor& color)
+{
+    std::string colorStr;
+    switch (color) {
+        case CardColor::RED:    colorStr = "RED";    break;
+        case CardColor::YELLOW: colorStr = "YELLOW"; break;
+        case CardColor::GREEN:  colorStr = "GREEN";  break;
+        case CardColor::BLUE:   colorStr = "BLUE";   break;
+        default: assert(0);
+    }
+
+    os << colorStr;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ActionType& type)
+{
+    std::string typeStr;
+    switch (type) {
+        case ActionType::DRAW: typeStr = "DRAW"; break;
+        case ActionType::SKIP: typeStr = "SKIP"; break;
+        case ActionType::PLAY: typeStr = "PLAY"; break;
+        default: assert(0);
+    }
+
+    os << typeStr;
     return os;
 }
 }}

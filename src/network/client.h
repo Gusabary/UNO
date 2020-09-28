@@ -17,7 +17,7 @@ public:
     void Connect();
 
     template <typename InfoT>
-    InfoT ReceiveInfo() {
+    std::unique_ptr<InfoT> ReceiveInfo() {
         return mSession->ReceiveInfo<InfoT>();
     }
 

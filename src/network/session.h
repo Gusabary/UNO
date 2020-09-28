@@ -15,7 +15,7 @@ public:
     explicit Session(tcp::socket socket);
 
     template <typename InfoT>
-    InfoT ReceiveInfo() {
+    std::unique_ptr<InfoT> ReceiveInfo() {
         Read();
         return InfoT::Deserialize(mReadBuffer);
     }

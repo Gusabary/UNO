@@ -8,6 +8,7 @@ namespace UNO { namespace Network {
 enum class CardColor : uint8_t {
     RED, YELLOW, GREEN, BLUE, BLACK
 };
+std::ostream& operator<<(std::ostream& os, const CardColor& color);
 
 enum class CardText : uint8_t {
     ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, 
@@ -27,10 +28,8 @@ struct Card {
 enum class MsgType : uint8_t {
     JOIN_GAME,
     GAME_START,
-    DRAW,
+    ACTION,
     DRAW_RSP,
-    SKIPPED,
-    PLAY
 };
 
 struct Msg {
@@ -51,8 +50,28 @@ struct GameStartMsg : public Msg {
     char mUsernames[];
 };
 
-struct DrawMsg : public Msg {
+enum class ActionType : uint8_t {
+    DRAW,
+    SKIP,
+    PLAY
+};
+std::ostream& operator<<(std::ostream& os, const ActionType& type);
+
+struct ActionMsg : public Msg {
+    ActionType mActionType;
+    int mPlayerIndex;
+};
+
+struct DrawMsg : public ActionMsg {
     int mNumber;  // the number of cards to draw
+};
+
+struct SkipMsg : public ActionMsg {
+};
+
+struct PlayMsg : public ActionMsg {
+    Card mCard;
+    CardColor mNextColor;  // valid only if mCard is black
 };
 
 struct DrawRspMsg : public Msg {
@@ -60,11 +79,4 @@ struct DrawRspMsg : public Msg {
     Card mCards[];
 };
 
-struct SkippedMsg : public Msg {
-};
-
-struct PlayMsg : public Msg {
-    Card mCard;
-    CardColor mNextColor;  // valid only if mCard is black
-};
 }}
