@@ -49,3 +49,10 @@
     v.resize(3);
     std::copy(a, a + 3, v.begin());
     ```
+
++ note that `size()` of `std::vector` (maybe most stl containers are also applied) return a **unsigned** value:
+
+    ```c++
+    std::vector<int> v;
+    std::cout << v.size() - 1 << std::endl;  // 18446744073709551615
+    ```

@@ -35,4 +35,8 @@ void Server::Accept()
     });
 }
 
+void Server::Close()
+{
+    mContext.stop();
+}
 }}

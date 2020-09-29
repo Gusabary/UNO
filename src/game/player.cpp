@@ -36,10 +36,11 @@ void Player::JoinGame()
 
 void Player::GameLoop()
 {
-    while (true) {
+    while (!mGameEnds) {
         if (mCurrentPlayer == 0) {
             char inputBuffer[10];
             std::cout << "Now it's your turn, your hand cards are: [";
+            assert(!mHandCards.empty());
             for (int i = 0; i < mHandCards.size() - 1; i++) {
                 std::cout << mHandCards[i] << ", ";
             }
@@ -74,13 +75,11 @@ void Player::GameLoop()
                     if (cardIndex < mHandCards.size()) {
                         Card cardToPlay = mHandCards[cardIndex];
                         if (CanCardBePlayed(cardToPlay)) {
+                            // TODO: specify next color if playing wild card
                             mHandCards.erase(mHandCards.begin() + cardIndex);
                             mClient.DeliverInfo<PlayInfo>(PlayInfo(cardToPlay));
-                            mPlayerStats[mCurrentPlayer].UpdateAfterPlay(cardToPlay);
-                            UpdateStateAfterPlay(cardToPlay);
-                            if (mHandCards.empty()) {
-                                // Win();
-                            }
+                            // the index of player himself is 0
+                            UpdateStateAfterPlay(0, cardToPlay);
                             break;
                         }
                     }
@@ -126,12 +125,17 @@ void Player::HandleSkip(const std::unique_ptr<SkipInfo> &info)
 void Player::HandlePlay(const std::unique_ptr<PlayInfo> &info)
 {
     std::cout << *info << std::endl;
-    mPlayerStats[info->mPlayerIndex].UpdateAfterPlay(info->mCard);
-    UpdateStateAfterPlay(info->mCard);
+    UpdateStateAfterPlay(info->mPlayerIndex, info->mCard);
 }
 
-void Player::UpdateStateAfterPlay(Card cardPlayed)
+void Player::UpdateStateAfterPlay(int playerIndex, Card cardPlayed)
 {
+    PlayerStat &stat = mPlayerStats[playerIndex];
+    stat.UpdateAfterPlay(cardPlayed);
+    if (stat.GetRemainingHandCardsNum() == 0) {
+        Win(playerIndex);
+    }
+
     mLastPlayedCard = cardPlayed;
     if (cardPlayed.mText == CardText::REVERSE) {
         mIsInClockwise = !mIsInClockwise;
@@ -161,14 +165,32 @@ int Player::WrapWithPlayerNum(int numToWrap)
     return ret;
 }
 
+void Player::Win(int playerIndex)
+{
+    mGameEnds = true;
+    if (playerIndex == 0) {
+        std::cout << "You win!" << std::endl;
+    }
+    else {
+        std::string winner = mPlayerStats[playerIndex].GetUsername();
+        std::cout << winner << " wins!" << std::endl;
+    }
+}
+
 void Player::PrintLocalState()
 {
     std::cout << "Local State: " << std::endl;
-    std::cout << "\t mHandCards: [";
-    for (int i = 0; i < mHandCards.size() - 1; i++) {
-        std::cout << mHandCards[i] << ", ";
+    if (mHandCards.empty()) {
+        std::cout << "\t mHandCards: []" << std::endl;
     }
-    std::cout << mHandCards.back() << "]" << std::endl;
+    else {
+        std::cout << "\t mHandCards: [";
+        assert(!mHandCards.empty());
+        for (int i = 0; i < mHandCards.size() - 1; i++) {
+            std::cout << mHandCards[i] << ", ";
+        }
+        std::cout << mHandCards.back() << "]" << std::endl;
+    }
 
     std::cout << "\t mLastPlayedCard: " << mLastPlayedCard << std::endl;
     std::cout << "\t mCurrentPlayer: " << mCurrentPlayer << std::endl;

@@ -26,6 +26,8 @@ public:
         mSessions[index]->DeliverInfo<InfoT>(info);
     }
 
+    void Close();
+
 private:
     void Accept();
 

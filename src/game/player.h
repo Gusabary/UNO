@@ -26,9 +26,11 @@ private:
 
     bool CanCardBePlayed(Card cardToPlay);
 
-    void UpdateStateAfterPlay(Card cardPlayed);
+    void UpdateStateAfterPlay(int playerIndex, Card cardPlayed);
 
     int WrapWithPlayerNum(int numToWrap);
+
+    void Win(int playerIndex);
 
     void PrintLocalState();
 
@@ -43,6 +45,7 @@ private:
     int mCurrentPlayer;
     bool mIsInClockwise;
     int mCardsNumToDraw;  // +2 and +4 can accumulate
+    bool mGameEnds{false};
 
     // state of all players
     std::vector<PlayerStat> mPlayerStats;

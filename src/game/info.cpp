@@ -188,6 +188,7 @@ std::ostream& operator<<(std::ostream& os, const GameStartInfo& info)
     os << "\t mFirstPlayer: " << info.mFirstPlayer << std::endl;
 
     os << "\t mUsernames: [";
+    assert(!info.mUsernames.empty());
     for (int i = 0; i < info.mUsernames.size() - 1; i++) {
         os << info.mUsernames[i] << ", ";
     }
@@ -232,6 +233,7 @@ std::ostream& operator<<(std::ostream& os, const DrawRspInfo& info)
     os << "DrawRspInfo Received: " << std::endl;
     os << "\t mNumber: " << info.mNumber << std::endl;
     os << "\t mCards: [";
+    assert(!info.mCards.empty());
     for (int i = 0; i < info.mCards.size() - 1; i++) {
         os << info.mCards[i] << ", ";
     }

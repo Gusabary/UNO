@@ -34,6 +34,8 @@ private:
     
     void HandlePlay(std::unique_ptr<PlayInfo> info);
 
+    void Win();
+
 private:
     constexpr static int PLAYER_NUM = 3;
     Network::Server mServer;
@@ -43,6 +45,7 @@ private:
     std::deque<Card> mDiscardPile;
     int mCurrentPlayer;
     bool mIsInClockwise;
+    bool mGameEnds{false};
 
     // state of all players
     std::vector<PlayerStat> mPlayerStats;

@@ -54,7 +54,7 @@ void GameBoard::StartGame()
 
 void GameBoard::GameLoop()
 {
-    while (true) {
+    while (!mGameEnds) {
         std::unique_ptr<ActionInfo> info = mServer.ReceiveInfo<ActionInfo>(mCurrentPlayer);
         switch (info->mActionType) {
             case ActionType::DRAW:
@@ -121,7 +121,6 @@ void GameBoard::HandleSkip(std::unique_ptr<SkipInfo> info)
 
 void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
 {
-#include "player_stat.h"
     std::cout << *info << std::endl;
     
     // update local state:
@@ -133,7 +132,11 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
     }
 
     // update player stats
-    mPlayerStats[mCurrentPlayer].UpdateAfterPlay(info->mCard);
+    PlayerStat &stat = mPlayerStats[mCurrentPlayer];
+    stat.UpdateAfterPlay(info->mCard);
+    if (stat.GetRemainingHandCardsNum() == 0) {
+        Win();
+    }
 
     // no response to the deliverer
 
@@ -144,6 +147,13 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
             mServer.DeliverInfo<PlayInfo>(i, *info);
         }
     }
+}
+
+void GameBoard::Win()
+{
+    mGameEnds = true;
+    mServer.Close();
+    std::cout << "Game Ends" << std::endl;
 }
 
 void GameBoard::InitDeck()
