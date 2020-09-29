@@ -15,7 +15,7 @@ GameBoard::GameBoard(std::string port)
 void GameBoard::ReceiveUsername(int index, const std::string &username)
 {
     std::cout << "receive, index: " << index << ", username: " << username << std::endl;
-    mUsernames.emplace_back(username);
+    mPlayerStats.emplace_back(username, 7);
     if (index == PLAYER_NUM - 1) {
         StartGame();
     }
@@ -34,7 +34,12 @@ void GameBoard::StartGame()
     std::srand(std::time(nullptr));
     int firstPlayer = std::rand() % PLAYER_NUM;
 
-    std::vector<std::string> tmpUsernames(mUsernames);
+    std::vector<std::string> tmpUsernames;
+    std::for_each(mPlayerStats.begin(), mPlayerStats.end(),
+        [&tmpUsernames](const PlayerStat &stat) {
+            tmpUsernames.push_back(stat.GetUsername());
+        }
+    );
     for (int player = 0; player < PLAYER_NUM; player++) {
         mServer.DeliverInfo<GameStartInfo>(player, 
             GameStartInfo(initHandCards[player], flippedCard, WrapWithPlayerNum(firstPlayer - player), tmpUsernames));
@@ -80,6 +85,9 @@ void GameBoard::HandleDraw(std::unique_ptr<DrawInfo> info)
         cardToDraw = mDeck.front();
         mDeck.pop_front();
     }
+
+    // update player stats
+    mPlayerStats[mCurrentPlayer].UpdateAfterDraw(info->mNumber);
     
     // respond to the deliverer
     mServer.DeliverInfo<DrawRspInfo>(mCurrentPlayer, DrawRspInfo(info->mNumber, cardsToDraw));
@@ -97,6 +105,9 @@ void GameBoard::HandleSkip(std::unique_ptr<SkipInfo> info)
 {
     std::cout << *info << std::endl;
 
+    // update player stats
+    mPlayerStats[mCurrentPlayer].UpdateAfterSkip();
+
     // no response to the deliverer
 
     // broadcast to other players
@@ -110,6 +121,7 @@ void GameBoard::HandleSkip(std::unique_ptr<SkipInfo> info)
 
 void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
 {
+#include "player_stat.h"
     std::cout << *info << std::endl;
     
     // update local state:
@@ -119,6 +131,9 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
     if (info->mCard.mText == CardText::REVERSE) {
         mIsInClockwise = !mIsInClockwise;
     }
+
+    // update player stats
+    mPlayerStats[mCurrentPlayer].UpdateAfterPlay(info->mCard);
 
     // no response to the deliverer
 

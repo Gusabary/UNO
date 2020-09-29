@@ -110,4 +110,14 @@ struct DrawRspInfo : public Info {
 
     friend std::ostream& operator<<(std::ostream& os, const DrawRspInfo& info);
 };
+
+struct GameEndInfo : public Info {
+    int mWinner;
+
+    GameEndInfo() {}
+    GameEndInfo(int winner) : mWinner(winner) {}
+
+    void Serialize(uint8_t *buffer) const;
+    static std::unique_ptr<GameEndInfo> Deserialize(const uint8_t *buffer);
+};
 }}

@@ -30,6 +30,7 @@ enum class MsgType : uint8_t {
     GAME_START,
     ACTION,
     DRAW_RSP,
+    GAME_END
 };
 
 struct Msg {
@@ -79,4 +80,7 @@ struct DrawRspMsg : public Msg {
     Card mCards[];
 };
 
+struct GameEndMsg : public Msg {
+    int mWinner;
+};
 }}

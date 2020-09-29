@@ -5,6 +5,7 @@
 #include <deque>
 #include <cstdlib>
 
+#include "player_stat.h"
 #include "../network/server.h"
 
 namespace UNO { namespace Game {
@@ -43,6 +44,7 @@ private:
     int mCurrentPlayer;
     bool mIsInClockwise;
 
-    std::vector<std::string> mUsernames;
+    // state of all players
+    std::vector<PlayerStat> mPlayerStats;
 };
 }}

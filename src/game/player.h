@@ -2,25 +2,12 @@
 
 #include <memory>
 
+#include "player_stat.h"
 #include "../network/client.h"
 
 namespace UNO { namespace Game {
 
 using namespace Network;
-
-struct PlayerStat {
-    const std::string mUsername;
-    int mRemainingHandCardsNum;
-    bool mDoPlayInLastRound{false};
-    Card mLastPlayedCard{};
-
-    PlayerStat() {}
-    PlayerStat(const std::string &username, int remainingHandCardsNum)
-        : mUsername(username), mRemainingHandCardsNum(remainingHandCardsNum)
-    {}
-    
-    friend std::ostream& operator<<(std::ostream& os, const PlayerStat& stat);
-};
 
 class Player {
 public:
@@ -39,7 +26,7 @@ private:
 
     bool CanCardBePlayed(Card cardToPlay);
 
-    void UpdateStateAfterPlaying(Card cardPlayed);
+    void UpdateStateAfterPlay(Card cardPlayed);
 
     int WrapWithPlayerNum(int numToWrap);
 

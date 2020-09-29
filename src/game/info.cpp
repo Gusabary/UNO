@@ -159,6 +159,22 @@ std::unique_ptr<DrawRspInfo> DrawRspInfo::Deserialize(const uint8_t *buffer)
     return info;
 }
 
+void GameEndInfo::Serialize(uint8_t *buffer) const
+{
+    GameEndMsg *msg = reinterpret_cast<GameEndMsg *>(buffer);
+    msg->mType = MsgType::GAME_END;
+    msg->mLen = sizeof(int);
+    msg->mWinner = mWinner;
+}
+
+std::unique_ptr<GameEndInfo> GameEndInfo::Deserialize(const uint8_t *buffer)
+{
+    const GameEndMsg *msg = reinterpret_cast<const GameEndMsg *>(buffer);
+    std::unique_ptr<GameEndInfo> info = std::make_unique<GameEndInfo>();
+    info->mWinner = msg->mWinner;
+    return info;
+}
+
 std::ostream& operator<<(std::ostream& os, const GameStartInfo& info)
 {
     os << "GameStartInfo Received: " << std::endl;

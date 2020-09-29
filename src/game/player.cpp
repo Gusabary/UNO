@@ -76,7 +76,11 @@ void Player::GameLoop()
                         if (CanCardBePlayed(cardToPlay)) {
                             mHandCards.erase(mHandCards.begin() + cardIndex);
                             mClient.DeliverInfo<PlayInfo>(PlayInfo(cardToPlay));
-                            UpdateStateAfterPlaying(cardToPlay);
+                            mPlayerStats[mCurrentPlayer].UpdateAfterPlay(cardToPlay);
+                            UpdateStateAfterPlay(cardToPlay);
+                            if (mHandCards.empty()) {
+                                // Win();
+                            }
                             break;
                         }
                     }
@@ -110,29 +114,23 @@ void Player::GameLoop()
 void Player::HandleDraw(const std::unique_ptr<DrawInfo> &info)
 {
     std::cout << *info << std::endl;
-    PlayerStat &stat = mPlayerStats[info->mPlayerIndex];
-    stat.mRemainingHandCardsNum += info->mNumber;
-    stat.mDoPlayInLastRound = false;
+    mPlayerStats[info->mPlayerIndex].UpdateAfterDraw(info->mNumber);
 }
 
 void Player::HandleSkip(const std::unique_ptr<SkipInfo> &info)
 {
     std::cout << *info << std::endl;
-    PlayerStat &stat = mPlayerStats[info->mPlayerIndex];
-    stat.mDoPlayInLastRound = false;
+    mPlayerStats[info->mPlayerIndex].UpdateAfterSkip();
 }
 
 void Player::HandlePlay(const std::unique_ptr<PlayInfo> &info)
 {
     std::cout << *info << std::endl;
-    PlayerStat &stat = mPlayerStats[info->mPlayerIndex];
-    stat.mRemainingHandCardsNum -= 1;
-    stat.mDoPlayInLastRound = true;
-    stat.mLastPlayedCard = info->mCard;
-    UpdateStateAfterPlaying(info->mCard);
+    mPlayerStats[info->mPlayerIndex].UpdateAfterPlay(info->mCard);
+    UpdateStateAfterPlay(info->mCard);
 }
 
-void Player::UpdateStateAfterPlaying(Card cardPlayed)
+void Player::UpdateStateAfterPlay(Card cardPlayed)
 {
     mLastPlayedCard = cardPlayed;
     if (cardPlayed.mText == CardText::REVERSE) {
@@ -146,10 +144,6 @@ void Player::UpdateStateAfterPlaying(Card cardPlayed)
     if (cardPlayed.mText == CardText::DRAW_FOUR) {
         mCardsNumToDraw = (mCardsNumToDraw == 1) ? 4 : (mCardsNumToDraw + 4);
     }
-
-    mPlayerStats[mCurrentPlayer].mRemainingHandCardsNum--;
-    mPlayerStats[mCurrentPlayer].mDoPlayInLastRound = true;
-    mPlayerStats[mCurrentPlayer].mLastPlayedCard = cardPlayed;
 }
 
 bool Player::CanCardBePlayed(Card cardToPlay)
@@ -188,13 +182,4 @@ void Player::PrintLocalState()
     std::cout << "\t ]" << std::endl;
 }
 
-std::ostream& operator<<(std::ostream& os, const PlayerStat& stat)
-{
-    os << "\t { " << stat.mUsername << ", " << stat.mRemainingHandCardsNum;
-    if (stat.mDoPlayInLastRound) {
-        os << ", " << stat.mLastPlayedCard;
-    }
-    os << " }";
-    return os;
-}
 }}
