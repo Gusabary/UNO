@@ -28,8 +28,8 @@ void Player::JoinGame()
             mPlayerStats.emplace_back(username, 7);
         }
     );
-    // TODO: if the flippedCard is reverse
-    mIsInClockwise = true;
+
+    mIsInClockwise = (info->mFlippedCard.mText == CardText::REVERSE) ? false : true;
     mCardsNumToDraw = 1;
     GameLoop();
 }

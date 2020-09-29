@@ -43,8 +43,7 @@ void GameBoard::StartGame()
     }
 
     mCurrentPlayer = firstPlayer;
-    // TODO: handle condition that flipped card is reverse
-    mIsInClockwise = true;
+    mIsInClockwise = (flippedCard.mText == CardText::REVERSE) ? false : true;
     GameLoop();
 }
 
