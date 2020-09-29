@@ -9,7 +9,7 @@ namespace UNO { namespace Game {
 using namespace Network;
 
 struct PlayerStat {
-    std::string mUsername;
+    const std::string mUsername;
     int mRemainingHandCardsNum;
     bool mDoPlayInLastRound{false};
     Card mLastPlayedCard{};
@@ -18,6 +18,8 @@ struct PlayerStat {
     PlayerStat(const std::string &username, int remainingHandCardsNum)
         : mUsername(username), mRemainingHandCardsNum(remainingHandCardsNum)
     {}
+    
+    friend std::ostream& operator<<(std::ostream& os, const PlayerStat& stat);
 };
 
 class Player {
@@ -35,8 +37,16 @@ private:
     
     void HandlePlay(const std::unique_ptr<PlayInfo> &info);
 
+    bool CanCardBePlayed(Card cardToPlay);
+
+    void UpdateStateAfterPlaying(Card cardPlayed);
+
+    int WrapWithPlayerNum(int numToWrap);
+
+    void PrintLocalState();
+
 private:
-    std::string mUsername;
+    const std::string mUsername;
     Network::Client mClient;
 
     std::vector<Card> mHandCards;

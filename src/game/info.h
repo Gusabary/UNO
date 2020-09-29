@@ -47,7 +47,7 @@ struct GameStartInfo : public Info {
 
 struct ActionInfo : public Info {
     ActionType mActionType;
-    int mPlayerIndex;
+    int mPlayerIndex{-1};
 
     ActionInfo() {}
     ActionInfo(ActionType actionType) : mActionType(actionType) {}
@@ -87,6 +87,7 @@ struct PlayInfo : public ActionInfo {
     CardColor mNextColor;
 
     PlayInfo() {}
+    PlayInfo(Card card) : PlayInfo(card, card.mColor) {}
     PlayInfo(Card card, CardColor nextColor)
         : ActionInfo(ActionType::PLAY), mCard(card), mNextColor(nextColor) {}
 

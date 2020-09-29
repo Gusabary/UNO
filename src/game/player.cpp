@@ -38,30 +38,49 @@ void Player::GameLoop()
 {
     while (true) {
         if (mCurrentPlayer == 0) {
-            std::string input;
-            std::cout << "Now it's your turn" << std::endl;
-            std::cin >> input;
-            if (input == "D") {
-                // Draw
-                mClient.DeliverInfo<DrawInfo>(DrawInfo(mCardsNumToDraw));
+            char inputBuffer[10];
+            std::cout << "Now it's your turn, your hand cards are: [";
+            for (int i = 0; i < mHandCards.size() - 1; i++) {
+                std::cout << mHandCards[i] << ", ";
+            }
+            std::cout << mHandCards.back() << "]" << std::endl;
+            while (true) {
+                std::cout << "Input (D)raw, (S)kip or (P)lay <card_index>:" << std::endl;
+                std::cin.getline(inputBuffer, 10);
+                std::string input(inputBuffer);
+                if (input == "D") {
+                    // Draw
+                    mClient.DeliverInfo<DrawInfo>(DrawInfo(mCardsNumToDraw));
 
-                // wait for draw rsp msg
-                std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
-                std::cout << *info << std::endl;
+                    // wait for draw rsp msg
+                    std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
+                    std::cout << *info << std::endl;
 
-                std::for_each(info->mCards.begin(), info->mCards.end(),
-                    [this](const Card &card) {
-                        mHandCards.push_back(card);
+                    std::for_each(info->mCards.begin(), info->mCards.end(),
+                        [this](const Card &card) {
+                            mHandCards.push_back(card);
+                        }
+                    );
+                    break;
+                }
+                else if (input == "S") {
+                    // Skip
+                    mClient.DeliverInfo<SkipInfo>(SkipInfo());
+                    break;
+                }
+                else if (input[0] == 'P') {
+                    // Play
+                    int cardIndex = std::stoi(input.substr(1));
+                    if (cardIndex < mHandCards.size()) {
+                        Card cardToPlay = mHandCards[cardIndex];
+                        if (CanCardBePlayed(cardToPlay)) {
+                            mHandCards.erase(mHandCards.begin() + cardIndex);
+                            mClient.DeliverInfo<PlayInfo>(PlayInfo(cardToPlay));
+                            UpdateStateAfterPlaying(cardToPlay);
+                            break;
+                        }
                     }
-                );
-            }
-            else if (input == "S") {
-                // Skip
-                mClient.DeliverInfo<SkipInfo>(SkipInfo());
-            }
-            else if (input == "P") {
-                // Play
-                mClient.DeliverInfo<PlayInfo>(PlayInfo(Card(CardColor::RED, CardText::ZERO), CardColor::YELLOW));
+                }
             }
         }
         else {
@@ -82,8 +101,9 @@ void Player::GameLoop()
             }
         }
 
-        // update local state
-        mCurrentPlayer = (mCurrentPlayer + 1) % mPlayerStats.size();
+        // update mCurrentPlayer
+        mCurrentPlayer = mIsInClockwise ? WrapWithPlayerNum(mCurrentPlayer + 1) : WrapWithPlayerNum(mCurrentPlayer - 1);
+        PrintLocalState();
     }
 }
 
@@ -109,6 +129,72 @@ void Player::HandlePlay(const std::unique_ptr<PlayInfo> &info)
     stat.mRemainingHandCardsNum -= 1;
     stat.mDoPlayInLastRound = true;
     stat.mLastPlayedCard = info->mCard;
-    mLastPlayedCard = info->mCard;
+    UpdateStateAfterPlaying(info->mCard);
+}
+
+void Player::UpdateStateAfterPlaying(Card cardPlayed)
+{
+    mLastPlayedCard = cardPlayed;
+    if (cardPlayed.mText == CardText::REVERSE) {
+        mIsInClockwise = !mIsInClockwise;
+    }
+    if (cardPlayed.mText == CardText::DRAW_TWO) {
+        // in the normal state, mCardsNumToDraw is equal to 1
+        // once a player plays a `Draw` card, the effect is gonna accumulate
+        mCardsNumToDraw = (mCardsNumToDraw == 1) ? 2 : (mCardsNumToDraw + 2);
+    }
+    if (cardPlayed.mText == CardText::DRAW_FOUR) {
+        mCardsNumToDraw = (mCardsNumToDraw == 1) ? 4 : (mCardsNumToDraw + 4);
+    }
+
+    mPlayerStats[mCurrentPlayer].mRemainingHandCardsNum--;
+    mPlayerStats[mCurrentPlayer].mDoPlayInLastRound = true;
+    mPlayerStats[mCurrentPlayer].mLastPlayedCard = cardPlayed;
+}
+
+bool Player::CanCardBePlayed(Card cardToPlay)
+{
+    return true;
+}
+
+int Player::WrapWithPlayerNum(int numToWrap)
+{
+    int playerNum = mPlayerStats.size();
+    int ret = numToWrap % playerNum;
+    if (ret < 0) {
+        ret += playerNum;
+    }
+    return ret;
+}
+
+void Player::PrintLocalState()
+{
+    std::cout << "Local State: " << std::endl;
+    std::cout << "\t mHandCards: [";
+    for (int i = 0; i < mHandCards.size() - 1; i++) {
+        std::cout << mHandCards[i] << ", ";
+    }
+    std::cout << mHandCards.back() << "]" << std::endl;
+
+    std::cout << "\t mLastPlayedCard: " << mLastPlayedCard << std::endl;
+    std::cout << "\t mCurrentPlayer: " << mCurrentPlayer << std::endl;
+    std::cout << "\t mIsInClockwise: " << mIsInClockwise << std::endl;
+    std::cout << "\t mCardsNumToDraw: " << mCardsNumToDraw << std::endl;
+
+    std::cout << "\t mPlayerStats: [" << std::endl;
+    for (const auto &stat : mPlayerStats) {
+        std::cout << "  " << stat << std::endl;
+    }
+    std::cout << "\t ]" << std::endl;
+}
+
+std::ostream& operator<<(std::ostream& os, const PlayerStat& stat)
+{
+    os << "\t { " << stat.mUsername << ", " << stat.mRemainingHandCardsNum;
+    if (stat.mDoPlayInLastRound) {
+        os << ", " << stat.mLastPlayedCard;
+    }
+    os << " }";
+    return os;
 }
 }}
