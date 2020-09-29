@@ -55,3 +55,4 @@ elseif(WIN32)
 endif()
 
 add_subdirectory(cxxopts)
+add_subdirectory(googletest)
