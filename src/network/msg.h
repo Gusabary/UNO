@@ -20,10 +20,14 @@ struct Card {
     CardText mText;
 
     Card() {}
+    Card(const char *str);
     Card(CardColor color, CardText text) : mColor(color), mText(text) {}
 
     friend std::ostream& operator<<(std::ostream& os, const Card& card);
 };
+inline bool operator==(const Card &lhs, const Card &rhs) {
+    return (lhs.mColor == rhs.mColor) && (lhs.mText == rhs.mText);
+}
 
 enum class MsgType : uint8_t {
     JOIN_GAME,

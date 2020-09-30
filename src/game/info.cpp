@@ -63,6 +63,7 @@ void ActionInfo::Serialize(uint8_t *buffer) const
 {
     ActionMsg *msg = reinterpret_cast<ActionMsg *>(buffer);
     msg->mType = MsgType::ACTION;
+    msg->mLen = sizeof(ActionMsg) - sizeof(Msg);
     msg->mActionType = mActionType;
     msg->mPlayerIndex = mPlayerIndex;
 }

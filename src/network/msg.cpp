@@ -2,6 +2,37 @@
 
 namespace UNO { namespace Network {
 
+Card::Card(const char *str)
+{
+    switch (*str) {
+        case 'R': mColor = CardColor::RED;    str++; break;
+        case 'Y': mColor = CardColor::YELLOW; str++; break;
+        case 'G': mColor = CardColor::GREEN;  str++; break;
+        case 'B': mColor = CardColor::BLUE;   str++; break;
+        default:  mColor = CardColor::BLACK;
+    }
+
+    switch (*str) {
+        case '0': mText = CardText::ZERO;    break;
+        case '1': mText = CardText::ONE;     break;
+        case '2': mText = CardText::TWO;     break;
+        case '3': mText = CardText::THREE;   break;
+        case '4': mText = CardText::FOUR;    break;
+        case '5': mText = CardText::FIVE;    break;
+        case '6': mText = CardText::SIX;     break;
+        case '7': mText = CardText::SEVEN;   break;
+        case '8': mText = CardText::EIGHT;   break;
+        case '9': mText = CardText::NINE;    break;
+        case 'S': mText = CardText::SKIP;    break;
+        case 'R': mText = CardText::REVERSE; break;
+        case 'W': mText = CardText::WILD;    break;
+        case '+': mText = (*(str + 1) == '2') ? 
+            CardText::DRAW_TWO : CardText::DRAW_FOUR; 
+            break;
+        default: assert(0);
+    }
+}
+
 std::ostream& operator<<(std::ostream& os, const Card& card)
 {
     std::string color;
