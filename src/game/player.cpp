@@ -75,12 +75,24 @@ void Player::GameLoop()
                     if (cardIndex < mHandCards.size()) {
                         Card cardToPlay = mHandCards[cardIndex];
                         if (CanCardBePlayed(cardToPlay)) {
-                            // TODO: specify next color if playing wild card
-                            mHandCards.erase(mHandCards.begin() + cardIndex);
-                            mClient.DeliverInfo<PlayInfo>(cardToPlay);
-                            // the index of player himself is 0
-                            UpdateStateAfterPlay(0, cardToPlay);
-                            break;
+                            if (cardToPlay.mColor == CardColor::BLACK) {
+                                std::cout << "Specify the next color (R/Y/G/B): " << std::endl;
+                                std::cin.getline(inputBuffer, 10);
+                                char nextColor = *inputBuffer;
+                                if (std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
+                                    mClient.DeliverInfo<PlayInfo>(cardToPlay, 
+                                        Card::ConvertFromCharToColor(nextColor));
+                                    goto PlaySuccess;
+                                }
+                            }
+                            else {
+                                mClient.DeliverInfo<PlayInfo>(cardToPlay);
+                            PlaySuccess:
+                                mHandCards.erase(mHandCards.begin() + cardIndex);
+                                // the index of player himself is 0
+                                UpdateStateAfterPlay(0, cardToPlay);
+                                break;
+                            }
                         }
                     }
                 }

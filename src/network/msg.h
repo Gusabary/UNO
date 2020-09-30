@@ -23,6 +23,8 @@ struct Card {
     Card(const char *str);
     Card(CardColor color, CardText text) : mColor(color), mText(text) {}
 
+    static CardColor ConvertFromCharToColor(char c);
+
     friend std::ostream& operator<<(std::ostream& os, const Card& card);
 };
 inline bool operator==(const Card &lhs, const Card &rhs) {

@@ -33,6 +33,17 @@ Card::Card(const char *str)
     }
 }
 
+CardColor Card::ConvertFromCharToColor(char c)
+{
+    switch (c) {
+        case 'R': return CardColor::RED;
+        case 'Y': return CardColor::YELLOW;
+        case 'G': return CardColor::GREEN;
+        case 'B': return CardColor::BLUE;
+    }
+    assert(0);
+}
+
 std::ostream& operator<<(std::ostream& os, const Card& card)
 {
     std::string color;
