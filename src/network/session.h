@@ -6,7 +6,13 @@
 #include "msg.h"
 #include "../game/info.h"
 
-namespace UNO { namespace Network {
+namespace UNO {
+
+namespace Test {
+    class SessionFixture;
+}
+
+namespace Network {
 
 using asio::ip::tcp;
 
@@ -39,5 +45,7 @@ private:
     tcp::socket mSocket;
     uint8_t mReadBuffer[MAX_BUFFER_SIZE];
     uint8_t mWriteBuffer[MAX_BUFFER_SIZE];
+
+    friend class Test::SessionFixture;
 };
 }}

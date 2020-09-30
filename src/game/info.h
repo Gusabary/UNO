@@ -24,6 +24,8 @@ struct JoinGameInfo : public Info {
 
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<JoinGameInfo> Deserialize(const uint8_t *buffer);
+  
+    friend std::ostream& operator<<(std::ostream& os, const JoinGameInfo& info);
 };
 
 struct GameStartInfo : public Info {

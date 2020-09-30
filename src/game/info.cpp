@@ -174,6 +174,13 @@ std::unique_ptr<GameEndInfo> GameEndInfo::Deserialize(const uint8_t *buffer)
     info->mWinner = msg->mWinner;
     return info;
 }
+    
+std::ostream& operator<<(std::ostream& os, const JoinGameInfo& info)
+{
+    os << "JoinGameInfo Received: " << std::endl;
+    os << "\t mUsername: " << info.mUsername << std::endl;
+    return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const GameStartInfo& info)
 {
