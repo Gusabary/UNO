@@ -42,7 +42,7 @@ void GameBoard::StartGame()
     );
     for (int player = 0; player < PLAYER_NUM; player++) {
         mServer.DeliverInfo<GameStartInfo>(player, 
-            GameStartInfo(initHandCards[player], flippedCard, WrapWithPlayerNum(firstPlayer - player), tmpUsernames));
+            initHandCards[player], flippedCard, WrapWithPlayerNum(firstPlayer - player), tmpUsernames);
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
     }
@@ -90,7 +90,7 @@ void GameBoard::HandleDraw(std::unique_ptr<DrawInfo> info)
     mPlayerStats[mCurrentPlayer].UpdateAfterDraw(info->mNumber);
     
     // respond to the deliverer
-    mServer.DeliverInfo<DrawRspInfo>(mCurrentPlayer, DrawRspInfo(info->mNumber, cardsToDraw));
+    mServer.DeliverInfo<DrawRspInfo>(mCurrentPlayer, info->mNumber, cardsToDraw);
 
     // broadcast to other players
     for (int i = 0; i < PLAYER_NUM; i++) {

@@ -51,7 +51,7 @@ public:
 };
 
 TEST_F(SessionFixture, JoinGame) {
-    mClientSession->DeliverInfo<JoinGameInfo>(JoinGameInfo("tbc"));
+    mClientSession->DeliverInfo<JoinGameInfo>("tbc");
     // here the invokation of run ensures that write will finish before receive
     mClientContext.run();
     
@@ -67,7 +67,7 @@ TEST_F(SessionFixture, JoinGame) {
 TEST_F(SessionFixture, GameStart) {
     std::array<Card, 7> initHandCards{"R1", "W", "+4", "R+2", "YS", "GR", "BW"};
     std::vector<std::string> usernames{"fred", "daniel", "greg", "cissie"};
-    mClientSession->DeliverInfo<GameStartInfo>(GameStartInfo(initHandCards, "B0", 1, usernames));
+    mClientSession->DeliverInfo<GameStartInfo>(initHandCards, "B0", 1, usernames);
     mClientContext.run();
 
     mServerThread->join();
@@ -80,7 +80,7 @@ TEST_F(SessionFixture, GameStart) {
 }
 
 TEST_F(SessionFixture, Action) {
-    mClientSession->DeliverInfo<ActionInfo>(ActionInfo(ActionType::DRAW));
+    mClientSession->DeliverInfo<ActionInfo>(ActionType::DRAW);
     mClientContext.run();
 
     mServerThread->join();

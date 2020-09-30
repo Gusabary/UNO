@@ -13,7 +13,7 @@ Player::Player(std::string username, std::string host, std::string port)
 void Player::JoinGame()
 {
     std::cout << "connect success, sending username to server" << std::endl;
-    mClient.DeliverInfo<JoinGameInfo>(JoinGameInfo(mUsername));
+    mClient.DeliverInfo<JoinGameInfo>(mUsername);
 
     // wait for game start
     std::unique_ptr<GameStartInfo> info = mClient.ReceiveInfo<GameStartInfo>();
@@ -51,7 +51,7 @@ void Player::GameLoop()
                 std::string input(inputBuffer);
                 if (input == "D") {
                     // Draw
-                    mClient.DeliverInfo<DrawInfo>(DrawInfo(mCardsNumToDraw));
+                    mClient.DeliverInfo<DrawInfo>(mCardsNumToDraw);
 
                     // wait for draw rsp msg
                     std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
@@ -66,7 +66,7 @@ void Player::GameLoop()
                 }
                 else if (input == "S") {
                     // Skip
-                    mClient.DeliverInfo<SkipInfo>(SkipInfo());
+                    mClient.DeliverInfo<SkipInfo>();
                     break;
                 }
                 else if (input[0] == 'P') {
@@ -77,7 +77,7 @@ void Player::GameLoop()
                         if (CanCardBePlayed(cardToPlay)) {
                             // TODO: specify next color if playing wild card
                             mHandCards.erase(mHandCards.begin() + cardIndex);
-                            mClient.DeliverInfo<PlayInfo>(PlayInfo(cardToPlay));
+                            mClient.DeliverInfo<PlayInfo>(cardToPlay);
                             // the index of player himself is 0
                             UpdateStateAfterPlay(0, cardToPlay);
                             break;

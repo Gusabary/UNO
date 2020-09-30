@@ -26,8 +26,9 @@ public:
         return InfoT::Deserialize(mReadBuffer);
     }
 
-    template <typename InfoT>
-    void DeliverInfo(const InfoT &info) {
+    template <typename InfoT, typename... Types>
+    void DeliverInfo(Types&&... args) {
+        InfoT info(args...);
         info.Serialize(mWriteBuffer);
         Write();
     }

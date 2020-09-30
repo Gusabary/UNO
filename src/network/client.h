@@ -21,9 +21,9 @@ public:
         return mSession->ReceiveInfo<InfoT>();
     }
 
-    template <typename InfoT>
-    void DeliverInfo(const InfoT &info) {
-        mSession->DeliverInfo<InfoT>(info);
+    template <typename InfoT, typename... Types>
+    void DeliverInfo(Types&&... args) {
+        mSession->DeliverInfo<InfoT>(args...);
     }
 
 public:
