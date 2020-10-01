@@ -164,7 +164,36 @@ void Player::UpdateStateAfterPlay(int playerIndex, Card cardPlayed)
 
 bool Player::CanCardBePlayed(Card cardToPlay)
 {
-    return true;
+    std::set<CardText> specialTexts{CardText::SKIP, CardText::REVERSE, 
+        CardText::DRAW_TWO, CardText::WILD, CardText::DRAW_FOUR};
+    
+    // special cards can not be played as the last one
+    if (mHandCards.size() == 1 && specialTexts.count(cardToPlay.mText)) {
+        return false;
+    }
+
+    // if the last played card is skip, you can only play a skip
+    if (mLastPlayedCard.mText == CardText::SKIP) {
+        return cardToPlay.mText == CardText::SKIP;
+    }
+
+    // if the last played card is draw two, you can only play a draw two or draw four
+    if (mLastPlayedCard.mText == CardText::DRAW_TWO) {
+        return (cardToPlay.mText == CardText::DRAW_TWO || cardToPlay.mText == CardText::DRAW_FOUR);
+    }
+
+    // if the last played card is draw four, you can only play a draw four
+    if (mLastPlayedCard.mText == CardText::DRAW_FOUR) {
+        return cardToPlay.mText == CardText::DRAW_FOUR;
+    }
+
+    // wild card can always be played except above conditions
+    if (cardToPlay.mColor == CardColor::BLACK) {
+        return true;
+    }
+
+    // if not wild card, only cards with the same num or color can be played
+    return (cardToPlay.mColor == mLastPlayedCard.mColor || cardToPlay.mText == mLastPlayedCard.mText);
 }
 
 int Player::WrapWithPlayerNum(int numToWrap)

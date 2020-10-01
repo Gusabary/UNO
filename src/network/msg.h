@@ -11,8 +11,16 @@ enum class CardColor : uint8_t {
 std::ostream& operator<<(std::ostream& os, const CardColor& color);
 
 enum class CardText : uint8_t {
-    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, 
-    EIGHT, NINE, SKIP, REVERSE, DRAW_TWO, WILD, DRAW_FOUR
+    ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, 
+    SKIP, REVERSE, DRAW_TWO, WILD, DRAW_FOUR, EMPTY
+    /**
+     * EMPTY is for conditions like:
+     *   1. in the game start, the flipped card is yellow +2,
+     *      now for the first player, the last played card is `yellow empty`,
+     *      which means he can only play a yellow or wild card
+     *   2. player A played a yellow +2 / +4, player B got the draw,
+     *      now for player C, the last played card is `yellow empty`
+     */
 };
 
 struct Card {
