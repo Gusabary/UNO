@@ -2,7 +2,15 @@
 
 namespace UNO { namespace Game {
 
-void HandCards::GetInitHandCards(const std::array<Card, 7> &cards)
+const std::initializer_list<CardColor> Card::NonWildColors = 
+    { CardColor::RED, CardColor::YELLOW, CardColor::GREEN, CardColor::BLUE };
+
+const std::initializer_list<CardText> Card::NonWildTexts = 
+    { CardText::ZERO, CardText::ONE, CardText::TWO, CardText::THREE, CardText::FOUR, 
+      CardText::FIVE, CardText::SIX, CardText::SEVEN, CardText::EIGHT, CardText::NINE, 
+      CardText::SKIP, CardText::REVERSE, CardText::DRAW_TWO };
+
+HandCards::HandCards(const std::array<Card, 7> &cards)
 {
     mCards.resize(cards.size());
     std::copy(cards.begin(), cards.end(), mCards.begin());
@@ -63,6 +71,48 @@ bool Card::CanBePlayerAfter(Card lastPlayedCard, bool isUno)
 
     // if not wild card, only cards with the same num or color can be played
     return (mColor == lastPlayedCard.mColor || mText == lastPlayedCard.mText);
+}
+
+void Deck::Init()
+{
+    for (auto color : Card::NonWildColors) {
+        for (auto text : Card::NonWildTexts) {
+            PushFront(color, text);
+            if (text != CardText::ZERO) {
+                // in UNO, there is only one zero for each color
+                // and two cards for other text (except wild and wild draw four)
+                PushFront(color, text);
+            }
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        // there are four `wild` and `wild draw four` each
+        PushFront(CardColor::BLACK, CardText::WILD);
+        PushFront(CardColor::BLACK, CardText::DRAW_FOUR);
+    }
+
+    Shuffle();
+}
+
+std::vector<std::array<Card, 7>> Deck::DealInitHandCards(int playerNum)
+{
+    std::vector<std::array<Card, 7>> initHandCards(playerNum);
+    for (int card = 0; card < 7; card++) {
+        for (int player = 0; player < playerNum; player++) {
+            initHandCards[player][card] = Draw();
+        }
+    }
+    return initHandCards;
+}
+
+Card Deck::Draw()
+{
+    if (Empty()) {
+        Swap(mDiscardPile);
+        Shuffle();
+    }
+    return PopFront();
 }
 
 std::ostream& operator<<(std::ostream& os, const HandCards& handCards)

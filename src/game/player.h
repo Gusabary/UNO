@@ -37,7 +37,7 @@ private:
     const std::string mUsername;
     Network::Client mClient;
 
-    HandCards mHandCards;
+    std::unique_ptr<HandCards> mHandCards;
 
     // state of game board
     Card mLastPlayedCard;

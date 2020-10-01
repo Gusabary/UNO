@@ -3,7 +3,8 @@
 namespace UNO { namespace Game {
 
 GameBoard::GameBoard(std::string port)
-    : mServer(port)
+    : mServer(port), mDiscardPile(std::make_unique<DiscardPile>()),
+    mDeck(std::make_unique<Deck>(*mDiscardPile))
 {
     mServer.OnReceiveJoinGameInfo = [this](int index, const JoinGameInfo &info) {
         ReceiveUsername(index, info.mUsername);
@@ -23,17 +24,16 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
 
 void GameBoard::StartGame()
 {
-    InitDeck();
-    std::vector<std::array<Card, 7>> initHandCards = DealInitHandCards();
+    mDeck->Init();
+    std::vector<std::array<Card, 7>> initHandCards = mDeck->DealInitHandCards(PLAYER_NUM);
 
     // flip a card
     Card flippedCard;
     while (true) {
-        flippedCard = mDeck.front();
-        mDeck.pop_front();
+        flippedCard = mDeck->Draw();
         if (flippedCard.mColor == CardColor::BLACK) {
             // if the flipped card is a wild card, put it to under the deck and flip a new one
-            mDeck.push_back(flippedCard);
+            mDeck->PutToBottom(flippedCard);
         }
         else {
             break;
@@ -92,8 +92,7 @@ void GameBoard::HandleDraw(std::unique_ptr<DrawInfo> info)
     // draw from deck
     std::vector<Card> cardsToDraw(info->mNumber);
     for (auto &cardToDraw : cardsToDraw) {
-        cardToDraw = mDeck.front();
-        mDeck.pop_front();
+        cardToDraw = mDeck->Draw();
     }
 
     // update player stats
@@ -136,7 +135,7 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
     // update local state:
     // add the card just played into discard pile
     // and reverse mIsInClockwise if necessary
-    mDiscardPile.push_front(info->mCard);
+    mDiscardPile->Add(info->mCard);
     if (info->mCard.mText == CardText::REVERSE) {
         mIsInClockwise = !mIsInClockwise;
     }
@@ -164,53 +163,6 @@ void GameBoard::Win()
     mGameEnds = true;
     mServer.Close();
     std::cout << "Game Ends" << std::endl;
-}
-
-void GameBoard::InitDeck()
-{
-    std::initializer_list<CardColor> colors = { CardColor::RED, CardColor::YELLOW, 
-        CardColor::GREEN, CardColor::BLUE };
-    
-    std::initializer_list<CardText> texts = { CardText::ZERO, CardText::ONE, CardText::TWO, 
-        CardText::THREE, CardText::FOUR, CardText::FIVE, CardText::SIX, CardText::SEVEN, 
-        CardText::EIGHT, CardText::NINE, CardText::SKIP, CardText::REVERSE, CardText::DRAW_TWO};
-    
-    mDeck.clear();
-    for (auto color : colors) {
-        for (auto text : texts) {
-            mDeck.emplace_back(color, text);
-            if (text != CardText::ZERO) {
-                // in UNO, there is only one zero for each color
-                // and two cards for other text (except wild and wild draw four)
-                mDeck.emplace_back(color, text);
-            }
-        }
-    }
-
-   for (int i = 0; i < 4; i++) {
-        // there are four `wild` and `wild draw four` each
-        mDeck.emplace_back(CardColor::BLACK, CardText::WILD);
-        mDeck.emplace_back(CardColor::BLACK, CardText::DRAW_FOUR);
-    }
-
-    // shuffle
-    std::random_device rd;
-    std::mt19937 g(rd());
-    std::shuffle(mDeck.begin(), mDeck.end(), g);
-
-    mDiscardPile.clear();
-}
-
-std::vector<std::array<Card, 7>> GameBoard::DealInitHandCards()
-{
-    std::vector<std::array<Card, 7>> initHandCards(PLAYER_NUM);
-    for (int card = 0; card < 7; card++) {
-        for (int player = 0; player < PLAYER_NUM; player++) {
-            initHandCards[player][card] = mDeck.front();
-            mDeck.pop_front();
-        }
-    }
-    return initHandCards;
 }
 
 int GameBoard::WrapWithPlayerNum(int numToWrap)

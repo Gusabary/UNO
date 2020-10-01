@@ -19,7 +19,7 @@ void Player::JoinGame()
     std::unique_ptr<GameStartInfo> info = mClient.ReceiveInfo<GameStartInfo>();
     std::cout << *info << std::endl;
 
-    mHandCards.GetInitHandCards(info->mInitHandCards);
+    mHandCards.reset(new HandCards(info->mInitHandCards));
     mLastPlayedCard = info->mFlippedCard;
     mCurrentPlayer = info->mFirstPlayer;
     std::for_each(info->mUsernames.begin(), info->mUsernames.end(), 
@@ -39,7 +39,7 @@ void Player::GameLoop()
         if (mCurrentPlayer == 0) {
             char inputBuffer[10];
             std::cout << "Now it's your turn." << std::endl;
-            std::cout << mHandCards << std::endl;
+            std::cout << *mHandCards << std::endl;
             while (true) {
                 std::cout << "Input (D)raw, (S)kip or (P)lay <card_index>:" << std::endl;
                 std::cin.getline(inputBuffer, 10);
@@ -52,7 +52,7 @@ void Player::GameLoop()
                     std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
                     std::cout << *info << std::endl;
 
-                    mHandCards.Draw(info->mCards);
+                    mHandCards->Draw(info->mCards);
                     break;
                 }
                 else if (input == "S") {
@@ -64,7 +64,7 @@ void Player::GameLoop()
                     // Play
                     int cardIndex = std::stoi(input.substr(1));
                     char nextColor = ' ';
-                    Card cardToPlay = mHandCards.At(cardIndex);
+                    Card cardToPlay = mHandCards->At(cardIndex);
                     if (cardToPlay.mColor == CardColor::BLACK) {
                         while (!std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
                             std::cout << "Specify the next color (R/Y/G/B): " << std::endl;
@@ -72,7 +72,7 @@ void Player::GameLoop()
                             nextColor = *inputBuffer;
                         }
                     }
-                    if (mHandCards.Play(cardIndex, mLastPlayedCard)) {
+                    if (mHandCards->Play(cardIndex, mLastPlayedCard)) {
                         if (nextColor == ' ') {
                             mClient.DeliverInfo<PlayInfo>(cardToPlay);
                         }
@@ -175,7 +175,7 @@ void Player::Win(int playerIndex)
 void Player::PrintLocalState()
 {
     std::cout << "Local State: " << std::endl;
-    std::cout << "\t " << mHandCards << std::endl;
+    std::cout << "\t " << *mHandCards << std::endl;
     std::cout << "\t mLastPlayedCard: " << mLastPlayedCard << std::endl;
     std::cout << "\t mCurrentPlayer: " << mCurrentPlayer << std::endl;
     std::cout << "\t mIsInClockwise: " << mIsInClockwise << std::endl;

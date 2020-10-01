@@ -56,3 +56,25 @@
     std::vector<int> v;
     std::cout << v.size() - 1 << std::endl;  // 18446744073709551615
     ```
+
++ `constexpr` does not always have an address. for example, the following code will complain `undefined reference to 'Card::NonWildColors'`. that is because `Card::NonWildColors` doesn't have an address, which cannot be traversed in a range-based loop
+
+    ```c++
+    struct Card {
+        constexpr static std::initializer_list<CardColor> NonWildColors = {/*data*/};
+    };
+
+    for (auto color : Card::NonWildColors) {
+        // do something
+    }
+    ```
+
+    the right way is to declare as `const static` and define somewhere else:
+
+    ```c++
+    struct Card {
+        const static std::initializer_list<CardColor> NonWildColors;
+    };
+
+    const std::initializer_list<CardText> Card::NonWildTexts = {/*data*/};
+    ```

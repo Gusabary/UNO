@@ -21,9 +21,6 @@ private:
 
     void StartGame();
 
-    void InitDeck();
-    std::vector<std::array<Card, 7>> DealInitHandCards();
-
     int WrapWithPlayerNum(int numToWrap);
 
     void GameLoop();
@@ -41,8 +38,8 @@ private:
     Network::Server mServer;
 
     // state of game board
-    std::deque<Card> mDeck;
-    std::deque<Card> mDiscardPile;
+    std::unique_ptr<Deck> mDeck;
+    std::unique_ptr<DiscardPile> mDiscardPile;
     int mCurrentPlayer;
     bool mIsInClockwise;
     bool mGameEnds{false};
