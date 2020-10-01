@@ -19,8 +19,7 @@ void Player::JoinGame()
     std::unique_ptr<GameStartInfo> info = mClient.ReceiveInfo<GameStartInfo>();
     std::cout << *info << std::endl;
 
-    mHandCards.resize(info->mInitHandCards.size());
-    std::copy(info->mInitHandCards.begin(), info->mInitHandCards.end(), mHandCards.begin());
+    mHandCards.GetInitHandCards(info->mInitHandCards);
     mLastPlayedCard = info->mFlippedCard;
     mCurrentPlayer = info->mFirstPlayer;
     std::for_each(info->mUsernames.begin(), info->mUsernames.end(), 
@@ -39,12 +38,8 @@ void Player::GameLoop()
     while (!mGameEnds) {
         if (mCurrentPlayer == 0) {
             char inputBuffer[10];
-            std::cout << "Now it's your turn, your hand cards are: [";
-            assert(!mHandCards.empty());
-            for (int i = 0; i < mHandCards.size() - 1; i++) {
-                std::cout << mHandCards[i] << ", ";
-            }
-            std::cout << mHandCards.back() << "]" << std::endl;
+            std::cout << "Now it's your turn." << std::endl;
+            std::cout << mHandCards << std::endl;
             while (true) {
                 std::cout << "Input (D)raw, (S)kip or (P)lay <card_index>:" << std::endl;
                 std::cin.getline(inputBuffer, 10);
@@ -57,11 +52,7 @@ void Player::GameLoop()
                     std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
                     std::cout << *info << std::endl;
 
-                    std::for_each(info->mCards.begin(), info->mCards.end(),
-                        [this](const Card &card) {
-                            mHandCards.push_back(card);
-                        }
-                    );
+                    mHandCards.Draw(info->mCards);
                     break;
                 }
                 else if (input == "S") {
@@ -72,28 +63,25 @@ void Player::GameLoop()
                 else if (input[0] == 'P') {
                     // Play
                     int cardIndex = std::stoi(input.substr(1));
-                    if (cardIndex < mHandCards.size()) {
-                        Card cardToPlay = mHandCards[cardIndex];
-                        if (CanCardBePlayed(cardToPlay)) {
-                            if (cardToPlay.mColor == CardColor::BLACK) {
-                                std::cout << "Specify the next color (R/Y/G/B): " << std::endl;
-                                std::cin.getline(inputBuffer, 10);
-                                char nextColor = *inputBuffer;
-                                if (std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
-                                    mClient.DeliverInfo<PlayInfo>(cardToPlay, 
-                                        Card::ConvertFromCharToColor(nextColor));
-                                    goto PlaySuccess;
-                                }
-                            }
-                            else {
-                                mClient.DeliverInfo<PlayInfo>(cardToPlay);
-                            PlaySuccess:
-                                mHandCards.erase(mHandCards.begin() + cardIndex);
-                                // the index of player himself is 0
-                                UpdateStateAfterPlay(0, cardToPlay);
-                                break;
-                            }
+                    char nextColor = ' ';
+                    Card cardToPlay = mHandCards.At(cardIndex);
+                    if (cardToPlay.mColor == CardColor::BLACK) {
+                        while (!std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
+                            std::cout << "Specify the next color (R/Y/G/B): " << std::endl;
+                            std::cin.getline(inputBuffer, 10);
+                            nextColor = *inputBuffer;
                         }
+                    }
+                    if (mHandCards.Play(cardIndex, mLastPlayedCard)) {
+                        if (nextColor == ' ') {
+                            mClient.DeliverInfo<PlayInfo>(cardToPlay);
+                        }
+                        else {
+                            mClient.DeliverInfo<PlayInfo>(cardToPlay, Card::FromChar(nextColor));
+                        }
+                        // the index of player himself is 0
+                        UpdateStateAfterPlay(0, cardToPlay);
+                        break;
                     }
                 }
             }
@@ -162,40 +150,6 @@ void Player::UpdateStateAfterPlay(int playerIndex, Card cardPlayed)
     }
 }
 
-bool Player::CanCardBePlayed(Card cardToPlay)
-{
-    std::set<CardText> specialTexts{CardText::SKIP, CardText::REVERSE, 
-        CardText::DRAW_TWO, CardText::WILD, CardText::DRAW_FOUR};
-    
-    // special cards can not be played as the last one
-    if (mHandCards.size() == 1 && specialTexts.count(cardToPlay.mText)) {
-        return false;
-    }
-
-    // if the last played card is skip, you can only play a skip
-    if (mLastPlayedCard.mText == CardText::SKIP) {
-        return cardToPlay.mText == CardText::SKIP;
-    }
-
-    // if the last played card is draw two, you can only play a draw two or draw four
-    if (mLastPlayedCard.mText == CardText::DRAW_TWO) {
-        return (cardToPlay.mText == CardText::DRAW_TWO || cardToPlay.mText == CardText::DRAW_FOUR);
-    }
-
-    // if the last played card is draw four, you can only play a draw four
-    if (mLastPlayedCard.mText == CardText::DRAW_FOUR) {
-        return cardToPlay.mText == CardText::DRAW_FOUR;
-    }
-
-    // wild card can always be played except above conditions
-    if (cardToPlay.mColor == CardColor::BLACK) {
-        return true;
-    }
-
-    // if not wild card, only cards with the same num or color can be played
-    return (cardToPlay.mColor == mLastPlayedCard.mColor || cardToPlay.mText == mLastPlayedCard.mText);
-}
-
 int Player::WrapWithPlayerNum(int numToWrap)
 {
     int playerNum = mPlayerStats.size();
@@ -221,18 +175,7 @@ void Player::Win(int playerIndex)
 void Player::PrintLocalState()
 {
     std::cout << "Local State: " << std::endl;
-    if (mHandCards.empty()) {
-        std::cout << "\t mHandCards: []" << std::endl;
-    }
-    else {
-        std::cout << "\t mHandCards: [";
-        assert(!mHandCards.empty());
-        for (int i = 0; i < mHandCards.size() - 1; i++) {
-            std::cout << mHandCards[i] << ", ";
-        }
-        std::cout << mHandCards.back() << "]" << std::endl;
-    }
-
+    std::cout << "\t " << mHandCards << std::endl;
     std::cout << "\t mLastPlayedCard: " << mLastPlayedCard << std::endl;
     std::cout << "\t mCurrentPlayer: " << mCurrentPlayer << std::endl;
     std::cout << "\t mIsInClockwise: " << mIsInClockwise << std::endl;

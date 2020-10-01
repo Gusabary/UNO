@@ -25,8 +25,6 @@ private:
     
     void HandlePlay(const std::unique_ptr<PlayInfo> &info);
 
-    bool CanCardBePlayed(Card cardToPlay);
-
     void UpdateStateAfterPlay(int playerIndex, Card cardPlayed);
 
     int WrapWithPlayerNum(int numToWrap);
@@ -39,7 +37,7 @@ private:
     const std::string mUsername;
     Network::Client mClient;
 
-    std::vector<Card> mHandCards;
+    HandCards mHandCards;
 
     // state of game board
     Card mLastPlayedCard;
