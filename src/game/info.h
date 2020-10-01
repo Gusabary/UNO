@@ -66,7 +66,7 @@ struct ActionInfo : public Info {
 struct DrawInfo : public ActionInfo {
     int mNumber;
 
-    DrawInfo() {}
+    DrawInfo() : ActionInfo(ActionType::DRAW) {}
     DrawInfo(int number) : ActionInfo(ActionType::DRAW), mNumber(number) {}
 
     void Serialize(uint8_t *buffer) const;
@@ -88,7 +88,7 @@ struct PlayInfo : public ActionInfo {
     Card mCard;
     CardColor mNextColor;
 
-    PlayInfo() {}
+    PlayInfo() : ActionInfo(ActionType::PLAY) {}
     PlayInfo(Card card) : PlayInfo(card, card.mColor) {}
     PlayInfo(Card card, CardColor nextColor)
         : ActionInfo(ActionType::PLAY), mCard(card), mNextColor(nextColor) {}
@@ -104,7 +104,7 @@ struct DrawRspInfo : public Info {
     std::vector<Card> mCards;
 
     DrawRspInfo() {}
-    DrawRspInfo(int number, const std::vector<Card> cards) 
+    DrawRspInfo(int number, const std::vector<Card> &cards) 
         : mNumber(number), mCards(cards) {}
 
     void Serialize(uint8_t *buffer) const;

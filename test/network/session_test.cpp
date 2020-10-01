@@ -18,8 +18,8 @@ public:
 
     void SetUp() {
         mServerThread.reset(new std::thread([this]() { SetUpServer(); }));
-        // is it necessary to **sleep** to ensure that connect is after accept?
-        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        // it's necessary to **sleep** to ensure that connect is after accept
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
         SetUpClient();
     }
 
@@ -50,7 +50,7 @@ public:
     std::unique_ptr<std::thread> mServerThread;
 };
 
-TEST_F(SessionFixture, JoinGame) {
+TEST_F(SessionFixture, JoinGameInfo) {
     mClientSession->DeliverInfo<JoinGameInfo>("tbc");
     // here the invokation of run ensures that write will finish before receive
     mClientContext.run();
@@ -64,7 +64,7 @@ TEST_F(SessionFixture, JoinGame) {
     EXPECT_EQ(info->mUsername, "tbc");
 }
 
-TEST_F(SessionFixture, GameStart) {
+TEST_F(SessionFixture, GameStartInfo) {
     std::array<Card, 7> initHandCards{"R1", "W", "+4", "R+2", "YS", "GR", "BW"};
     std::vector<std::string> usernames{"fred", "daniel", "greg", "cissie"};
     mClientSession->DeliverInfo<GameStartInfo>(initHandCards, "B0", 1, usernames);
@@ -79,7 +79,7 @@ TEST_F(SessionFixture, GameStart) {
     EXPECT_EQ(info->mUsernames, usernames);
 }
 
-TEST_F(SessionFixture, Action) {
+TEST_F(SessionFixture, ActionInfo) {
     mClientSession->DeliverInfo<ActionInfo>(ActionType::DRAW);
     mClientContext.run();
 
@@ -90,4 +90,64 @@ TEST_F(SessionFixture, Action) {
     EXPECT_EQ(info->mPlayerIndex, -1);
 }
 
+TEST_F(SessionFixture, DrawInfo) {
+    mClientSession->DeliverInfo<DrawInfo>(2);
+    mClientContext.run();
+
+    mServerThread->join();
+    std::unique_ptr<DrawInfo> info = mServerSession->ReceiveInfo<DrawInfo>();
+
+    EXPECT_EQ(info->mActionType, ActionType::DRAW);
+    EXPECT_EQ(info->mPlayerIndex, -1);
+    EXPECT_EQ(info->mNumber, 2);
+}
+
+TEST_F(SessionFixture, SkipInfo) {
+    mClientSession->DeliverInfo<SkipInfo>();
+    mClientContext.run();
+
+    mServerThread->join();
+    std::unique_ptr<SkipInfo> info = mServerSession->ReceiveInfo<SkipInfo>();
+    
+    EXPECT_EQ(info->mActionType, ActionType::SKIP);
+    EXPECT_EQ(info->mPlayerIndex, -1);
+}
+
+TEST_F(SessionFixture, PlayInfoWithoutNextColor) {
+    mClientSession->DeliverInfo<PlayInfo>("R6");
+    mClientContext.run();
+
+    mServerThread->join();
+    std::unique_ptr<PlayInfo> info = mServerSession->ReceiveInfo<PlayInfo>();
+
+    EXPECT_EQ(info->mActionType, ActionType::PLAY);
+    EXPECT_EQ(info->mPlayerIndex, -1);
+    EXPECT_EQ(info->mCard, "R6");
+    EXPECT_EQ(info->mNextColor, CardColor::RED);
+}
+
+TEST_F(SessionFixture, PlayInfoWithNextColor) {
+    mClientSession->DeliverInfo<PlayInfo>("W", CardColor::BLUE);
+    mClientContext.run();
+
+    mServerThread->join();
+    std::unique_ptr<PlayInfo> info = mServerSession->ReceiveInfo<PlayInfo>();
+
+    EXPECT_EQ(info->mActionType, ActionType::PLAY);
+    EXPECT_EQ(info->mPlayerIndex, -1);
+    EXPECT_EQ(info->mCard, "W");
+    EXPECT_EQ(info->mNextColor, CardColor::BLUE);
+}
+
+TEST_F(SessionFixture, DrawRspInfo) {
+    mServerThread->join();
+    std::vector<Card> cards{"R2", "+4"};
+    mServerSession->DeliverInfo<DrawRspInfo>(2, cards);
+    mServerContext.run();
+
+    std::unique_ptr<DrawRspInfo> info = mClientSession->ReceiveInfo<DrawRspInfo>();
+
+    EXPECT_EQ(info->mNumber, 2);
+    EXPECT_EQ(info->mCards, cards);
+}
 }}
