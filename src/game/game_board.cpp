@@ -27,8 +27,18 @@ void GameBoard::StartGame()
     std::vector<std::array<Card, 7>> initHandCards = DealInitHandCards();
 
     // flip a card
-    Card flippedCard = mDeck.front();
-    mDeck.pop_front();
+    Card flippedCard;
+    while (true) {
+        flippedCard = mDeck.front();
+        mDeck.pop_front();
+        if (flippedCard.mColor == CardColor::BLACK) {
+            // if the flipped card is a wild card, put it to under the deck and flip a new one
+            mDeck.push_back(flippedCard);
+        }
+        else {
+            break;
+        }
+    }
 
     // choose the first player randomly
     std::srand(std::time(nullptr));
