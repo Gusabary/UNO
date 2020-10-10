@@ -5,7 +5,7 @@
 #include <deque>
 #include <cstdlib>
 
-#include "player_stat.h"
+#include "stat.h"
 #include "../network/server.h"
 
 namespace UNO { namespace Game {
@@ -20,8 +20,6 @@ private:
     void ReceiveUsername(int index, const std::string &username);
 
     void StartGame();
-
-    int WrapWithPlayerNum(int numToWrap);
 
     void GameLoop();
     
@@ -40,9 +38,7 @@ private:
     // state of game board
     std::unique_ptr<Deck> mDeck;
     std::unique_ptr<DiscardPile> mDiscardPile;
-    int mCurrentPlayer;
-    bool mIsInClockwise;
-    bool mGameEnds{false};
+    std::unique_ptr<GameStat> mGameStat;
 
     // state of all players
     std::vector<PlayerStat> mPlayerStats;

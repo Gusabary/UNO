@@ -3,7 +3,7 @@
 #include <memory>
 #include <set>
 
-#include "player_stat.h"
+#include "stat.h"
 #include "../network/client.h"
 #include "../ui/ui_manager.h"
 
@@ -29,8 +29,6 @@ private:
 
     void UpdateStateAfterPlay(int playerIndex, Card cardPlayed);
 
-    int WrapWithPlayerNum(int numToWrap);
-
     void Win(int playerIndex);
 
     void PrintLocalState();
@@ -43,11 +41,7 @@ private:
     std::unique_ptr<UIManager> mUIManager;
 
     // state of game board
-    Card mLastPlayedCard;
-    int mCurrentPlayer;
-    bool mIsInClockwise;
-    int mCardsNumToDraw;  // +2 and +4 can accumulate
-    bool mGameEnds{false};
+    std::unique_ptr<GameStat> mGameStat;
 
     // state of all players
     std::vector<PlayerStat> mPlayerStats;

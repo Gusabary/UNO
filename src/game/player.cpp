@@ -21,23 +21,20 @@ void Player::JoinGame()
     std::cout << *info << std::endl;
 
     mHandCards.reset(new HandCards(info->mInitHandCards));
-    mLastPlayedCard = info->mFlippedCard;
-    mCurrentPlayer = info->mFirstPlayer;
+    mGameStat.reset(new GameStat(*info));
     std::for_each(info->mUsernames.begin(), info->mUsernames.end(), 
         [this](const std::string &username) {
             mPlayerStats.emplace_back(username, 7);
         }
     );
 
-    mIsInClockwise = (info->mFlippedCard.mText == CardText::REVERSE) ? false : true;
-    mCardsNumToDraw = 1;
     GameLoop();
 }
 
 void Player::GameLoop()
 {
-    while (!mGameEnds) {
-        if (mCurrentPlayer == 0) {
+    while (!mGameStat->DoesGameEnd()) {
+        if (mGameStat->IsMyTurn()) {
             char inputBuffer[10];
             std::cout << "Now it's your turn." << std::endl;
             std::cout << *mHandCards << std::endl;
@@ -47,7 +44,7 @@ void Player::GameLoop()
                 std::string input(inputBuffer);
                 if (input == "D") {
                     // Draw
-                    mClient.DeliverInfo<DrawInfo>(mCardsNumToDraw);
+                    mClient.DeliverInfo<DrawInfo>(mGameStat->GetCardsNumToDraw());
 
                     // wait for draw rsp msg
                     std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
@@ -73,7 +70,7 @@ void Player::GameLoop()
                             nextColor = *inputBuffer;
                         }
                     }
-                    if (mHandCards->Play(cardIndex, mLastPlayedCard)) {
+                    if (mHandCards->Play(cardIndex, mGameStat->GetLastPlayedCard())) {
                         if (nextColor == ' ') {
                             mClient.DeliverInfo<PlayInfo>(cardToPlay);
                         }
@@ -106,10 +103,9 @@ void Player::GameLoop()
         }
 
         // update mCurrentPlayer
-        mCurrentPlayer = mIsInClockwise ? WrapWithPlayerNum(mCurrentPlayer + 1) 
-            : WrapWithPlayerNum(mCurrentPlayer - 1);
+        mGameStat->NextPlayer(mPlayerStats.size());
+        
         // PrintLocalState();
-
         mUIManager->Render();
     }
 }
@@ -140,33 +136,12 @@ void Player::UpdateStateAfterPlay(int playerIndex, Card cardPlayed)
         Win(playerIndex);
     }
 
-    mLastPlayedCard = cardPlayed;
-    if (cardPlayed.mText == CardText::REVERSE) {
-        mIsInClockwise = !mIsInClockwise;
-    }
-    if (cardPlayed.mText == CardText::DRAW_TWO) {
-        // in the normal state, mCardsNumToDraw is equal to 1
-        // once a player plays a `Draw` card, the effect is gonna accumulate
-        mCardsNumToDraw = (mCardsNumToDraw == 1) ? 2 : (mCardsNumToDraw + 2);
-    }
-    if (cardPlayed.mText == CardText::DRAW_FOUR) {
-        mCardsNumToDraw = (mCardsNumToDraw == 1) ? 4 : (mCardsNumToDraw + 4);
-    }
-}
-
-int Player::WrapWithPlayerNum(int numToWrap)
-{
-    int playerNum = mPlayerStats.size();
-    int ret = numToWrap % playerNum;
-    if (ret < 0) {
-        ret += playerNum;
-    }
-    return ret;
+    mGameStat->UpdateAfterPlay(cardPlayed);
 }
 
 void Player::Win(int playerIndex)
 {
-    mGameEnds = true;
+    mGameStat->GameEnds();
     if (playerIndex == 0) {
         std::cout << "You win!" << std::endl;
     }
@@ -180,10 +155,10 @@ void Player::PrintLocalState()
 {
     std::cout << "Local State: " << std::endl;
     std::cout << "\t " << *mHandCards << std::endl;
-    std::cout << "\t mLastPlayedCard: " << mLastPlayedCard << std::endl;
-    std::cout << "\t mCurrentPlayer: " << mCurrentPlayer << std::endl;
-    std::cout << "\t mIsInClockwise: " << mIsInClockwise << std::endl;
-    std::cout << "\t mCardsNumToDraw: " << mCardsNumToDraw << std::endl;
+    std::cout << "\t mLastPlayedCard: " << mGameStat->GetLastPlayedCard() << std::endl;
+    std::cout << "\t mCurrentPlayer: " << mGameStat->GetCurrentPlayer() << std::endl;
+    std::cout << "\t mIsInClockwise: " << mGameStat->IsInClockwise() << std::endl;
+    std::cout << "\t mCardsNumToDraw: " << mGameStat->GetCardsNumToDraw() << std::endl;
 
     std::cout << "\t mPlayerStats: [" << std::endl;
     for (const auto &stat : mPlayerStats) {

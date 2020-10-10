@@ -51,21 +51,20 @@ void GameBoard::StartGame()
         }
     );
     for (int player = 0; player < PLAYER_NUM; player++) {
-        mServer.DeliverInfo<GameStartInfo>(player, 
-            initHandCards[player], flippedCard, WrapWithPlayerNum(firstPlayer - player), tmpUsernames);
+        mServer.DeliverInfo<GameStartInfo>(player, initHandCards[player], 
+            flippedCard, Util::WrapWithPlayerNum(firstPlayer - player, PLAYER_NUM), tmpUsernames);
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
     }
 
-    mCurrentPlayer = firstPlayer;
-    mIsInClockwise = (flippedCard.mText == CardText::REVERSE) ? false : true;
+    mGameStat.reset(new GameStat(firstPlayer, flippedCard));
     GameLoop();
 }
 
 void GameBoard::GameLoop()
 {
-    while (!mGameEnds) {
-        std::unique_ptr<ActionInfo> info = mServer.ReceiveInfo<ActionInfo>(mCurrentPlayer);
+    while (!mGameStat->DoesGameEnd()) {
+        std::unique_ptr<ActionInfo> info = mServer.ReceiveInfo<ActionInfo>(mGameStat->GetCurrentPlayer());
         switch (info->mActionType) {
             case ActionType::DRAW:
                 HandleDraw(std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release())));
@@ -81,7 +80,7 @@ void GameBoard::GameLoop()
         }
 
         // update mCurrentPlayer
-        mCurrentPlayer = mIsInClockwise ? WrapWithPlayerNum(mCurrentPlayer + 1) : WrapWithPlayerNum(mCurrentPlayer - 1);
+        mGameStat->NextPlayer(PLAYER_NUM);
     }
 }
 
@@ -95,16 +94,17 @@ void GameBoard::HandleDraw(std::unique_ptr<DrawInfo> info)
         cardToDraw = mDeck->Draw();
     }
 
+    int currentPlayer = mGameStat->GetCurrentPlayer();
     // update player stats
-    mPlayerStats[mCurrentPlayer].UpdateAfterDraw(info->mNumber);
+    mPlayerStats[currentPlayer].UpdateAfterDraw(info->mNumber);
     
     // respond to the deliverer
-    mServer.DeliverInfo<DrawRspInfo>(mCurrentPlayer, info->mNumber, cardsToDraw);
+    mServer.DeliverInfo<DrawRspInfo>(currentPlayer, info->mNumber, cardsToDraw);
 
     // broadcast to other players
     for (int i = 0; i < PLAYER_NUM; i++) {
-        if (i != mCurrentPlayer) {
-            info->mPlayerIndex = WrapWithPlayerNum(mCurrentPlayer - i);
+        if (i != currentPlayer) {
+            info->mPlayerIndex = Util::WrapWithPlayerNum(currentPlayer - i, PLAYER_NUM);
             mServer.DeliverInfo<DrawInfo>(i, *info);
         }
     }
@@ -114,15 +114,16 @@ void GameBoard::HandleSkip(std::unique_ptr<SkipInfo> info)
 {
     std::cout << *info << std::endl;
 
+    int currentPlayer = mGameStat->GetCurrentPlayer();
     // update player stats
-    mPlayerStats[mCurrentPlayer].UpdateAfterSkip();
+    mPlayerStats[currentPlayer].UpdateAfterSkip();
 
     // no response to the deliverer
 
     // broadcast to other players
     for (int i = 0; i < PLAYER_NUM; i++) {
-        if (i != mCurrentPlayer) {
-            info->mPlayerIndex = WrapWithPlayerNum(mCurrentPlayer - i);
+        if (i != currentPlayer) {
+            info->mPlayerIndex = Util::WrapWithPlayerNum(currentPlayer - i, PLAYER_NUM);
             mServer.DeliverInfo<SkipInfo>(i, *info);
         }
     }
@@ -137,11 +138,12 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
     // and reverse mIsInClockwise if necessary
     mDiscardPile->Add(info->mCard);
     if (info->mCard.mText == CardText::REVERSE) {
-        mIsInClockwise = !mIsInClockwise;
+        mGameStat->Reverse();
     }
 
+    int currentPlayer = mGameStat->GetCurrentPlayer();
     // update player stats
-    PlayerStat &stat = mPlayerStats[mCurrentPlayer];
+    PlayerStat &stat = mPlayerStats[currentPlayer];
     stat.UpdateAfterPlay(info->mCard);
     if (stat.GetRemainingHandCardsNum() == 0) {
         Win();
@@ -151,8 +153,8 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
 
     // broadcast to other players
     for (int i = 0; i < PLAYER_NUM; i++) {
-        if (i != mCurrentPlayer) {
-            info->mPlayerIndex = WrapWithPlayerNum(mCurrentPlayer - i);
+        if (i != currentPlayer) {
+            info->mPlayerIndex = Util::WrapWithPlayerNum(currentPlayer - i, PLAYER_NUM);
             mServer.DeliverInfo<PlayInfo>(i, *info);
         }
     }
@@ -160,17 +162,9 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
 
 void GameBoard::Win()
 {
-    mGameEnds = true;
+    mGameStat->GameEnds();
     mServer.Close();
     std::cout << "Game Ends" << std::endl;
 }
 
-int GameBoard::WrapWithPlayerNum(int numToWrap)
-{
-    int ret = numToWrap % PLAYER_NUM;
-    if (ret < 0) {
-        ret += PLAYER_NUM;
-    }
-    return ret;
-}
 }}

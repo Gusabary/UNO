@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../game/player_stat.h"
+#include "../game/stat.h"
 
 namespace UNO { namespace UI {
 
@@ -14,7 +14,7 @@ public:
         : mPlayerStats(playerStats) {}
 
     void Render();
-    
+
 private:
     std::vector<PlayerStat> &mPlayerStats;
 };
