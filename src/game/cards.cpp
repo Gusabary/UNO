@@ -184,6 +184,7 @@ std::string Card::ToString() const
         case CardText::DRAW_TWO:    text = "+2"; break;
         case CardText::WILD:        text = "W";  break;
         case CardText::DRAW_FOUR:   text = "+4"; break;
+        case CardText::EMPTY:       text = "";   break;
         default: assert(0);
     }
 

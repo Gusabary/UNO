@@ -144,6 +144,10 @@ void GameBoard::HandlePlay(std::unique_ptr<PlayInfo> info)
     if (info->mCard.mText == CardText::REVERSE) {
         mGameStat->Reverse();
     }
+    if (info->mCard.mColor == CardColor::BLACK) {
+        // change the color to the specified next color to show in UI
+        info->mCard.mColor = info->mNextColor;
+    }
 
     int currentPlayer = mGameStat->GetCurrentPlayer();
     // update player stats
