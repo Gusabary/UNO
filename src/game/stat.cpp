@@ -18,6 +18,16 @@ void GameStat::NextPlayer(int playerNum)
         Util::WrapWithPlayerNum(mCurrentPlayer - 1, playerNum);
 }
 
+void GameStat::UpdateAfterDraw()
+{
+    if (Card::DrawTexts.count(mLastPlayedCard.mText) > 0) {
+        // last played card will become EMPTY after the draw penalty is consumed
+        mLastPlayedCard.mText = CardText::EMPTY;
+    }
+    // the number of cards to draw falls back to 1
+    mCardsNumToDraw = 1;
+}
+
 void GameStat::UpdateAfterPlay(Card card)
 {
     mLastPlayedCard = card;

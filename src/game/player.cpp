@@ -113,6 +113,7 @@ void Player::HandleDraw(const std::unique_ptr<DrawInfo> &info)
 {
     std::cout << *info << std::endl;
     mPlayerStats[info->mPlayerIndex].UpdateAfterDraw(info->mNumber);
+    mGameStat->UpdateAfterDraw();
 }
 
 void Player::HandleSkip(const std::unique_ptr<SkipInfo> &info)

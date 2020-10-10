@@ -2,13 +2,15 @@
 
 namespace UNO { namespace Game {
 
-const std::initializer_list<CardColor> Card::NonWildColors = 
+const std::set<CardColor> Card::NonWildColors = 
     { CardColor::RED, CardColor::YELLOW, CardColor::GREEN, CardColor::BLUE };
 
-const std::initializer_list<CardText> Card::NonWildTexts = 
+const std::set<CardText> Card::NonWildTexts = 
     { CardText::ZERO, CardText::ONE, CardText::TWO, CardText::THREE, CardText::FOUR, 
       CardText::FIVE, CardText::SIX, CardText::SEVEN, CardText::EIGHT, CardText::NINE, 
       CardText::SKIP, CardText::REVERSE, CardText::DRAW_TWO };
+
+const std::set<CardText> Card::DrawTexts = { CardText::DRAW_TWO, CardText::DRAW_FOUR };
 
 HandCards::HandCards(const std::array<Card, 7> &cards)
 {
@@ -117,16 +119,7 @@ Card Deck::Draw()
 
 std::ostream& operator<<(std::ostream& os, const HandCards& handCards)
 {
-    os << "Your hand cards are: [";
-    if (handCards.mCards.empty()) {
-        os << "]";
-        return os;
-    }
-
-    for (int i = 0; i < handCards.mCards.size() - 1; i++) {
-        os << handCards.mCards[i] << ", ";
-    }
-    os << handCards.mCards.back() << "]";
+    os << "Your hand cards are: [" << handCards.ToString() << "]";
     return os;
 }
 
@@ -201,7 +194,7 @@ int Card::Length() const
 {
     int length = 0;
     length += (mColor == CardColor::BLACK ? 0 : 1);
-    length += (!std::set<CardText>{CardText::DRAW_TWO, CardText::DRAW_FOUR}.count(mText) ? 1 : 2);
+    length += (!Card::DrawTexts.count(mText) ? 1 : 2);
     return length;
 }
 

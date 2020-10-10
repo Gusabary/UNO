@@ -45,8 +45,9 @@ struct Card {
 
     static CardColor FromChar(char c);
 
-    const static std::initializer_list<CardColor> NonWildColors;
-    const static std::initializer_list<CardText> NonWildTexts;
+    const static std::set<CardColor> NonWildColors;
+    const static std::set<CardText> NonWildTexts;
+    const static std::set<CardText> DrawTexts;
 
     friend std::ostream& operator<<(std::ostream& os, const Card& card);
 };

@@ -17,6 +17,8 @@ public:
     
     void NextPlayer(int playerNum);
 
+    void UpdateAfterDraw();
+
     void UpdateAfterPlay(Card card);
 
     bool IsMyTurn() const { return mCurrentPlayer == 0; }
