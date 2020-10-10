@@ -78,3 +78,5 @@
 
     const std::initializer_list<CardText> Card::NonWildTexts = {/*data*/};
     ```
+
+    *[reference](https://stackoverflow.com/questions/8452952/c-linker-error-with-class-static-constexpr)*

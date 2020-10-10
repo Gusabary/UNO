@@ -5,10 +5,12 @@
 
 #include "player_stat.h"
 #include "../network/client.h"
+#include "../ui/ui_manager.h"
 
 namespace UNO { namespace Game {
 
 using namespace Network;
+using namespace UI;
 
 class Player {
 public:
@@ -38,6 +40,7 @@ private:
     Network::Client mClient;
 
     std::unique_ptr<HandCards> mHandCards;
+    std::unique_ptr<UIManager> mUIManager;
 
     // state of game board
     Card mLastPlayedCard;

@@ -3,7 +3,8 @@
 namespace UNO { namespace Game {
 
 Player::Player(std::string username, std::string host, std::string port)
-    : mUsername(username), mClient(host, port) 
+    : mUsername(username), mClient(host, port), 
+    mUIManager(std::make_unique<UIManager>(mPlayerStats))
 {
     mClient.OnConnect = [this]() { JoinGame(); };
 
@@ -105,8 +106,11 @@ void Player::GameLoop()
         }
 
         // update mCurrentPlayer
-        mCurrentPlayer = mIsInClockwise ? WrapWithPlayerNum(mCurrentPlayer + 1) : WrapWithPlayerNum(mCurrentPlayer - 1);
-        PrintLocalState();
+        mCurrentPlayer = mIsInClockwise ? WrapWithPlayerNum(mCurrentPlayer + 1) 
+            : WrapWithPlayerNum(mCurrentPlayer - 1);
+        // PrintLocalState();
+
+        mUIManager->Render();
     }
 }
 

@@ -2,6 +2,7 @@ aux_source_directory(. TEST_DIR)
 aux_source_directory(network TEST_DIR)
 aux_source_directory(../src/game TEST_DIR)
 aux_source_directory(../src/network TEST_DIR)
+aux_source_directory(../src/ui TEST_DIR)
 
 add_executable(uno_test ${TEST_DIR})
 target_link_libraries(uno_test PRIVATE asio)
