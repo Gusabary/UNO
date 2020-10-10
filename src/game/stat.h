@@ -60,7 +60,7 @@ public:
 
     int GetRemainingHandCardsNum() const { return mRemainingHandCardsNum;  }
 
-    bool GetDoPlayInLastRound() const { return mDoPlayInLastRound; }
+    bool DoPlayInLastRound() const { return mDoPlayInLastRound; }
 
     Card GetLastPlayedCard() const { return mLastPlayedCard; }
 

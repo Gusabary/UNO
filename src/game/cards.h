@@ -39,6 +39,10 @@ struct Card {
 
     bool CanBePlayerAfter(Card lastPlayedCard, bool isUno);
 
+    std::string ToString() const;
+
+    int Length() const;
+
     static CardColor FromChar(char c);
 
     const static std::initializer_list<CardColor> NonWildColors;
@@ -61,6 +65,10 @@ public:
     bool Empty() const { return mCards.empty(); }
 
     Card At(int index) const { return mCards[index]; }
+
+    std::string ToString() const;
+
+    int Length() const;
 
     friend std::ostream& operator<<(std::ostream& os, const HandCards& handCards);
 

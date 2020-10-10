@@ -161,23 +161,12 @@ Card::Card(const char *str)
     }
 }
 
-CardColor Card::FromChar(char c)
-{
-    switch (c) {
-        case 'R': return CardColor::RED;
-        case 'Y': return CardColor::YELLOW;
-        case 'G': return CardColor::GREEN;
-        case 'B': return CardColor::BLUE;
-    }
-    assert(0);
-}
-
-std::ostream& operator<<(std::ostream& os, const Card& card)
+std::string Card::ToString() const
 {
     std::string color;
     std::string text;
 
-    switch (card.mColor) {
+    switch (mColor) {
         case CardColor::RED:    color = "R"; break;
         case CardColor::YELLOW: color = "Y"; break;
         case CardColor::GREEN:  color = "G"; break;
@@ -186,7 +175,7 @@ std::ostream& operator<<(std::ostream& os, const Card& card)
         default: assert(0);
     }
 
-    switch (card.mText) {
+    switch (mText) {
         case CardText::ZERO:        text = "0";  break;
         case CardText::ONE:         text = "1";  break;
         case CardText::TWO:         text = "2";  break;
@@ -205,7 +194,60 @@ std::ostream& operator<<(std::ostream& os, const Card& card)
         default: assert(0);
     }
 
-    os << color << text;
+    return color.append(text);
+}
+
+int Card::Length() const
+{
+    int length = 0;
+    length += (mColor == CardColor::BLACK ? 0 : 1);
+    length += (!std::set<CardText>{CardText::DRAW_TWO, CardText::DRAW_FOUR}.count(mText) ? 1 : 2);
+    return length;
+}
+
+std::string HandCards::ToString() const
+{
+    std::string str;
+    if (Empty()) {
+        return str;
+    }
+
+    std::for_each(mCards.begin(), std::prev(mCards.end()),
+        [&str](Card card) {
+            str.append(card.ToString()).append(", ");
+        }
+    );
+
+    str.append(mCards.back().ToString());
+    return str;
+}
+
+int HandCards::Length() const
+{
+    int length = 0;
+    for (auto card : mCards) {
+        // the length of card and delimiter ", "
+        length += (card.Length() + 2);
+    }
+    // truncate the ending ", "
+    length -= 2;
+    return length;
+}
+
+CardColor Card::FromChar(char c)
+{
+    switch (c) {
+        case 'R': return CardColor::RED;
+        case 'Y': return CardColor::YELLOW;
+        case 'G': return CardColor::GREEN;
+        case 'B': return CardColor::BLUE;
+    }
+    assert(0);
+}
+
+std::ostream& operator<<(std::ostream& os, const Card& card)
+{
+    os << card.ToString();
     return os;
 }
 

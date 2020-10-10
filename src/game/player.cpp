@@ -4,7 +4,7 @@ namespace UNO { namespace Game {
 
 Player::Player(std::string username, std::string host, std::string port)
     : mUsername(username), mClient(host, port), 
-    mUIManager(std::make_unique<UIManager>(mPlayerStats))
+    mUIManager(std::make_unique<UIManager>(mGameStat, mPlayerStats, mHandCards))
 {
     mClient.OnConnect = [this]() { JoinGame(); };
 
@@ -37,7 +37,6 @@ void Player::GameLoop()
         if (mGameStat->IsMyTurn()) {
             char inputBuffer[10];
             std::cout << "Now it's your turn." << std::endl;
-            std::cout << *mHandCards << std::endl;
             while (true) {
                 std::cout << "Input (D)raw, (S)kip or (P)lay <card_index>:" << std::endl;
                 std::cin.getline(inputBuffer, 10);
