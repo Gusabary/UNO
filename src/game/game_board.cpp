@@ -36,7 +36,7 @@ void GameBoard::StartGame()
             mDeck->PutToBottom(flippedCard);
         }
         else {
-            if (Card::DrawTexts.count(flippedCard.mText) > 0) {
+            if (Card::DrawTexts.count(flippedCard.mText)) {
                 // last played card will become EMPTY if the flipped card is `Draw` card
                 flippedCard.mText = CardText::EMPTY;
             }

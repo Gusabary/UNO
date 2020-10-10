@@ -15,12 +15,12 @@ struct ArgInfo {
     std::string mUsername;
 };
 
-ArgInfo parseArgs(int argc, const char **argv) 
+ArgInfo ParseArgs(int argc, const char **argv)
 {
-    cxxopts::Options options("uno", "uno card game");
+    cxxopts::Options options("uno", "UNO - uno card game");
     options.add_options()
         ("l, listen", "the port number that server will listen on", cxxopts::value<std::string>())
-        ("c, connect", "the endpoint that client will connect to", cxxopts::value<std::string>())
+        ("c, connect", "the endpoint that client (player) will connect to", cxxopts::value<std::string>())
         ("u, username", "the username of the player", cxxopts::value<std::string>());
 
     ArgInfo argInfo;
@@ -34,8 +34,8 @@ ArgInfo parseArgs(int argc, const char **argv)
         if (!result.count("listen") && !result.count("connect")) {
             throw std::runtime_error("must specify either -l or -c option");
         }
-        if (!result.count("username")) {
-            throw std::runtime_error("must specify -u option");
+        if (result.count("connect") && !result.count("username")) {
+            throw std::runtime_error("must specify -u option if -c option is specified");
         }
 
         // -l
@@ -55,7 +55,9 @@ ArgInfo parseArgs(int argc, const char **argv)
         }
 
         // -u
-        argInfo.mUsername = result["username"].as<std::string>();
+        if (result.count("username")) {
+            argInfo.mUsername = result["username"].as<std::string>();
+        }
     }
     catch (std::exception &e) {
         std::cout << options.help() << std::endl;
@@ -68,7 +70,7 @@ ArgInfo parseArgs(int argc, const char **argv)
 
 int main(int argc, char **argv)
 {
-    const ArgInfo argInfo = parseArgs(argc, const_cast<const char **>(argv));
+    const ArgInfo argInfo = ParseArgs(argc, const_cast<const char **>(argv));
 
     if (argInfo.mIsServer) {
         Game::GameBoard gameBoard(argInfo.mPort);
