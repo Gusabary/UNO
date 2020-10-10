@@ -34,6 +34,7 @@ void Player::JoinGame()
 void Player::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
+        mUIManager->Render();
         if (mGameStat->IsMyTurn()) {
             char inputBuffer[10];
             std::cout << "Now it's your turn." << std::endl;
@@ -103,9 +104,6 @@ void Player::GameLoop()
 
         // update mCurrentPlayer
         mGameStat->NextPlayer(mPlayerStats.size());
-        
-        // PrintLocalState();
-        mUIManager->Render();
     }
 }
 

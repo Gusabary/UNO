@@ -8,6 +8,9 @@ void UIManager::Render()
     mView->Clear();
     RenderOthers();
     RenderSelf();
+
+    // before print, it needs to clear screen first
+    ClearScreen();
     std::cout << *mView << std::endl;
     std::cout << "Last played card: " << mGameStat->GetLastPlayedCard() << std::endl;
 }
@@ -29,5 +32,15 @@ void UIManager::RenderSelf()
 {
     mView->DrawSelfBox(8, 0, *mGameStat, mPlayerStats[0], *mHandCards);
 }
+
+void UIManager::ClearScreen()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
 }}
 

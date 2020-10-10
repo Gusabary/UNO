@@ -26,6 +26,8 @@ private:
 
     void RenderOthers();
 
+    void ClearScreen();
+
 private:
     
 
