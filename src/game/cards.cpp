@@ -213,13 +213,12 @@ std::string HandCards::ToString() const
         return str;
     }
 
-    std::for_each(mCards.begin(), std::prev(mCards.end()),
+    std::for_each(mCards.begin(), mCards.end(),
         [&str](Card card) {
-            str.append(card.ToString()).append(", ");
+            str.append(" ").append(card.ToString()).append(" ");
         }
     );
 
-    str.append(mCards.back().ToString());
     return str;
 }
 
@@ -227,11 +226,9 @@ int HandCards::Length() const
 {
     int length = 0;
     for (auto card : mCards) {
-        // the length of card and delimiter ", "
-        length += (card.Length() + 2);
+        // the length of card and spaces at both sides (e.g. " R4 ")
+        length += (1 + card.Length() + 1);
     }
-    // truncate the ending ", "
-    length -= 2;
     return length;
 }
 

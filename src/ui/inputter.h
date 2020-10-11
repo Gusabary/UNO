@@ -3,15 +3,25 @@
 #include <string>
 #include <iostream>
 
+#include "../common/util.h"
+#include "../game/cards.h"
+
 namespace UNO { namespace UI {
+
+enum class InputAction : uint8_t {
+    CURSOR_MOVE_LEFT,
+    CURSOR_MOVE_RIGHT,
+    PLAY,
+    PASS  // skip or draw
+};
 
 class Inputter {
 public:
     Inputter() {}
 
-    std::string GetAction();
+    InputAction GetAction();
 
-    char SpecifyNextColor();
+    Game::CardColor SpecifyNextColor();
 
 private:
 };

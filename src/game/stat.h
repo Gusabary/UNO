@@ -25,6 +25,8 @@ public:
 
     bool IsMyTurn() const { return mCurrentPlayer == 0; }
 
+    bool IsSkipped() const { return mLastPlayedCard.mText == CardText::SKIP; }
+
     int GetCurrentPlayer() const { return mCurrentPlayer; }
 
     bool IsInClockwise() const { return mIsInClockwise; }
@@ -68,13 +70,16 @@ public:
 
     Card GetLastPlayedCard() const { return mLastPlayedCard; }
 
+    bool HasChanceToPlayAfterDraw() const { return mHasChanceToPlayAfterDraw; }
+
 private:
     const std::string mUsername;
 
     int mRemainingHandCardsNum;
     bool mDoPlayInLastRound{false};
     Card mLastPlayedCard{};
-    
+    bool mHasChanceToPlayAfterDraw{false};
+
     friend std::ostream& operator<<(std::ostream& os, const PlayerStat& stat);
 };
 

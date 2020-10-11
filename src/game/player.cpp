@@ -34,26 +34,35 @@ void Player::JoinGame()
 void Player::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
-        mUIManager->Render();
         if (mGameStat->IsMyTurn()) {
-            while (true) {
-                std::string input = mUIManager->GetAction();
-                if (input == "D") {
-                    HandleSelfDraw();
-                    break;
-                }
-                else if (input == "S") {
-                    HandleSelfSkip();
-                    break;
-                }
-                else if (input[0] == 'P') {
-                    if (HandleSelfPlay(std::stoi(input.substr(1)))) {
+            bool actionSuccess = false;
+            bool lastCardCanBePlayed = true;
+            while (!actionSuccess) {
+                auto [action, cardIndex] = mUIManager->GetAction(lastCardCanBePlayed,
+                        mPlayerStats[0].HasChanceToPlayAfterDraw());
+                switch (action) {
+                    case InputAction::PASS: {
+                        if (mGameStat->IsSkipped()) {
+                            HandleSelfSkip();
+                        }
+                        else {
+                            HandleSelfDraw();
+                        }
+                        actionSuccess = true;
                         break;
                     }
+                    case InputAction::PLAY: {
+                        actionSuccess = HandleSelfPlay(cardIndex);
+                        lastCardCanBePlayed = actionSuccess;
+                        break;
+                    }
+                    default:
+                        assert(0);
                 }
             }
         }
         else {
+            mUIManager->Render(false);
             // wait for gameboard state update from server
             std::unique_ptr<ActionInfo> info = mClient.ReceiveInfo<ActionInfo>();
             switch (info->mActionType) {
@@ -100,20 +109,13 @@ void Player::HandleSelfSkip()
 
 bool Player::HandleSelfPlay(int cardIndex)
 {
-    char nextColor = ' ';
     Card cardToPlay = mHandCards->At(cardIndex);
-    if (cardToPlay.mColor == CardColor::BLACK) {
-        while (!std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
-            nextColor = mUIManager->SpecifyNextColor();
-        }
-    }
+    
+    // if Play success, the card to play will be erased in handcards
     if (mHandCards->Play(cardIndex, mGameStat->GetLastPlayedCard())) {
-        if (nextColor == ' ') {
-            mClient.DeliverInfo<PlayInfo>(cardToPlay);
-        }
-        else {
-            mClient.DeliverInfo<PlayInfo>(cardToPlay, Card::FromChar(nextColor));
-        }
+        CardColor nextColor = (cardToPlay.mColor != CardColor::BLACK) ?
+            cardToPlay.mColor : mUIManager->SpecifyNextColor();
+        mClient.DeliverInfo<PlayInfo>(cardToPlay, nextColor);
         // the index of player himself is 0
         UpdateStateAfterPlay(0, cardToPlay);
         return true;

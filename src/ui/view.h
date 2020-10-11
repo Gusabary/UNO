@@ -20,7 +20,7 @@ public:
         bool isCurrentPlayer);
 
     void DrawSelfBox(int row, int col, const GameStat &gameStat, const PlayerStat &stat,
-        const HandCards &handcards);
+        const HandCards &handcards, int cursorPos);
 
     friend std::ostream& operator<<(std::ostream& os, const View& view);
 

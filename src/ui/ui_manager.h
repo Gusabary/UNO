@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <utility>
 
 #include "../game/stat.h"
 #include "view.h"
@@ -19,11 +20,13 @@ public:
         mHandCards(handCards), mView(std::make_unique<View>()),
         mInputter(std::make_unique<Inputter>()) {}
 
-    void Render();
+    void Render(bool isMyTurn, bool lastCardCanBePlayed = true,
+        bool hasChanceToPlayAfterDraw = false);
 
-    std::string GetAction();
+    std::pair<InputAction, int> GetAction(bool lastCardCanBePlayed, 
+        bool hasChanceToPlayAfterDraw);
 
-    char SpecifyNextColor();
+    CardColor SpecifyNextColor();
 
 private:
     int PlayerNum() const { return mPlayerStats.size(); }
@@ -34,12 +37,15 @@ private:
 
     void ClearScreen();
 
+    void PrintHintText(bool lastCardCanBePlayed, bool hasChanceToPlayAfterDraw);
+
 private:
+    std::unique_ptr<View> mView;
+    std::unique_ptr<Inputter> mInputter;
+
     std::unique_ptr<GameStat> &mGameStat;
     std::vector<PlayerStat> &mPlayerStats;
     std::unique_ptr<HandCards> &mHandCards;
-
-    std::unique_ptr<View> mView;
-    std::unique_ptr<Inputter> mInputter;
+    int mCursorPos{0};
 };
 }}

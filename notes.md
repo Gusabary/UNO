@@ -80,3 +80,27 @@
     ```
 
     *[reference](https://stackoverflow.com/questions/8452952/c-linker-error-with-class-static-constexpr)*
+
++ when passing a method of a class as callable, usually there are two ways:
+
+    + using `std::bind`:
+
+        ```c++
+        class A {
+            void f() {}
+            void g() {
+                some_func(std::bind(&A::f, this));
+            }
+        };
+        ```
+    
+    + using lambda:
+
+        ```c++
+        class A {
+            void f() {}
+            void g() {
+                some_func([this]() { return f(); }]);
+            }
+        };
+        ```

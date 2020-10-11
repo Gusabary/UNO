@@ -2,21 +2,31 @@
 
 namespace UNO { namespace UI {
 
-std::string Inputter::GetAction()
+InputAction Inputter::GetAction()
 {
-    char inputBuffer[10];
-    std::cout << "Now it's your turn." << std::endl;
-    std::cout << "Input (D)raw, (S)kip or (P)lay <card_index>:" << std::endl;
-    std::cin.getline(inputBuffer, 10);
-    return std::string{inputBuffer};
+    while (true) {
+        char ch = Common::Util::GetCharImmediately();
+        switch (ch) {
+            case ',':  return InputAction::CURSOR_MOVE_LEFT;
+            case '.':  return InputAction::CURSOR_MOVE_RIGHT;
+            case '\r': return InputAction::PLAY;
+            case ' ':  return InputAction::PASS;
+        }
+    }
 }
 
-char Inputter::SpecifyNextColor()
+Game::CardColor Inputter::SpecifyNextColor()
 {
-    char inputBuffer[10];
-    std::cout << "Specify the next color (R/Y/G/B): " << std::endl;
-    std::cin.getline(inputBuffer, 10);
-    return *inputBuffer;
+    while (true) {
+        std::cout << "Specify the next color (R/Y/G/B): ";
+        char ch = std::getchar();
+        switch (ch) {
+            case 'R': case 'r': return Game::CardColor::RED;
+            case 'Y': case 'y': return Game::CardColor::YELLOW;
+            case 'G': case 'g': return Game::CardColor::GREEN;
+            case 'B': case 'b': return Game::CardColor::BLUE;
+        }
+    }
 }
 
 }}

@@ -61,11 +61,15 @@ void PlayerStat::UpdateAfterDraw(int number)
 {
     mRemainingHandCardsNum += number;
     mDoPlayInLastRound = false;
+    // only common draw (rather than draw penalty due to +2 / +4) 
+    // has the chance to play the card just drawn immediately
+    mHasChanceToPlayAfterDraw = (number == 1);
 }
 
 void PlayerStat::UpdateAfterSkip()
 {
     mDoPlayInLastRound = false;
+    mHasChanceToPlayAfterDraw = false;
 }
 
 void PlayerStat::UpdateAfterPlay(Card card)
@@ -73,6 +77,7 @@ void PlayerStat::UpdateAfterPlay(Card card)
     mRemainingHandCardsNum--;
     mDoPlayInLastRound = true;
     mLastPlayedCard = card;
+    mHasChanceToPlayAfterDraw = false;
 }
 
 std::ostream& operator<<(std::ostream& os, const PlayerStat& stat)
