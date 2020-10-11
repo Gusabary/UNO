@@ -11,11 +11,11 @@ GameStat::GameStat(int firstPlayer, Card flippedCard)
     : mCurrentPlayer(firstPlayer),
     mIsInClockwise(flippedCard.mText != CardText::REVERSE) {}
 
-void GameStat::NextPlayer(int playerNum)
+void GameStat::NextPlayer()
 {
     mCurrentPlayer = mIsInClockwise ? 
-        Util::WrapWithPlayerNum(mCurrentPlayer + 1, playerNum) :
-        Util::WrapWithPlayerNum(mCurrentPlayer - 1, playerNum);
+        Common::Util::WrapWithPlayerNum(mCurrentPlayer + 1) :
+        Common::Util::WrapWithPlayerNum(mCurrentPlayer - 1);
 }
 
 void GameStat::UpdateAfterDraw()
@@ -26,6 +26,14 @@ void GameStat::UpdateAfterDraw()
     }
     // the number of cards to draw falls back to 1
     mCardsNumToDraw = 1;
+
+    // no need to invoke NextPlayer() here 
+    // because a draw action is always followed by a skip or play action
+}
+
+void GameStat::UpdateAfterSkip()
+{
+    NextPlayer();
 }
 
 void GameStat::UpdateAfterPlay(Card card)
@@ -42,6 +50,7 @@ void GameStat::UpdateAfterPlay(Card card)
     if (card.mText == CardText::DRAW_FOUR) {
         mCardsNumToDraw = (mCardsNumToDraw == 1) ? 4 : (mCardsNumToDraw + 4);
     }
+    NextPlayer();
 }
 
 

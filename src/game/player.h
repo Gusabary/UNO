@@ -21,12 +21,22 @@ private:
 
     void GameLoop();
 
-    void HandleDraw(const std::unique_ptr<DrawInfo> &info);
-    
-    void HandleSkip(const std::unique_ptr<SkipInfo> &info);
-    
-    void HandlePlay(const std::unique_ptr<PlayInfo> &info);
+    void HandleSelfDraw();
 
+    void HandleSelfSkip();
+
+    bool HandleSelfPlay(int cardIndex);
+
+    void HandleOtherDraw(const std::unique_ptr<DrawInfo> &info);
+    
+    void HandleOtherSkip(const std::unique_ptr<SkipInfo> &info);
+    
+    void HandleOtherPlay(const std::unique_ptr<PlayInfo> &info);
+
+    void UpdateStateAfterDraw(int playerIndex, int number);
+    
+    void UpdateStateAfterSkip(int playerIndex);
+    
     void UpdateStateAfterPlay(int playerIndex, Card cardPlayed);
 
     void Win(int playerIndex);

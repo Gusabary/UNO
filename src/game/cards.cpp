@@ -117,6 +117,13 @@ Card Deck::Draw()
     return PopFront();
 }
 
+std::vector<Card> Deck::Draw(int number)
+{
+    std::vector<Card> cards(number);
+    std::generate(cards.begin(), cards.end(), [this]() { return Draw(); });
+    return cards;
+}
+
 std::ostream& operator<<(std::ostream& os, const HandCards& handCards)
 {
     os << "Your hand cards are: [" << handCards.ToString() << "]";

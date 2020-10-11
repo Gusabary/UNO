@@ -36,49 +36,18 @@ void Player::GameLoop()
     while (!mGameStat->DoesGameEnd()) {
         mUIManager->Render();
         if (mGameStat->IsMyTurn()) {
-            char inputBuffer[10];
-            std::cout << "Now it's your turn." << std::endl;
             while (true) {
-                std::cout << "Input (D)raw, (S)kip or (P)lay <card_index>:" << std::endl;
-                std::cin.getline(inputBuffer, 10);
-                std::string input(inputBuffer);
+                std::string input = mUIManager->GetAction();
                 if (input == "D") {
-                    // Draw
-                    mClient.DeliverInfo<DrawInfo>(mGameStat->GetCardsNumToDraw());
-
-                    // wait for draw rsp msg
-                    std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
-                    std::cout << *info << std::endl;
-
-                    mHandCards->Draw(info->mCards);
+                    HandleSelfDraw();
                     break;
                 }
                 else if (input == "S") {
-                    // Skip
-                    mClient.DeliverInfo<SkipInfo>();
+                    HandleSelfSkip();
                     break;
                 }
                 else if (input[0] == 'P') {
-                    // Play
-                    int cardIndex = std::stoi(input.substr(1));
-                    char nextColor = ' ';
-                    Card cardToPlay = mHandCards->At(cardIndex);
-                    if (cardToPlay.mColor == CardColor::BLACK) {
-                        while (!std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
-                            std::cout << "Specify the next color (R/Y/G/B): " << std::endl;
-                            std::cin.getline(inputBuffer, 10);
-                            nextColor = *inputBuffer;
-                        }
-                    }
-                    if (mHandCards->Play(cardIndex, mGameStat->GetLastPlayedCard())) {
-                        if (nextColor == ' ') {
-                            mClient.DeliverInfo<PlayInfo>(cardToPlay);
-                        }
-                        else {
-                            mClient.DeliverInfo<PlayInfo>(cardToPlay, Card::FromChar(nextColor));
-                        }
-                        // the index of player himself is 0
-                        UpdateStateAfterPlay(0, cardToPlay);
+                    if (HandleSelfPlay(std::stoi(input.substr(1)))) {
                         break;
                     }
                 }
@@ -89,41 +58,88 @@ void Player::GameLoop()
             std::unique_ptr<ActionInfo> info = mClient.ReceiveInfo<ActionInfo>();
             switch (info->mActionType) {
                 case ActionType::DRAW:
-                    HandleDraw(std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release())));
+                    HandleOtherDraw(std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release())));
                     break;
                 case ActionType::SKIP:
-                    HandleSkip(std::unique_ptr<SkipInfo>(dynamic_cast<SkipInfo *>(info.release())));
+                    HandleOtherSkip(std::unique_ptr<SkipInfo>(dynamic_cast<SkipInfo *>(info.release())));
                     break;
                 case ActionType::PLAY:
-                    HandlePlay(std::unique_ptr<PlayInfo>(dynamic_cast<PlayInfo *>(info.release())));
+                    HandleOtherPlay(std::unique_ptr<PlayInfo>(dynamic_cast<PlayInfo *>(info.release())));
                     break;
                 default:
                     assert(0);
             }
         }
-
-        // update mCurrentPlayer
-        mGameStat->NextPlayer(mPlayerStats.size());
     }
 }
 
-void Player::HandleDraw(const std::unique_ptr<DrawInfo> &info)
+void Player::HandleSelfDraw()
 {
-    std::cout << *info << std::endl;
-    mPlayerStats[info->mPlayerIndex].UpdateAfterDraw(info->mNumber);
-    mGameStat->UpdateAfterDraw();
+    mClient.DeliverInfo<DrawInfo>(mGameStat->GetCardsNumToDraw());
+    // wait for draw rsp msg
+    std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
+    mHandCards->Draw(info->mCards);
+
+    UpdateStateAfterDraw(0, mGameStat->GetCardsNumToDraw());
 }
 
-void Player::HandleSkip(const std::unique_ptr<SkipInfo> &info)
+void Player::HandleSelfSkip()
 {
-    std::cout << *info << std::endl;
-    mPlayerStats[info->mPlayerIndex].UpdateAfterSkip();
+    mClient.DeliverInfo<SkipInfo>();
+    UpdateStateAfterSkip(0);
 }
 
-void Player::HandlePlay(const std::unique_ptr<PlayInfo> &info)
+bool Player::HandleSelfPlay(int cardIndex)
+{
+    char nextColor = ' ';
+    Card cardToPlay = mHandCards->At(cardIndex);
+    if (cardToPlay.mColor == CardColor::BLACK) {
+        while (!std::set<char>{'R', 'Y', 'G', 'B'}.count(nextColor)) {
+            nextColor = mUIManager->SpecifyNextColor();
+        }
+    }
+    if (mHandCards->Play(cardIndex, mGameStat->GetLastPlayedCard())) {
+        if (nextColor == ' ') {
+            mClient.DeliverInfo<PlayInfo>(cardToPlay);
+        }
+        else {
+            mClient.DeliverInfo<PlayInfo>(cardToPlay, Card::FromChar(nextColor));
+        }
+        // the index of player himself is 0
+        UpdateStateAfterPlay(0, cardToPlay);
+        return true;
+    }
+    return false;
+}
+
+void Player::HandleOtherDraw(const std::unique_ptr<DrawInfo> &info)
+{
+    std::cout << *info << std::endl;
+    UpdateStateAfterDraw(info->mPlayerIndex, info->mNumber);
+}
+
+void Player::HandleOtherSkip(const std::unique_ptr<SkipInfo> &info)
+{
+    std::cout << *info << std::endl;
+    UpdateStateAfterSkip(info->mPlayerIndex);
+}
+
+void Player::HandleOtherPlay(const std::unique_ptr<PlayInfo> &info)
 {
     std::cout << *info << std::endl;
     UpdateStateAfterPlay(info->mPlayerIndex, info->mCard);
+}
+
+void Player::UpdateStateAfterDraw(int playerIndex, int number)
+{
+    mPlayerStats[playerIndex].UpdateAfterDraw(number);
+    mGameStat->UpdateAfterDraw();
+}
+
+void Player::UpdateStateAfterSkip(int playerIndex)
+{
+    mPlayerStats[playerIndex].UpdateAfterSkip();
+    mGameStat->UpdateAfterSkip();
 }
 
 void Player::UpdateStateAfterPlay(int playerIndex, Card cardPlayed)

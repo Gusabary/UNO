@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <random>
 
+#include "../common/common.h"
+
 namespace UNO { namespace Game {
 
 enum class CardColor : uint8_t {
@@ -137,6 +139,8 @@ public:
     std::vector<std::array<Card, 7>> DealInitHandCards(int playerNum);
 
     Card Draw();
+
+    std::vector<Card> Draw(int number);
 
     void PutToBottom(Card card) { PushBack(card); }
 private:

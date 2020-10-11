@@ -1,7 +1,7 @@
 #pragma once
 
 #include "info.h"
-#include "util.h"
+#include "../common/util.h"
 
 namespace UNO { namespace Game {
 
@@ -15,9 +15,11 @@ public:
     /// constructor for \c GameBoard
     GameStat(int firstPlayer, Card flippedCard);
     
-    void NextPlayer(int playerNum);
+    void NextPlayer();
 
     void UpdateAfterDraw();
+
+    void UpdateAfterSkip();
 
     void UpdateAfterPlay(Card card);
 

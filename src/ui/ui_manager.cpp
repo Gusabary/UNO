@@ -10,9 +10,19 @@ void UIManager::Render()
     RenderSelf();
 
     // before print, it needs to clear screen first
-    ClearScreen();
+    // ClearScreen();
     std::cout << *mView << std::endl;
     std::cout << "Last played card: " << mGameStat->GetLastPlayedCard() << std::endl;
+}
+
+std::string UIManager::GetAction()
+{
+    return mInputter->GetAction();
+}
+
+char UIManager::SpecifyNextColor()
+{
+    return mInputter->SpecifyNextColor();
 }
 
 void UIManager::RenderOthers()
