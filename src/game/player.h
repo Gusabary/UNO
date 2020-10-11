@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <set>
+#include <type_traits>
 
 #include "stat.h"
 #include "../network/client.h"
@@ -26,12 +27,6 @@ private:
     void HandleSelfSkip();
 
     bool HandleSelfPlay(int cardIndex);
-
-    void HandleOtherDraw(const std::unique_ptr<DrawInfo> &info);
-    
-    void HandleOtherSkip(const std::unique_ptr<SkipInfo> &info);
-    
-    void HandleOtherPlay(const std::unique_ptr<PlayInfo> &info);
 
     void UpdateStateAfterDraw(int playerIndex, int number);
     

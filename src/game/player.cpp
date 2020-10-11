@@ -57,15 +57,24 @@ void Player::GameLoop()
             // wait for gameboard state update from server
             std::unique_ptr<ActionInfo> info = mClient.ReceiveInfo<ActionInfo>();
             switch (info->mActionType) {
-                case ActionType::DRAW:
-                    HandleOtherDraw(std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release())));
+                case ActionType::DRAW: {
+                    auto drawInfo = std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release()));
+                    std::cout << *drawInfo << std::endl;
+                    UpdateStateAfterDraw(drawInfo->mPlayerIndex, drawInfo->mNumber);
                     break;
-                case ActionType::SKIP:
-                    HandleOtherSkip(std::unique_ptr<SkipInfo>(dynamic_cast<SkipInfo *>(info.release())));
+                }
+                case ActionType::SKIP: {
+                    auto skipInfo = std::unique_ptr<SkipInfo>(dynamic_cast<SkipInfo *>(info.release()));
+                    std::cout << *skipInfo << std::endl;
+                    UpdateStateAfterSkip(skipInfo->mPlayerIndex);
                     break;
-                case ActionType::PLAY:
-                    HandleOtherPlay(std::unique_ptr<PlayInfo>(dynamic_cast<PlayInfo *>(info.release())));
+                }
+                case ActionType::PLAY: {
+                    auto playInfo = std::unique_ptr<PlayInfo>(dynamic_cast<PlayInfo *>(info.release()));
+                    std::cout << *playInfo << std::endl;
+                    UpdateStateAfterPlay(playInfo->mPlayerIndex, playInfo->mCard);
                     break;
+                }
                 default:
                     assert(0);
             }
@@ -110,24 +119,6 @@ bool Player::HandleSelfPlay(int cardIndex)
         return true;
     }
     return false;
-}
-
-void Player::HandleOtherDraw(const std::unique_ptr<DrawInfo> &info)
-{
-    std::cout << *info << std::endl;
-    UpdateStateAfterDraw(info->mPlayerIndex, info->mNumber);
-}
-
-void Player::HandleOtherSkip(const std::unique_ptr<SkipInfo> &info)
-{
-    std::cout << *info << std::endl;
-    UpdateStateAfterSkip(info->mPlayerIndex);
-}
-
-void Player::HandleOtherPlay(const std::unique_ptr<PlayInfo> &info)
-{
-    std::cout << *info << std::endl;
-    UpdateStateAfterPlay(info->mPlayerIndex, info->mCard);
 }
 
 void Player::UpdateStateAfterDraw(int playerIndex, int number)
