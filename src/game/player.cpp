@@ -42,7 +42,7 @@ void Player::GameLoop()
                         mPlayerStats[0].HasChanceToPlayAfterDraw());
                 switch (action) {
                     case InputAction::PASS: {
-                        if (mGameStat->IsSkipped()) {
+                        if (mPlayerStats[0].HasChanceToPlayAfterDraw() || mGameStat->IsSkipped()) {
                             HandleSelfSkip();
                         }
                         else {
