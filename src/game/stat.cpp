@@ -38,7 +38,14 @@ void GameStat::UpdateAfterSkip()
 
 void GameStat::UpdateAfterPlay(Card card)
 {
-    mLastPlayedCard = card;
+    if (card.mText == CardText::WILD) {
+        // if just a common wild card (not +4), don't affect the number text
+        mLastPlayedCard.mColor = card.mColor;
+    }
+    else {
+        mLastPlayedCard = card;
+    }
+    
     if (card.mText == CardText::REVERSE) {
         mIsInClockwise = !mIsInClockwise;
     }

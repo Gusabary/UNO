@@ -116,6 +116,7 @@ bool Player::HandleSelfPlay(int cardIndex)
         CardColor nextColor = (cardToPlay.mColor != CardColor::BLACK) ?
             cardToPlay.mColor : mUIManager->SpecifyNextColor();
         mClient.DeliverInfo<PlayInfo>(cardToPlay, nextColor);
+        cardToPlay.mColor = nextColor;
         // the index of player himself is 0
         UpdateStateAfterPlay(0, cardToPlay);
         return true;
