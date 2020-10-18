@@ -28,6 +28,10 @@ public:
 
     CardColor SpecifyNextColor();
 
+    void ResetCursor() { MoveCursorTo(0); }
+
+    void MoveCursorTo(int index) { mCursorIndex = index; }
+
 private:
     int PlayerNum() const { return mPlayerStats.size(); }
 
@@ -46,6 +50,6 @@ private:
     std::unique_ptr<GameStat> &mGameStat;
     std::vector<PlayerStat> &mPlayerStats;
     std::unique_ptr<HandCards> &mHandCards;
-    int mCursorPos{0};
+    int mCursorIndex{0};
 };
 }}

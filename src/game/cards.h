@@ -73,6 +73,8 @@ public:
 
     bool Empty() const { return mCards.empty(); }
 
+    int GetIndex(Card card) const;
+
     Card At(int index) const {
         return *IteratorAt(index);
     }
@@ -80,6 +82,8 @@ public:
     std::string ToString() const;
 
     int Length() const;
+
+    int LengthBeforeIndex(int index) const;
 
     friend std::ostream& operator<<(std::ostream& os, const HandCards& handCards);
 

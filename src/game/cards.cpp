@@ -42,6 +42,18 @@ bool HandCards::Play(int index, Card lastPlayedCard)
     return true;
 }
 
+/**
+ * get the index of a given card in the handcards. Noth that:
+ *   1) the given card has to exist in the handcards (guaranteed by the caller)
+ *   2) if the given card is duplicated in the handcards, return the index of the first one
+ */
+int HandCards::GetIndex(Card card) const
+{
+    auto it = mCards.find(card);
+    assert(it != mCards.end());
+    return std::distance(mCards.begin(), it);
+}
+
 std::multiset<Card>::iterator HandCards::IteratorAt(int index) const {
     auto it = std::begin(mCards);
     std::advance(it, index);
@@ -231,11 +243,16 @@ std::string HandCards::ToString() const
 
 int HandCards::Length() const
 {
+    return LengthBeforeIndex(mCards.size());
+}
+
+int HandCards::LengthBeforeIndex(int index) const
+{
     int length = 0;
-    for (auto card : mCards) {
+    std::for_each(mCards.begin(), IteratorAt(index), [&length](Card card) {
         // the length of card and spaces at both sides (e.g. " R4 ")
         length += (1 + card.Length() + 1);
-    }
+    });
     return length;
 }
 

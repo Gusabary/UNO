@@ -46,19 +46,19 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed, bool 
         switch (action) {
             case InputAction::CURSOR_MOVE_LEFT: {
                 if (!hasChanceToPlayAfterDraw) {
-                    mCursorPos = Common::Util::Wrap(mCursorPos - 1, mPlayerStats[0].GetRemainingHandCardsNum());
+                    mCursorIndex = Common::Util::Wrap(mCursorIndex - 1, mPlayerStats[0].GetRemainingHandCardsNum());
                 }
                 break;
             }
             case InputAction::CURSOR_MOVE_RIGHT: {
                 if (!hasChanceToPlayAfterDraw) {
-                    mCursorPos = Common::Util::Wrap(mCursorPos + 1, mPlayerStats[0].GetRemainingHandCardsNum());
+                    mCursorIndex = Common::Util::Wrap(mCursorIndex + 1, mPlayerStats[0].GetRemainingHandCardsNum());
                 }
                 break;
             }
             case InputAction::PLAY: {
                 /// XXX: the last card as the one just drawn, need to modify if use multiset to store handcards
-                int cardIndex = (!hasChanceToPlayAfterDraw) ? mCursorPos :
+                int cardIndex = (!hasChanceToPlayAfterDraw) ? mCursorIndex :
                     (mPlayerStats[0].GetRemainingHandCardsNum() - 1);
                 return std::make_pair(InputAction::PLAY, cardIndex);
             }
@@ -90,7 +90,7 @@ void UIManager::RenderOthers()
 
 void UIManager::RenderSelf()
 {
-    mView->DrawSelfBox(8, 0, *mGameStat, mPlayerStats[0], *mHandCards, mCursorPos);
+    mView->DrawSelfBox(8, 0, *mGameStat, mPlayerStats[0], *mHandCards, mCursorIndex);
 }
 
 void UIManager::ClearScreen()

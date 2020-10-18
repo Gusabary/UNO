@@ -60,7 +60,7 @@ void View::DrawOtherBox(int row, int col, const GameStat &gameStat, const Player
  *      +----------------------------------------+
  */
 void View::DrawSelfBox(int row, int col, const GameStat &gameStat, const PlayerStat &playerStat, 
-    const HandCards &handcards, int cursorPos)
+    const HandCards &handcards, int cursorIndex)
 {
     int width = 2 + HAND_CARDS_STR.size() + handcards.Length() + 1;
     DrawBorderAndUsername(row, col, width, SELF_BOX_HEIGHT, playerStat.GetUsername());
@@ -71,8 +71,8 @@ void View::DrawSelfBox(int row, int col, const GameStat &gameStat, const PlayerS
     if (gameStat.IsMyTurn()) {
         mView[row + 1][col + width - 3] = '*';
         // show cursor only in the turn of player himself
-        /// FIXME: calculate the correct cursorPos
-        mView[row + 3][col + 2 + HAND_CARDS_STR.size() + cursorPos * 4] = '>';
+        int cursorPos = col + 2 + HAND_CARDS_STR.size() + handcards.LengthBeforeIndex(cursorIndex);
+        mView[row + 3][cursorPos] = '>';
     }
 }
 

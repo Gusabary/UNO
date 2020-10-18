@@ -35,6 +35,11 @@ void Player::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
         if (mGameStat->IsMyTurn()) {
+            // when it's my turn, reset the cursor for a better ui,
+            // except the condition that having a chance to play immediately after draw
+            if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
+                mUIManager->ResetCursor();
+            }
             bool actionSuccess = false;
             bool lastCardCanBePlayed = true;
             while (!actionSuccess) {
@@ -53,6 +58,9 @@ void Player::GameLoop()
                     }
                     case InputAction::PLAY: {
                         actionSuccess = HandleSelfPlay(cardIndex);
+                        // if action succeeded, ok, nothing happens.
+                        // while if failure, lastCardCanBePlayed will be set to false, 
+                        // which will affect the hint text.
                         lastCardCanBePlayed = actionSuccess;
                         break;
                     }
@@ -102,6 +110,13 @@ void Player::HandleSelfDraw()
     if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
         // draw penalty due to a +2 / +4, cannot play immediately
         HandleSelfSkip();
+    }
+    else {
+        // a common draw, move the cursor to the card just drawn
+        assert(info->mCards.size() == 1);
+        Card cardDrawn = info->mCards.front();
+        int cursorIndex = mHandCards->GetIndex(cardDrawn);
+        mUIManager->MoveCursorTo(cursorIndex);
     }
 }
 
