@@ -99,6 +99,10 @@ void Player::HandleSelfDraw()
     mHandCards->Draw(info->mCards);
 
     UpdateStateAfterDraw(0, mGameStat->GetCardsNumToDraw());
+    if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
+        // draw penalty due to a +2 / +4, cannot play immediately
+        HandleSelfSkip();
+    }
 }
 
 void Player::HandleSelfSkip()
