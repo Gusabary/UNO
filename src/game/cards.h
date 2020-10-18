@@ -39,7 +39,7 @@ struct Card {
     Card(const char *str);
     Card(CardColor color, CardText text) : mColor(color), mText(text) {}
 
-    bool CanBePlayerAfter(Card lastPlayedCard, bool isUno);
+    bool CanBePlayedAfter(Card lastPlayedCard, bool isUno);
 
     std::string ToString() const;
 
@@ -51,11 +51,17 @@ struct Card {
     const static std::set<CardText> NonWildTexts;
     const static std::set<CardText> DrawTexts;
 
+    bool operator<(const Card &rhs) const {
+        return (mColor < rhs.mColor) || 
+            (mColor == rhs.mColor && mText < rhs.mText);
+    }
+
+    bool operator==(const Card &rhs) const {
+        return (mColor == rhs.mColor) && (mText == rhs.mText);
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Card& card);
 };
-inline bool operator==(const Card &lhs, const Card &rhs) {
-    return (lhs.mColor == rhs.mColor) && (lhs.mText == rhs.mText);
-}
 
 class HandCards {
 public:
@@ -67,7 +73,9 @@ public:
 
     bool Empty() const { return mCards.empty(); }
 
-    Card At(int index) const { return mCards[index]; }
+    Card At(int index) const {
+        return *IteratorAt(index);
+    }
 
     std::string ToString() const;
 
@@ -76,7 +84,11 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const HandCards& handCards);
 
 private:
-    std::vector<Card> mCards;
+    std::multiset<Card>::iterator IteratorAt(int index) const;
+
+private:
+    // use multiset to ensure that handcards are always in order
+    std::multiset<Card> mCards;
 };
 
 /**

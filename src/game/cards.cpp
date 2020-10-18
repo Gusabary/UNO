@@ -14,14 +14,15 @@ const std::set<CardText> Card::DrawTexts = { CardText::DRAW_TWO, CardText::DRAW_
 
 HandCards::HandCards(const std::array<Card, 7> &cards)
 {
-    mCards.resize(cards.size());
-    std::copy(cards.begin(), cards.end(), mCards.begin());
+    for (auto card : cards) {
+        mCards.emplace(card);
+    }
 }
 
 void HandCards::Draw(const std::vector<Card> &cards)
 {
     std::for_each(cards.begin(), cards.end(), [this](const Card &card) {
-        mCards.push_back(card);
+        mCards.emplace(card);
     });
 }
 
@@ -31,17 +32,23 @@ bool HandCards::Play(int index, Card lastPlayedCard)
         return false;
     }
 
-    Card cardToPlay = mCards[index];
+    Card cardToPlay = At(index);
     bool isUno = mCards.size() == 1;
-    if (!cardToPlay.CanBePlayerAfter(lastPlayedCard, isUno)) {
+    if (!cardToPlay.CanBePlayedAfter(lastPlayedCard, isUno)) {
         return false;
     }
 
-    mCards.erase(mCards.begin() + index);
+    mCards.erase(IteratorAt(index));
     return true;
 }
 
-bool Card::CanBePlayerAfter(Card lastPlayedCard, bool isUno)
+std::multiset<Card>::iterator HandCards::IteratorAt(int index) const {
+    auto it = std::begin(mCards);
+    std::advance(it, index);
+    return it;
+}
+
+bool Card::CanBePlayedAfter(Card lastPlayedCard, bool isUno)
 {
     std::set<CardText> specialTexts{CardText::SKIP, CardText::REVERSE, 
         CardText::DRAW_TWO, CardText::WILD, CardText::DRAW_FOUR};
