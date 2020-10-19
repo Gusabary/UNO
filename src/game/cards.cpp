@@ -228,10 +228,6 @@ int Card::Length() const
 std::string HandCards::ToString() const
 {
     std::string str;
-    if (Empty()) {
-        return str;
-    }
-
     std::for_each(mCards.begin(), mCards.end(),
         [&str](Card card) {
             str.append(" ").append(card.ToString()).append(" ");

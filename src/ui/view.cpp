@@ -53,25 +53,23 @@ void View::DrawOtherBox(int row, int col, const GameStat &gameStat, const Player
  * draw a box of the player himself, whose top left corner is located by \p row and \p col,
  * and contains the information of \p gameStat, \p playerStat and \p handcards.
  * the self box looks like:
- *      +----------------------------------------+
- *      | Gusabary                             * |
- *      +----------------------------------------+
- *      | handcards:  R1  R2  Y3  R4  W >B+2  +4 |
- *      +----------------------------------------+
+ *      +----------------------------+
+ *      | Gusabary                 * |
+ *      +----------------------------+
+ *      | R1  R2  Y3  R4  W >B+2  +4 |
+ *      +----------------------------+
  */
 void View::DrawSelfBox(int row, int col, const GameStat &gameStat, const PlayerStat &playerStat, 
     const HandCards &handcards, int cursorIndex)
 {
-    int width = 2 + HAND_CARDS_STR.size() + handcards.Length() + 1;
+    int width = 1 + handcards.Length() + 1;
     DrawBorderAndUsername(row, col, width, SELF_BOX_HEIGHT, playerStat.GetUsername());
-
-    Copy(row + 3, col + 2, HAND_CARDS_STR);
-    Copy(row + 3, col + 2 + HAND_CARDS_STR.size(), handcards.ToString());
+    Copy(row + 3, col + 1, handcards.ToString());
 
     if (gameStat.IsMyTurn()) {
         mView[row + 1][col + width - 3] = '*';
         // show cursor only in the turn of player himself
-        int cursorPos = col + 2 + HAND_CARDS_STR.size() + handcards.LengthBeforeIndex(cursorIndex);
+        int cursorPos = col + 1 + handcards.LengthBeforeIndex(cursorIndex);
         mView[row + 3][cursorPos] = '>';
     }
 }
@@ -109,6 +107,7 @@ void View::DrawHorizontalBorder(int row, int col, int length)
  */
 void View::DrawVerticalBorder(int row, int col, int height)
 {
+    std::cout << "***" << col << std::endl;
     for (int i = 0; i < height; i++) {
         mView[row + i][col] = '|';
     }
