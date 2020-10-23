@@ -2,15 +2,15 @@
 
 namespace UNO { namespace Game {
 
-const std::set<CardColor> Card::NonWildColors = 
+const std::set<CardColor> CardSet::NonWildColors = 
     { CardColor::RED, CardColor::YELLOW, CardColor::GREEN, CardColor::BLUE };
 
-const std::set<CardText> Card::NonWildTexts = 
+const std::set<CardText> CardSet::NonWildTexts = 
     { CardText::ZERO, CardText::ONE, CardText::TWO, CardText::THREE, CardText::FOUR, 
       CardText::FIVE, CardText::SIX, CardText::SEVEN, CardText::EIGHT, CardText::NINE, 
       CardText::SKIP, CardText::REVERSE, CardText::DRAW_TWO };
 
-const std::set<CardText> Card::DrawTexts = { CardText::DRAW_TWO, CardText::DRAW_FOUR };
+const std::set<CardText> CardSet::DrawTexts = { CardText::DRAW_TWO, CardText::DRAW_FOUR };
 
 HandCards::HandCards(const std::array<Card, 7> &cards)
 {
@@ -96,8 +96,8 @@ bool Card::CanBePlayedAfter(Card lastPlayedCard, bool isUno)
 
 void Deck::Init()
 {
-    for (auto color : Card::NonWildColors) {
-        for (auto text : Card::NonWildTexts) {
+    for (auto color : CardSet::NonWildColors) {
+        for (auto text : CardSet::NonWildTexts) {
             PushFront(color, text);
             if (text != CardText::ZERO) {
                 // in UNO, there is only one zero for each color
@@ -221,7 +221,7 @@ int Card::Length() const
 {
     int length = 0;
     length += (mColor == CardColor::BLACK ? 0 : 1);
-    length += (!Card::DrawTexts.count(mText) ? 1 : 2);
+    length += (!CardSet::DrawTexts.count(mText) ? 1 : 2);
     return length;
 }
 

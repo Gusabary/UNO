@@ -31,6 +31,12 @@ enum class CardText : uint8_t {
      */
 };
 
+struct CardSet {
+    const static std::set<CardColor> NonWildColors;
+    const static std::set<CardText> NonWildTexts;
+    const static std::set<CardText> DrawTexts;
+};
+
 struct Card {
     CardColor mColor;
     CardText mText;
@@ -46,10 +52,6 @@ struct Card {
     int Length() const;
 
     static CardColor FromChar(char c);
-
-    const static std::set<CardColor> NonWildColors;
-    const static std::set<CardText> NonWildTexts;
-    const static std::set<CardText> DrawTexts;
 
     bool operator<(const Card &rhs) const {
         return (mColor < rhs.mColor) || 

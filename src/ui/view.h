@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "../game/stat.h"
+#include "view_formatter.h"
 
 namespace UNO { namespace UI {
 
@@ -16,10 +17,9 @@ public:
 
     void Clear();
 
-    void DrawOtherBox(int row, int col, const GameStat &gameStat, const PlayerStat &stat,
-        bool isCurrentPlayer);
+    void DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerStat &playerStat);
 
-    void DrawSelfBox(int row, int col, const GameStat &gameStat, const PlayerStat &stat,
+    void DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
         const HandCards &handcards, int cursorIndex);
 
     friend std::ostream& operator<<(std::ostream& os, const View& view);
@@ -44,6 +44,6 @@ private:
     const static std::string HAND_CARDS_STR;
 
     ViewT mView;
+    ViewFormatter mFormatter;
 };
-
 }}

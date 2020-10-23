@@ -20,7 +20,7 @@ void GameStat::NextPlayer()
 
 void GameStat::UpdateAfterDraw()
 {
-    if (Card::DrawTexts.count(mLastPlayedCard.mText)) {
+    if (CardSet::DrawTexts.count(mLastPlayedCard.mText)) {
         // last played card will become EMPTY after the draw penalty is consumed
         mLastPlayedCard.mText = CardText::EMPTY;
     }

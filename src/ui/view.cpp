@@ -32,10 +32,14 @@ void View::Clear()
  *      | last played: YR    |
  *      +--------------------+
  */
-void View::DrawOtherBox(int row, int col, const GameStat &gameStat, const PlayerStat &playerStat,
-    bool isCurrentPlayer)
+void View::DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerStat &playerStat)
 {
+    bool isCurrentPlayer = false;
+    auto [row, col] = mFormatter.GetPosOfPlayerBox(playerIndex);
     DrawBorderAndUsername(row, col, OTHER_BOX_WIDTH, OTHER_BOX_HEIGHT, playerStat.GetUsername());
+    if (gameStat.GetCurrentPlayer() == playerIndex) {
+        isCurrentPlayer = true;
+    }
     if (isCurrentPlayer) {
         mView[row + 1][col + OTHER_BOX_WIDTH - 3] = '*';
     }
@@ -59,10 +63,11 @@ void View::DrawOtherBox(int row, int col, const GameStat &gameStat, const Player
  *      | R1  R2  Y3  R4  W >B+2  +4 |
  *      +----------------------------+
  */
-void View::DrawSelfBox(int row, int col, const GameStat &gameStat, const PlayerStat &playerStat, 
+void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat, 
     const HandCards &handcards, int cursorIndex)
 {
     int width = 1 + handcards.Length() + 1;
+    auto [row, col] = mFormatter.GetPosOfPlayerBox(0);
     DrawBorderAndUsername(row, col, width, SELF_BOX_HEIGHT, playerStat.GetUsername());
     Copy(row + 3, col + 1, handcards.ToString());
 
@@ -107,7 +112,6 @@ void View::DrawHorizontalBorder(int row, int col, int length)
  */
 void View::DrawVerticalBorder(int row, int col, int height)
 {
-    std::cout << "***" << col << std::endl;
     for (int i = 0; i < height; i++) {
         mView[row + i][col] = '|';
     }
