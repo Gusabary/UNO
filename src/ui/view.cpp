@@ -40,9 +40,9 @@ void View::DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerS
     if (gameStat.GetCurrentPlayer() == playerIndex) {
         isCurrentPlayer = true;
     }
-    if (isCurrentPlayer) {
-        mView[row + 1][col + OTHER_BOX_WIDTH - 3] = '*';
-    }
+    // if (isCurrentPlayer) {
+        // mView[row + 1][col + OTHER_BOX_WIDTH - 3] = '*';
+    // }
 
     Copy(row + 3, col + 2, CARDS_REMAINED_STR);
     Copy(row + 3, col + 2 + CARDS_REMAINED_STR.size(), std::to_string(playerStat.GetRemainingHandCardsNum()));
@@ -66,16 +66,40 @@ void View::DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerS
 void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat, 
     const HandCards &handcards, int cursorIndex)
 {
-    int width = 1 + handcards.Length() + 1;
+    // int width = 1 + handcards.Length() + 1;
     auto [row, col] = mFormatter.GetPosOfPlayerBox(0);
-    DrawBorderAndUsername(row, col, width, SELF_BOX_HEIGHT, playerStat.GetUsername());
-    Copy(row + 3, col + 1, handcards.ToString());
+    int height = GetSelfBoxHeight(handcards.Number());
+    DrawBorderAndUsername(row, col, SELF_BOX_WIDTH, height, playerStat.GetUsername());
+    // AlignCenter(row + 3, col, SELF_BOX_WIDTH, handcards.ToString());
+    DrawHandCards(row, col, handcards);
 
     if (gameStat.IsMyTurn()) {
-        mView[row + 1][col + width - 3] = '*';
+        // mView[row + 1][col + width - 3] = '*';
         // show cursor only in the turn of player himself
-        int cursorPos = col + 1 + handcards.LengthBeforeIndex(cursorIndex);
-        mView[row + 3][cursorPos] = '>';
+        int segIndex = GetSegmentIndex(cursorIndex);
+        int length = handcards.ToStringBySegment(segIndex).size();
+        int indent = (SELF_BOX_WIDTH - length) / 2;
+        int indexInSeg = GetIndexInSegment(cursorIndex);
+        int cursorPos = col + indent + handcards.LengthBeforeIndexInSegment(segIndex, indexInSeg);
+        mView[row + 3 + segIndex][cursorPos] = '>';
+    }
+}
+
+void View::DrawLastPlayedCard(Card lastPlayedCard)
+{
+    auto [row, col] = mFormatter.GetPosOfLastPlayedCard();
+    Copy(row, col, lastPlayedCard.ToString());
+}
+
+int View::GetSelfBoxHeight(int handcardsSize)
+{
+    return (SELF_BOX_HEIGHT_BASE + GetSegmentNum(handcardsSize) - 1);
+}
+
+void View::DrawHandCards(int row, int col, const HandCards &handcards)
+{
+    for (int i = 0; i < GetSegmentNum(handcards.Number()); i++) {
+        AlignCenter(row + 3 + i, col, SELF_BOX_WIDTH, handcards.ToStringBySegment(i));
     }
 }
 
@@ -91,7 +115,7 @@ void View::DrawBorderAndUsername(int row, int col, int width, int height, const 
     DrawVerticalBorder(row + 1, col, height);
     DrawVerticalBorder(row + 1, col + width - 1, height);
     DrawHorizontalBorder(row + 2, col, width);
-    Copy(row + 1, col + 2, username);
+    AlignCenter(row + 1, col, width, username);
 }
 
 /**
@@ -115,6 +139,12 @@ void View::DrawVerticalBorder(int row, int col, int height)
     for (int i = 0; i < height; i++) {
         mView[row + i][col] = '|';
     }
+}
+
+void View::AlignCenter(int row, int col, int width, const std::string &src)
+{
+    int indent = (width - src.size()) / 2;
+    Copy(row, col + indent, src);
 }
 
 /**

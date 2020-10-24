@@ -22,6 +22,8 @@ public:
     void DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
         const HandCards &handcards, int cursorIndex);
 
+    void DrawLastPlayedCard(Card lastPlayedCard);
+
     friend std::ostream& operator<<(std::ostream& os, const View& view);
 
 private:
@@ -31,14 +33,27 @@ private:
 
     void DrawVerticalBorder(int row, int col, int height);
 
+    void DrawHandCards(int row, int col, const HandCards &handcards);
+
+    int GetSelfBoxHeight(int handcardsSize);
+
     void Copy(int row, int col, const std::string &src);
 
+    void AlignCenter(int row, int col, int width, const std::string &src);
+
+    int GetSegmentNum(int handcardNum) const { return (handcardNum - 1) / 8 + 1; }
+
+    int GetSegmentIndex(int handcardIndex) const { return handcardIndex / 8; }
+
+    int GetIndexInSegment(int handcardIndex) const { return handcardIndex % 8; }
+
 private:
-    using ViewT = std::array<std::array<char, 60>, 15>;
+    using ViewT = std::array<std::array<char, 60>, 20>;
 
     constexpr static int OTHER_BOX_WIDTH = 22;
     constexpr static int OTHER_BOX_HEIGHT = 4;
-    constexpr static int SELF_BOX_HEIGHT = 3;
+    constexpr static int SELF_BOX_WIDTH = 42;
+    constexpr static int SELF_BOX_HEIGHT_BASE = 3;
     const static std::string CARDS_REMAINED_STR;
     const static std::string LAST_PLAYED_STR;
     const static std::string HAND_CARDS_STR;

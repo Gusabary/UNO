@@ -53,10 +53,19 @@ ViewFormatter::ViewFormatter()
     mPosOfPlayerBox.emplace_back(std::vector<PosT>{
         PosT{10, 6}, PosT{0, 0}, PosT{0, 32}
     });
-}
 
+    mPosOfLastPlayedCard.emplace_back(PosT{});
+    mPosOfLastPlayedCard.emplace_back(PosT{});
+    mPosOfLastPlayedCard.emplace_back(PosT{8, 20});
+    mPosOfLastPlayedCard.emplace_back(PosT{8, 26});
+}
 
 ViewFormatter::PosT ViewFormatter::GetPosOfPlayerBox(int player) {
     return mPosOfPlayerBox[Common::Common::mPlayerNum][player];
+}
+
+ViewFormatter::PosT ViewFormatter::GetPosOfLastPlayedCard()
+{
+    return mPosOfLastPlayedCard[Common::Common::mPlayerNum];
 }
 }}

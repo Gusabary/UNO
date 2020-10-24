@@ -227,13 +227,25 @@ int Card::Length() const
 
 std::string HandCards::ToString() const
 {
+    return ToStringByCard(0, mCards.size());
+}
+
+std::string HandCards::ToStringBySegment(int seg) const
+{
+    int start = seg * 8;
+    int len = std::min(static_cast<int>(mCards.size() - start), 8);
+    return ToStringByCard(start, len);
+}
+
+std::string HandCards::ToStringByCard(int start, int len) const
+{
     std::string str;
-    std::for_each(mCards.begin(), mCards.end(),
+    std::for_each(std::next(mCards.begin(), start), std::next(mCards.begin(), start + len),
         [&str](Card card) {
             str.append(" ").append(card.ToString()).append(" ");
         }
     );
-
+    std::cout << "[ToStringByCard]" << str << std::endl;
     return str;
 }
 
@@ -249,6 +261,19 @@ int HandCards::LengthBeforeIndex(int index) const
         // the length of card and spaces at both sides (e.g. " R4 ")
         length += (1 + card.Length() + 1);
     });
+    return length;
+}
+
+int HandCards::LengthBeforeIndexInSegment(int segIndex, int indexInSeg) const
+{
+    int length = 0;
+    int start = segIndex * 8;
+    int len = indexInSeg;
+    std::for_each(std::next(mCards.begin(), start), std::next(mCards.begin(), start + len),
+        [&length](Card card) {
+            length += (1 + card.Length() + 1);
+        }
+    );
     return length;
 }
 

@@ -13,9 +13,13 @@ public:
 
 public:
     ViewFormatter();
+
     PosT GetPosOfPlayerBox(int playerIndex);
+
+    PosT GetPosOfLastPlayedCard();
 
 private:
     std::vector<std::vector<PosT>> mPosOfPlayerBox;
+    std::vector<PosT> mPosOfLastPlayedCard;
 };
 }}

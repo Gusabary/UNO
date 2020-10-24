@@ -81,16 +81,24 @@ public:
         return *IteratorAt(index);
     }
 
+    int Number() const { return mCards.size(); }
+
     std::string ToString() const;
+
+    std::string ToStringBySegment(int seg) const;
 
     int Length() const;
 
     int LengthBeforeIndex(int index) const;
 
+    int LengthBeforeIndexInSegment(int segIndex, int indexInSeg) const;
+
     friend std::ostream& operator<<(std::ostream& os, const HandCards& handCards);
 
 private:
     std::multiset<Card>::iterator IteratorAt(int index) const;
+
+    std::string ToStringByCard(int start, int len) const;
 
 private:
     // use multiset to ensure that handcards are always in order

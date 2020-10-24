@@ -8,6 +8,7 @@ void UIManager::Render(bool isMyTurn, bool lastCardCanBePlayed, bool hasChanceTo
     mView->Clear();
     RenderOthers();
     RenderSelf();
+    mView->DrawLastPlayedCard(mGameStat->GetLastPlayedCard());
 
     // before print, it needs to clear screen first
     // ClearScreen();
