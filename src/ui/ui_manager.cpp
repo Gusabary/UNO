@@ -2,8 +2,8 @@
 
 namespace UNO { namespace UI {
 
-UIManager::UIManager(std::unique_ptr<GameStat> &gameStat, std::vector<PlayerStat> &playerStats,
-    std::unique_ptr<HandCards> &handCards) 
+UIManager::UIManager(std::unique_ptr<GameStat> &gameStat, 
+    std::vector<PlayerStat> &playerStats, std::unique_ptr<HandCards> &handCards) 
     : mGameStat(gameStat), mPlayerStats(playerStats), mHandCards(handCards), 
     mView(std::make_unique<View>()), mInputter(std::make_unique<Inputter>())
 {}
@@ -46,7 +46,7 @@ void UIManager::NextTurn()
 void UIManager::Print() const
 {
     // before print, it needs to clear screen first
-    ClearScreen();
+    // ClearScreen();
     std::cout << *mView << std::endl;
     
     if (mGameStat->IsMyTurn()) {
@@ -73,7 +73,8 @@ void UIManager::PrintHintText() const
     }
 }
 
-std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed, bool hasChanceToPlayAfterDraw)
+std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed, 
+    bool hasChanceToPlayAfterDraw)
 {
     mLastCardCanBePlayed = lastCardCanBePlayed;
     mHasChanceToPlayAfterDraw = hasChanceToPlayAfterDraw;
@@ -92,20 +93,21 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed, bool 
         switch (action) {
             case InputAction::CURSOR_MOVE_LEFT: {
                 if (!hasChanceToPlayAfterDraw) {
-                    mCursorIndex = Common::Util::Wrap(mCursorIndex - 1, mPlayerStats[0].GetRemainingHandCardsNum());
+                    mCursorIndex = Common::Util::Wrap(mCursorIndex - 1, 
+                        mPlayerStats[0].GetRemainingHandCardsNum());
                 }
                 break;
             }
             case InputAction::CURSOR_MOVE_RIGHT: {
                 if (!hasChanceToPlayAfterDraw) {
-                    mCursorIndex = Common::Util::Wrap(mCursorIndex + 1, mPlayerStats[0].GetRemainingHandCardsNum());
+                    mCursorIndex = Common::Util::Wrap(mCursorIndex + 1, 
+                        mPlayerStats[0].GetRemainingHandCardsNum());
                 }
                 break;
             }
             case InputAction::PLAY: {
-                /// XXX: the last card as the one just drawn, need to modify if use multiset to store handcards
                 int cardIndex = (!hasChanceToPlayAfterDraw) ? mCursorIndex :
-                    (mPlayerStats[0].GetRemainingHandCardsNum() - 1);
+                    (mPlayerStats[0].GetIndexOfNewlyDrawn());
                 return std::make_pair(InputAction::PLAY, cardIndex);
             }
             case InputAction::PASS: {

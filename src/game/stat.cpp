@@ -69,13 +69,14 @@ void GameStat::Tick()
 PlayerStat::PlayerStat(const std::string &username, int remainingHandCardsNum)
     : mUsername(username), mRemainingHandCardsNum(remainingHandCardsNum) {}
 
-void PlayerStat::UpdateAfterDraw(int number)
+void PlayerStat::UpdateAfterDraw(int number, int indexOfNewlyDrawn)
 {
     mRemainingHandCardsNum += number;
     mDoPlayInLastRound = false;
     // only common draw (rather than draw penalty due to +2 / +4) 
     // has the chance to play the card just drawn immediately
     mHasChanceToPlayAfterDraw = (number == 1);
+    mIndexOfNewlyDrawn = indexOfNewlyDrawn;
 }
 
 void PlayerStat::UpdateAfterSkip()

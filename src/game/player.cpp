@@ -108,9 +108,14 @@ void Player::HandleSelfDraw()
     mClient.DeliverInfo<DrawInfo>(mGameStat->GetCardsNumToDraw());
     // wait for draw rsp msg
     std::unique_ptr<DrawRspInfo> info = mClient.ReceiveInfo<DrawRspInfo>();
+    auto handcardsBeforeDraw = *mHandCards;
+    int indexOfNewlyDrawn;
     mHandCards->Draw(info->mCards);
+    if (info->mNumber == 1) {
+        indexOfNewlyDrawn = mHandCards->GetIndexOfNewlyDrawn(handcardsBeforeDraw);
+    }
 
-    UpdateStateAfterDraw(0, mGameStat->GetCardsNumToDraw());
+    UpdateStateAfterDraw(0, mGameStat->GetCardsNumToDraw(), indexOfNewlyDrawn);
     if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
         // draw penalty due to a +2 / +4, cannot play immediately
         HandleSelfSkip();
@@ -147,9 +152,9 @@ bool Player::HandleSelfPlay(int cardIndex)
     return false;
 }
 
-void Player::UpdateStateAfterDraw(int playerIndex, int number)
+void Player::UpdateStateAfterDraw(int playerIndex, int number, int indexOfNewlyDrawn)
 {
-    mPlayerStats[playerIndex].UpdateAfterDraw(number);
+    mPlayerStats[playerIndex].UpdateAfterDraw(number, indexOfNewlyDrawn);
     mGameStat->UpdateAfterDraw();
 }
 

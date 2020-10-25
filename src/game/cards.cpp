@@ -60,6 +60,17 @@ std::multiset<Card>::iterator HandCards::IteratorAt(int index) const {
     return it;
 }
 
+int HandCards::GetIndexOfNewlyDrawn(const HandCards &handcardsBeforeDraw) const
+{
+    assert(Number() == handcardsBeforeDraw.Number() + 1);
+    for (int i = 0; i < handcardsBeforeDraw.Number(); i++) {
+        if (At(i) != handcardsBeforeDraw.At(i)) {
+            return i;
+        }
+    }
+    return handcardsBeforeDraw.Number();
+}
+
 bool Card::CanBePlayedAfter(Card lastPlayedCard, bool isUno)
 {
     std::set<CardText> specialTexts{CardText::SKIP, CardText::REVERSE, 

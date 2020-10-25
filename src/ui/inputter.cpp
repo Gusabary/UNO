@@ -18,7 +18,7 @@ InputAction Inputter::GetAction(int timeout)
         switch (ch) {
             case ',':  return InputAction::CURSOR_MOVE_LEFT;
             case '.':  return InputAction::CURSOR_MOVE_RIGHT;
-            case '\r': return InputAction::PLAY;
+            case '\n': return InputAction::PLAY;
             case ' ':  return InputAction::PASS;
         }
     }

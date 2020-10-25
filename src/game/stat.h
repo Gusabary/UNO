@@ -61,7 +61,7 @@ public:
     PlayerStat() {}
     explicit PlayerStat(const std::string &username, int remainingHandCardsNum);
 
-    void UpdateAfterDraw(int number);
+    void UpdateAfterDraw(int number, int indexOfNewlyDrawn = -1);
     
     void UpdateAfterSkip();
     
@@ -77,6 +77,8 @@ public:
 
     bool HasChanceToPlayAfterDraw() const { return mHasChanceToPlayAfterDraw; }
 
+    int GetIndexOfNewlyDrawn() const { return mIndexOfNewlyDrawn; }
+
 private:
     const std::string mUsername;
 
@@ -84,6 +86,7 @@ private:
     bool mDoPlayInLastRound{false};
     Card mLastPlayedCard{};
     bool mHasChanceToPlayAfterDraw{false};
+    int mIndexOfNewlyDrawn;
 
     friend std::ostream& operator<<(std::ostream& os, const PlayerStat& stat);
 };

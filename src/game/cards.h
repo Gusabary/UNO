@@ -62,6 +62,10 @@ struct Card {
         return (mColor == rhs.mColor) && (mText == rhs.mText);
     }
 
+    bool operator!=(const Card &card) const {
+        return !(*this == card);
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Card& card);
 };
 
@@ -92,6 +96,8 @@ public:
     int LengthBeforeIndex(int index) const;
 
     int LengthBeforeIndexInSegment(int segIndex, int indexInSeg) const;
+
+    int GetIndexOfNewlyDrawn(const HandCards &handcardsBeforeDraw) const;
 
     friend std::ostream& operator<<(std::ostream& os, const HandCards& handCards);
 

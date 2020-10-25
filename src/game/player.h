@@ -28,7 +28,7 @@ private:
 
     bool HandleSelfPlay(int cardIndex);
 
-    void UpdateStateAfterDraw(int playerIndex, int number);
+    void UpdateStateAfterDraw(int playerIndex, int number, int indexOfNewlyDrawn = -1);
     
     void UpdateStateAfterSkip(int playerIndex);
     
