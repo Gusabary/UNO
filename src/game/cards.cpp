@@ -245,7 +245,6 @@ std::string HandCards::ToStringByCard(int start, int len) const
             str.append(" ").append(card.ToString()).append(" ");
         }
     );
-    std::cout << "[ToStringByCard]" << str << std::endl;
     return str;
 }
 

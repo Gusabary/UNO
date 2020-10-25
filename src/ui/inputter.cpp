@@ -2,10 +2,19 @@
 
 namespace UNO { namespace UI {
 
-InputAction Inputter::GetAction()
+InputAction Inputter::GetAction(int timeout)
 {
     while (true) {
-        char ch = Common::Util::GetCharImmediately();
+        // char ch = Common::Util::GetCharImmediately();
+        char ch;
+        try {
+            ch = Common::Util::GetCharWithTimeout(timeout, true);
+        }
+        catch (std::exception &e) {
+            // timeout
+            return InputAction::PASS;
+        }
+
         switch (ch) {
             case ',':  return InputAction::CURSOR_MOVE_LEFT;
             case '.':  return InputAction::CURSOR_MOVE_RIGHT;
@@ -15,11 +24,20 @@ InputAction Inputter::GetAction()
     }
 }
 
-Game::CardColor Inputter::SpecifyNextColor()
+Game::CardColor Inputter::SpecifyNextColor(int timeout)
 {
     while (true) {
         std::cout << "Specify the next color (R/Y/G/B): ";
-        char ch = std::getchar();
+        char ch;
+        try {
+            ch = Common::Util::GetCharWithTimeout(timeout, false);
+        }
+        catch (std::exception &e) {
+            // timeout, red is default
+            return Game::CardColor::RED;
+        }
+
+        // char ch = std::getchar();
         switch (ch) {
             case 'R': case 'r': return Game::CardColor::RED;
             case 'Y': case 'y': return Game::CardColor::YELLOW;

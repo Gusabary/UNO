@@ -58,14 +58,35 @@ ViewFormatter::ViewFormatter()
     mPosOfLastPlayedCard.emplace_back(PosT{});
     mPosOfLastPlayedCard.emplace_back(PosT{8, 20});
     mPosOfLastPlayedCard.emplace_back(PosT{8, 26});
+
+    mBaseScaleOfView.emplace_back(ScaleT{});
+    mBaseScaleOfView.emplace_back(ScaleT{});
+    mBaseScaleOfView.emplace_back(ScaleT{16, 42});
+    mBaseScaleOfView.emplace_back(ScaleT{16, 54});
+
+    mMaxScaleOfView.emplace_back(ScaleT{});
+    mMaxScaleOfView.emplace_back(ScaleT{});
+    mMaxScaleOfView.emplace_back(ScaleT{22, 42});
+    mMaxScaleOfView.emplace_back(ScaleT{22, 54});
 }
 
-ViewFormatter::PosT ViewFormatter::GetPosOfPlayerBox(int player) {
+ViewFormatter::PosT ViewFormatter::GetPosOfPlayerBox(int player) const
+{
     return mPosOfPlayerBox[Common::Common::mPlayerNum][player];
 }
 
-ViewFormatter::PosT ViewFormatter::GetPosOfLastPlayedCard()
+ViewFormatter::PosT ViewFormatter::GetPosOfLastPlayedCard() const
 {
     return mPosOfLastPlayedCard[Common::Common::mPlayerNum];
+}
+
+ViewFormatter::ScaleT ViewFormatter::GetBaseScaleOfView() const
+{
+    return mBaseScaleOfView[Common::Common::mPlayerNum];
+}
+
+ViewFormatter::ScaleT ViewFormatter::GetMaxScaleOfView() const
+{
+    return mMaxScaleOfView[Common::Common::mPlayerNum];
 }
 }}

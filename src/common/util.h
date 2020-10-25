@@ -11,6 +11,7 @@ public:
     static int WrapWithPlayerNum(int numToWrap);
 
     static char GetCharImmediately();
-};
 
+    static char GetCharWithTimeout(int milliseconds, bool autoFlush);
+};
 }}

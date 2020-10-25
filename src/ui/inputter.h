@@ -19,9 +19,9 @@ class Inputter {
 public:
     Inputter() {}
 
-    InputAction GetAction();
+    InputAction GetAction(int timeout);
 
-    Game::CardColor SpecifyNextColor();
+    Game::CardColor SpecifyNextColor(int timeout);
 
 private:
 };

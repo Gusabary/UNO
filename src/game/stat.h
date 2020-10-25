@@ -23,6 +23,8 @@ public:
 
     void UpdateAfterPlay(Card card);
 
+    void Tick();
+
     bool IsMyTurn() const { return mCurrentPlayer == 0; }
 
     bool IsSkipped() const { return mLastPlayedCard.mText == CardText::SKIP; }
@@ -32,6 +34,8 @@ public:
     bool IsInClockwise() const { return mIsInClockwise; }
 
     bool DoesGameEnd() const { return mGameEnds; }
+
+    int GetTimeElapsed() const { return mTimeElapsed; }
 
     Card GetLastPlayedCard() const { return mLastPlayedCard; }
 
@@ -45,6 +49,7 @@ private:
     int mCurrentPlayer;
     bool mIsInClockwise;
     bool mGameEnds{false};
+    int mTimeElapsed{0};
 
     // currently the two fields below are not used by GameStat of GameBoard
     Card mLastPlayedCard;

@@ -3,6 +3,7 @@
 namespace UNO {
 
 int Common::Common::mPlayerNum = 3;
+int Common::Common::mTimeoutPerTurn = 15;
 
 namespace Game {
 

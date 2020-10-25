@@ -15,7 +15,7 @@ class View {
 public:
     View();
 
-    void Clear();
+    void Clear(bool doClearIndicator, int currentPlayer = 0);
 
     void DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerStat &playerStat);
 
@@ -23,6 +23,8 @@ public:
         const HandCards &handcards, int cursorIndex);
 
     void DrawLastPlayedCard(Card lastPlayedCard);
+
+    void DrawTimeIndicator(int currentPlayer, int timeElapsed);
 
     friend std::ostream& operator<<(std::ostream& os, const View& view);
 
@@ -35,7 +37,7 @@ private:
 
     void DrawHandCards(int row, int col, const HandCards &handcards);
 
-    int GetSelfBoxHeight(int handcardsSize);
+    int GetSelfBoxHeight();
 
     void Copy(int row, int col, const std::string &src);
 
@@ -48,7 +50,7 @@ private:
     int GetIndexInSegment(int handcardIndex) const { return handcardIndex % 8; }
 
 private:
-    using ViewT = std::array<std::array<char, 60>, 20>;
+    using ViewT = std::vector<std::vector<char>>;
 
     constexpr static int OTHER_BOX_WIDTH = 22;
     constexpr static int OTHER_BOX_HEIGHT = 4;
@@ -60,5 +62,7 @@ private:
 
     ViewT mView;
     ViewFormatter mFormatter;
+
+    int mExtraRowNum;  // due to more than one handcard segment
 };
 }}

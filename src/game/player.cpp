@@ -28,6 +28,7 @@ void Player::JoinGame()
         }
     );
 
+    mUIManager->RunTimerThread();
     GameLoop();
 }
 
@@ -38,7 +39,7 @@ void Player::GameLoop()
             // when it's my turn, reset the cursor for a better ui,
             // except the condition that having a chance to play immediately after draw
             if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
-                mUIManager->ResetCursor();
+                mUIManager->NextTurn();
             }
             bool actionSuccess = false;
             bool lastCardCanBePlayed = true;
@@ -70,7 +71,10 @@ void Player::GameLoop()
             }
         }
         else {
-            mUIManager->Render(false);
+            if (!mPlayerStats[mGameStat->GetCurrentPlayer()].HasChanceToPlayAfterDraw()) {
+                mUIManager->NextTurn();
+            }
+            mUIManager->Render();
             // wait for gameboard state update from server
             std::unique_ptr<ActionInfo> info = mClient.ReceiveInfo<ActionInfo>();
             switch (info->mActionType) {

@@ -16,6 +16,7 @@ void GameStat::NextPlayer()
     mCurrentPlayer = mIsInClockwise ? 
         Common::Util::WrapWithPlayerNum(mCurrentPlayer + 1) :
         Common::Util::WrapWithPlayerNum(mCurrentPlayer - 1);
+    mTimeElapsed = 0;
 }
 
 void GameStat::UpdateAfterDraw()
@@ -60,6 +61,10 @@ void GameStat::UpdateAfterPlay(Card card)
     NextPlayer();
 }
 
+void GameStat::Tick()
+{
+    mTimeElapsed++;
+}
 
 PlayerStat::PlayerStat(const std::string &username, int remainingHandCardsNum)
     : mUsername(username), mRemainingHandCardsNum(remainingHandCardsNum) {}
