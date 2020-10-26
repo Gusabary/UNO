@@ -139,14 +139,14 @@ bool Player::HandleSelfPlay(int cardIndex)
 {
     Card cardToPlay = mHandCards->At(cardIndex);
     
-    // if Play success, the card to play will be erased in handcards
-    if (mHandCards->Play(cardIndex, mGameStat->GetLastPlayedCard())) {
+    if (mHandCards->CanBePlayedAfter(cardIndex, mGameStat->GetLastPlayedCard())) {
+        // the card to play should be erased **after** specifying next color if it's wild card
         CardColor nextColor = (cardToPlay.mColor != CardColor::BLACK) ?
             cardToPlay.mColor : mUIManager->SpecifyNextColor();
         mClient.DeliverInfo<PlayInfo>(cardToPlay, nextColor);
         cardToPlay.mColor = nextColor;
-        // the index of player himself is 0
         UpdateStateAfterPlay(0, cardToPlay);
+        mHandCards->Erase(cardIndex);
         return true;
     }
     return false;

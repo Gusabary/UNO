@@ -75,7 +75,9 @@ public:
 
     void Draw(const std::vector<Card> &cards);
 
-    bool Play(int index, Card lastPlayedCard);
+    bool CanBePlayedAfter(int index, Card lastPlayedCard);
+
+    void Erase(int index);
 
     bool Empty() const { return mCards.empty(); }
 

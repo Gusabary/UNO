@@ -55,15 +55,22 @@ void UIManager::Print() const
     // std::cout << *mView << std::endl;
     mOutputter->PrintView(*mView);
 
-    if (mGameStat->IsMyTurn()) {
+    if (mGameStat->IsMyTurn())
+    {
         PrintHintText();
     }
 }
 
 void UIManager::PrintHintText() const
 {
-    if (!mLastCardCanBePlayed) {
+    if (mIsSpecifyingNextColor) {
+        std::cout << "Specify the next color (R/Y/G/B): ";
+        // without std::endl, so a flush is needed
+        std::cout.flush();
+    }
+    else if (!mLastCardCanBePlayed) {
         std::cout << "This card cannot be played. Last played card is "
+        /// TODO: add color to the card shown here
                   << mGameStat->GetLastPlayedCard() << std::endl;
         std::cout << "Press , and . to move the cursor and Enter to play the card." << std::endl;
         std::cout << "Or press Space to draw cards / skip." << std::endl;
@@ -94,7 +101,6 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
         mTimeLeft -= static_cast<int>(secondsElapsed.count() * 1000);
         // mTimeLeft shouldn't be negative
         mTimeLeft = std::max(mTimeLeft, 0);
-        // std::cout << "time left: " << mTimeLeft << std::endl;
 
         switch (action) {
             case InputAction::CURSOR_MOVE_LEFT: {
@@ -126,11 +132,14 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
 
 CardColor UIManager::SpecifyNextColor()
 {
+    mIsSpecifyingNextColor = true;
     auto startTime = std::chrono::system_clock::now();
     auto nextColor = mInputter->SpecifyNextColor(mTimeLeft);
     auto endTime = std::chrono::system_clock::now();
+    mIsSpecifyingNextColor = false;
     std::chrono::duration<double> secondsElapsed = endTime - startTime;
     mTimeLeft -= static_cast<int>(secondsElapsed.count() * 1000);
+    mTimeLeft = std::max(mTimeLeft, 0);
     return nextColor;
 }
 

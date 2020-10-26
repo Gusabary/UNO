@@ -26,20 +26,17 @@ void HandCards::Draw(const std::vector<Card> &cards)
     });
 }
 
-bool HandCards::Play(int index, Card lastPlayedCard)
+bool HandCards::CanBePlayedAfter(int index, Card lastPlayedCard)
 {
-    if (index >= mCards.size()) {
-        return false;
-    }
-
+    assert(index < mCards.size());
     Card cardToPlay = At(index);
-    bool isUno = mCards.size() == 1;
-    if (!cardToPlay.CanBePlayedAfter(lastPlayedCard, isUno)) {
-        return false;
-    }
+    bool isUno = (mCards.size() == 1);
+    return cardToPlay.CanBePlayedAfter(lastPlayedCard, isUno);
+}
 
-    mCards.erase(IteratorAt(index));
-    return true;
+void HandCards::Erase(int index)
+{
+    mCards.erase(std::next(mCards.begin(), index));
 }
 
 /**

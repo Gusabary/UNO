@@ -30,7 +30,7 @@ Game::CardColor Inputter::SpecifyNextColor(int timeout)
         std::cout << "Specify the next color (R/Y/G/B): ";
         char ch;
         try {
-            ch = Common::Util::GetCharWithTimeout(timeout, false);
+            ch = Common::Util::GetCharWithTimeout(timeout, true);
         }
         catch (std::exception &e) {
             // timeout, red is default

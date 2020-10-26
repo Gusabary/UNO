@@ -68,5 +68,6 @@ private:
 
     bool mLastCardCanBePlayed;
     bool mHasChanceToPlayAfterDraw;
+    bool mIsSpecifyingNextColor;
 };
 }}
