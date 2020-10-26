@@ -41,6 +41,33 @@ void Outputter::PrintView(const View &view) const
     }
 }
 
+void Outputter::PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlayed,
+    bool hasChanceToPlayAfterDraw) const
+{
+    if (isSpecifyingNextColor) {
+        std::cout << "Specify the next color (R/Y/G/B): ";
+        // without std::endl, so a flush is needed
+        std::cout.flush();
+    }
+    else if (!lastCardCanBePlayed) {
+        auto lastPlayedCard = mGameStat->GetLastPlayedCard();
+        std::cout << "This card cannot be played. Last played card is "
+                  << ToColorEscape(lastPlayedCard.mColor)
+                  << lastPlayedCard << ColorEscape::RESET << std::endl;
+        std::cout << "Press , and . to move the cursor and Enter to play the card." << std::endl;
+        std::cout << "Or press Space to draw cards / skip." << std::endl;
+    }
+    else if (!hasChanceToPlayAfterDraw) {
+        std::cout << "Now it's your turn." << std::endl;
+        std::cout << "Press , and . to move the cursor and Enter to play the card." << std::endl;
+        std::cout << "Or press Space to draw cards / skip." << std::endl;
+    }
+    else {
+        std::cout << "Press Enter to play the card just drawn immediately." << std::endl;
+        std::cout << "Or press Space to turn to the next player." << std::endl;
+    }
+}
+
 std::string Outputter::ToColorEscape(CardColor color) const
 {
     switch (color) {

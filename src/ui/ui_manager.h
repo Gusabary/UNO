@@ -51,8 +51,6 @@ private:
 
     void ClearScreen() const;
 
-    void PrintHintText() const;
-
 private:
     std::unique_ptr<View> mView;
     std::unique_ptr<Inputter> mInputter;

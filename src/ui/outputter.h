@@ -26,11 +26,10 @@ public:
     
     void PrintView(const View &view) const;
 
+    void PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlayed,
+        bool hasChanceToPlayAfterDraw) const;
+
 private:
-    void PrintHandCards() const;
-
-    void PrintColorfulCard(Card card) const;
-
     std::vector<Card> GetCardsToRender() const;
 
     std::vector<ViewFormatter::PosT> GetPosesToRender() const;

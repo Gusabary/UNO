@@ -55,34 +55,9 @@ void UIManager::Print() const
     // std::cout << *mView << std::endl;
     mOutputter->PrintView(*mView);
 
-    if (mGameStat->IsMyTurn())
-    {
-        PrintHintText();
-    }
-}
-
-void UIManager::PrintHintText() const
-{
-    if (mIsSpecifyingNextColor) {
-        std::cout << "Specify the next color (R/Y/G/B): ";
-        // without std::endl, so a flush is needed
-        std::cout.flush();
-    }
-    else if (!mLastCardCanBePlayed) {
-        std::cout << "This card cannot be played. Last played card is "
-        /// TODO: add color to the card shown here
-                  << mGameStat->GetLastPlayedCard() << std::endl;
-        std::cout << "Press , and . to move the cursor and Enter to play the card." << std::endl;
-        std::cout << "Or press Space to draw cards / skip." << std::endl;
-    }
-    else if (!mHasChanceToPlayAfterDraw) {
-        std::cout << "Now it's your turn." << std::endl;
-        std::cout << "Press , and . to move the cursor and Enter to play the card." << std::endl;
-        std::cout << "Or press Space to draw cards / skip." << std::endl;
-    }
-    else {
-        std::cout << "Press Enter to play the card just drawn immediately." << std::endl;
-        std::cout << "Or press Space to turn to the next player." << std::endl;
+    if (mGameStat->IsMyTurn()) {
+        mOutputter->PrintHintText(mIsSpecifyingNextColor, mLastCardCanBePlayed, 
+            mHasChanceToPlayAfterDraw);
     }
 }
 
