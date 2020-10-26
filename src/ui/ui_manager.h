@@ -7,6 +7,7 @@
 #include "../game/stat.h"
 #include "view.h"
 #include "inputter.h"
+#include "outputter.h"
 
 namespace UNO { namespace UI {
 
@@ -55,6 +56,7 @@ private:
 private:
     std::unique_ptr<View> mView;
     std::unique_ptr<Inputter> mInputter;
+    std::unique_ptr<Outputter> mOutputter;
 
     std::unique_ptr<GameStat> &mGameStat;
     std::vector<PlayerStat> &mPlayerStats;

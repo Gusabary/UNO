@@ -13,5 +13,11 @@ public:
     static char GetCharImmediately();
 
     static char GetCharWithTimeout(int milliseconds, bool autoFlush);
+
+    static int GetSegmentNum(int handcardNum);
+
+    static int GetSegmentIndex(int handcardIndex);
+
+    static int GetIndexInSegment(int handcardIndex);
 };
 }}

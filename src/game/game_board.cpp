@@ -4,6 +4,7 @@ namespace UNO {
 
 int Common::Common::mPlayerNum = 3;
 int Common::Common::mTimeoutPerTurn = 15;
+int Common::Common::mHandCardsNumPerRow = 8;
 
 namespace Game {
 

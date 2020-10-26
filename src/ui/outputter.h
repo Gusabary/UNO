@@ -1,0 +1,45 @@
+#pragma once
+
+#include <string>
+
+#include "../game/stat.h"
+#include "view.h"
+
+namespace UNO { namespace UI {
+
+using namespace Game;
+
+struct ColorEscape {
+    const static std::string RESET;
+    const static std::string RED;
+    const static std::string YELLOW;
+    const static std::string GREEN;
+    const static std::string BLUE;
+    const static std::string BLACK;
+};
+
+class Outputter {
+public:
+    Outputter(std::unique_ptr<GameStat> &gameStat,
+              std::vector<PlayerStat> &playerStats,
+              std::unique_ptr<HandCards> &handCards);
+    
+    void PrintView(const View &view) const;
+
+private:
+    void PrintHandCards() const;
+
+    void PrintColorfulCard(Card card) const;
+
+    std::vector<Card> GetCardsToRender() const;
+
+    std::vector<ViewFormatter::PosT> GetPosesToRender() const;
+
+    std::string ToColorEscape(CardColor color) const;
+
+private:
+    std::unique_ptr<GameStat> &mGameStat;
+    std::vector<PlayerStat> &mPlayerStats;
+    std::unique_ptr<HandCards> &mHandCards;
+};
+}}

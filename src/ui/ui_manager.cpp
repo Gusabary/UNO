@@ -4,9 +4,14 @@ namespace UNO { namespace UI {
 
 UIManager::UIManager(std::unique_ptr<GameStat> &gameStat, 
     std::vector<PlayerStat> &playerStats, std::unique_ptr<HandCards> &handCards) 
-    : mGameStat(gameStat), mPlayerStats(playerStats), mHandCards(handCards), 
-    mView(std::make_unique<View>()), mInputter(std::make_unique<Inputter>())
-{}
+    : mGameStat(gameStat), mPlayerStats(playerStats), mHandCards(handCards)
+{
+    // ViewFormatter should be init first
+    ViewFormatter::Init();
+    mView.reset(new View());
+    mInputter.reset(new Inputter());
+    mOutputter.reset(new Outputter(gameStat, playerStats, handCards));
+}
 
 void UIManager::RunTimerThread()
 {
@@ -47,8 +52,9 @@ void UIManager::Print() const
 {
     // before print, it needs to clear screen first
     // ClearScreen();
-    std::cout << *mView << std::endl;
-    
+    // std::cout << *mView << std::endl;
+    mOutputter->PrintView(*mView);
+
     if (mGameStat->IsMyTurn()) {
         PrintHintText();
     }

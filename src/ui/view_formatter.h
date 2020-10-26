@@ -3,7 +3,8 @@
 #include <utility>
 #include <vector>
 
-#include "../common/common.h"
+#include "../common/util.h"
+#include "../game/cards.h"
 
 namespace UNO { namespace UI {
 
@@ -13,20 +14,25 @@ public:
     using ScaleT = std::pair<int, int>;
 
 public:
-    ViewFormatter();
+    static void Init();
+    
+    static PosT GetPosOfPlayerBox(int playerIndex);
 
-    PosT GetPosOfPlayerBox(int playerIndex) const;
+    static PosT GetPosOfLastPlayedCard();
 
-    PosT GetPosOfLastPlayedCard() const;
+    static PosT GetPosOfPlayerLastPlayedCard(int playerIndex);
 
-    ScaleT GetBaseScaleOfView() const;
+    static PosT GetPosOfHandCard(int handcardIndex, const Game::HandCards &handcards);
 
-    ScaleT GetMaxScaleOfView() const;
+    static ScaleT GetBaseScaleOfView();
+
+    static ScaleT GetMaxScaleOfView();
+
+    static ScaleT GetBaseScaleOfBox(int playerIndex);
 
 private:
-    std::vector<std::vector<PosT>> mPosOfPlayerBox;
-    std::vector<PosT> mPosOfLastPlayedCard;
-    std::vector<ScaleT> mBaseScaleOfView;
-    std::vector<ScaleT> mMaxScaleOfView;
+    static std::vector<std::vector<PosT>> mPosOfPlayerBox;
+    static std::vector<PosT> mPosOfLastPlayedCard;
+    static std::vector<ScaleT> mBaseScaleOfView;
 };
 }}

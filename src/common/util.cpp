@@ -21,6 +21,12 @@ int Util::WrapWithPlayerNum(int numToWrap)
     return Wrap(numToWrap, Common::mPlayerNum);
 }
 
+int Util::GetSegmentNum(int handcardNum) { return (handcardNum - 1) / Common::mHandCardsNumPerRow + 1; }
+
+int Util::GetSegmentIndex(int handcardIndex) { return handcardIndex / Common::mHandCardsNumPerRow; }
+
+int Util::GetIndexInSegment(int handcardIndex) { return handcardIndex % Common::mHandCardsNumPerRow; }
+
 char Util::GetCharImmediately()
 {
     /// XXX: only apply to linux

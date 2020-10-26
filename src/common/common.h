@@ -6,5 +6,6 @@ class Common {
 public:
     static int mPlayerNum;
     static int mTimeoutPerTurn;
+    static int mHandCardsNumPerRow;
 };
 }}
