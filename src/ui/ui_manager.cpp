@@ -44,6 +44,10 @@ void UIManager::NextTurn()
     if (mGameStat->IsMyTurn()) {
         ResetCursor();
         ResetTimeLeft();
+        Common::Terminal::EnableInput();
+    }
+    else {
+        Common::Terminal::DisableInput();
     }
     mView->Clear(true);
 }
@@ -52,7 +56,6 @@ void UIManager::Print() const
 {
     // before print, it needs to clear screen first
     // ClearScreen();
-    // std::cout << *mView << std::endl;
     mOutputter->PrintView(*mView);
 
     if (mGameStat->IsMyTurn()) {
@@ -108,6 +111,7 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
 CardColor UIManager::SpecifyNextColor()
 {
     mIsSpecifyingNextColor = true;
+    Print();
     auto startTime = std::chrono::system_clock::now();
     auto nextColor = mInputter->SpecifyNextColor(mTimeLeft);
     auto endTime = std::chrono::system_clock::now();

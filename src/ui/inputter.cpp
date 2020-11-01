@@ -5,7 +5,6 @@ namespace UNO { namespace UI {
 InputAction Inputter::GetAction(int timeout)
 {
     while (true) {
-        // char ch = Common::Util::GetCharImmediately();
         char ch;
         try {
             ch = Common::Util::GetCharWithTimeout(timeout, true);
@@ -27,7 +26,6 @@ InputAction Inputter::GetAction(int timeout)
 Game::CardColor Inputter::SpecifyNextColor(int timeout)
 {
     while (true) {
-        std::cout << "Specify the next color (R/Y/G/B): ";
         char ch;
         try {
             ch = Common::Util::GetCharWithTimeout(timeout, true);
@@ -37,7 +35,6 @@ Game::CardColor Inputter::SpecifyNextColor(int timeout)
             return Game::CardColor::RED;
         }
 
-        // char ch = std::getchar();
         switch (ch) {
             case 'R': case 'r': return Game::CardColor::RED;
             case 'Y': case 'y': return Game::CardColor::YELLOW;

@@ -28,6 +28,8 @@ enum class CardText : uint8_t {
      *      which means he can only play a yellow or wild card
      *   2. player A played a yellow +2 / +4, player B got the draw,
      *      now for player C, the last played card is `yellow empty`
+     *   3. player A played a green skip, player B was skipped,
+     *      now for player C, the last played card is `green empty`
      */
 };
 

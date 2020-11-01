@@ -34,6 +34,10 @@ void GameStat::UpdateAfterDraw()
 
 void GameStat::UpdateAfterSkip()
 {
+    if (mLastPlayedCard.mText == CardText::SKIP) {
+        // last played card will become EMPTY after the skip penalty is consumed
+        mLastPlayedCard.mText = CardText::EMPTY;
+    }
     NextPlayer();
 }
 

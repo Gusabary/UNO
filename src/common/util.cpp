@@ -27,80 +27,21 @@ int Util::GetSegmentIndex(int handcardIndex) { return handcardIndex / Common::mH
 
 int Util::GetIndexInSegment(int handcardIndex) { return handcardIndex % Common::mHandCardsNumPerRow; }
 
-char Util::GetCharImmediately()
-{
-    /// XXX: only apply to linux
-    struct termios newAttr, oldAttr;
-
-    // save the old attr
-    if (tcgetattr(STDIN_FILENO, &oldAttr) != 0) {
-        return -1;
-    }
-
-    // init the new attr as raw
-    // cfmakeraw(&newAttr);
-    tcgetattr(STDIN_FILENO, &newAttr);
-    newAttr.c_lflag &= ~ICANON;
-    newAttr.c_lflag &= ~ECHO;
-
-    // set the attr to new attr
-    if (tcsetattr(STDIN_FILENO, TCSANOW, &newAttr) != 0) {
-        return -1;
-    }
-
-    // get a char immediately
-    char c = getchar();
-
-    // recover the old attr
-    if (tcsetattr(STDIN_FILENO, TCSANOW, &oldAttr) != 0) {
-        return -1;
-    }
-
-    return c;
-}
-
 char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
 {
-    /// XXX: only apply to linux
-    struct termios newAttr, oldAttr;
-
+    std::unique_ptr<Terminal> terminal;
     if (autoFlush) {
-        // save the old attr
-        if (tcgetattr(STDIN_FILENO, &oldAttr) != 0) {
-            return -1;
-        }
-
-        // init the new attr as raw
-        // cfmakeraw(&newAttr);
-        tcgetattr(STDIN_FILENO, &newAttr);
-        newAttr.c_lflag &= ~ICANON;
-        newAttr.c_lflag &= ~ECHO;
-
-        // set the attr to new attr
-        if (tcsetattr(STDIN_FILENO, TCSANOW, &newAttr) != 0) {
-            return -1;
-        }
+        terminal.reset(new Terminal());
+        terminal->SetModeAutoFlush();
     }
 
     struct pollfd pfd = { STDIN_FILENO, POLLIN, 0 };
     int ret = poll(&pfd, 1, milliseconds);
 
     if (ret == 0) {
-        // recover the old attr
-        if (autoFlush) {
-            if (tcsetattr(STDIN_FILENO, TCSANOW, &oldAttr) != 0) {
-                return -1;
-            }
-        }
         throw std::runtime_error("timeout");
     }
     else if (ret == 1) {
-        // recover the old attr
-        if (autoFlush) {
-            if (tcsetattr(STDIN_FILENO, TCSANOW, &oldAttr) != 0) {
-                return -1;
-            }
-        }
         char c = getchar();
         return c;
     }

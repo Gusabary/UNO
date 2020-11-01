@@ -1,6 +1,9 @@
 #pragma once
 
+#include <memory>
+
 #include "common.h"
+#include "terminal.h"
 
 namespace UNO { namespace Common {
 
