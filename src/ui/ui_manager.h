@@ -4,7 +4,6 @@
 #include <utility>
 #include <thread>
 
-#include "../game/stat.h"
 #include "view.h"
 #include "inputter.h"
 #include "outputter.h"

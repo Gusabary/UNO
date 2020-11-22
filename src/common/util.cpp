@@ -45,6 +45,6 @@ char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
         char c = getchar();
         return c;
     }
+    return 0;
 }
-
 }}

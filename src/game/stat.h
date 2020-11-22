@@ -45,6 +45,15 @@ public:
 
     void Reverse() { mIsInClockwise = !mIsInClockwise; }
 
+    // for tests
+    void SetCurrentPlayer(int currentPlayer) { mCurrentPlayer = currentPlayer; }
+    
+    void SetIsInClockwise(bool isInClockwise) { mIsInClockwise = isInClockwise; }
+
+    void SetLastPlayedCard(Card lastPlayedCard) { mLastPlayedCard = lastPlayedCard; }
+
+    void SetCardsNumToDraw(int cardsNumToDraw) { mCardsNumToDraw = cardsNumToDraw; }
+
 private:
     int mCurrentPlayer;
     bool mIsInClockwise;
@@ -52,7 +61,7 @@ private:
     int mTimeElapsed{0};
 
     // currently the two fields below are not used by GameStat of GameBoard
-    Card mLastPlayedCard;
+    Card mLastPlayedCard{};
     int mCardsNumToDraw{1};  // +2 and +4 can accumulate
 };
 
@@ -79,6 +88,9 @@ public:
 
     int GetIndexOfNewlyDrawn() const { return mIndexOfNewlyDrawn; }
 
+    // for test
+    void SetLastPlayedCard(Card lastPlayedCard) { mLastPlayedCard = lastPlayedCard; }
+
 private:
     const std::string mUsername;
 
@@ -86,7 +98,7 @@ private:
     bool mDoPlayInLastRound{false};
     Card mLastPlayedCard{};
     bool mHasChanceToPlayAfterDraw{false};
-    int mIndexOfNewlyDrawn;
+    int mIndexOfNewlyDrawn{-1};
 
     friend std::ostream& operator<<(std::ostream& os, const PlayerStat& stat);
 };

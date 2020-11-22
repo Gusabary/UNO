@@ -184,6 +184,7 @@ Card::Card(const char *str)
         case '+': mText = (*(str + 1) == '2') ? 
             CardText::DRAW_TWO : CardText::DRAW_FOUR; 
             break;
+        case '\0': mText = CardText::EMPTY;  break;
         default: assert(0);
     }
 }

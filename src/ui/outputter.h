@@ -2,7 +2,6 @@
 
 #include <string>
 
-#include "../game/stat.h"
 #include "view.h"
 
 namespace UNO { namespace UI {
