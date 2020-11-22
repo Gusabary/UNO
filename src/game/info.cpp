@@ -175,7 +175,50 @@ std::unique_ptr<GameEndInfo> GameEndInfo::Deserialize(const uint8_t *buffer)
     info->mWinner = msg->mWinner;
     return info;
 }
-    
+
+bool JoinGameInfo::operator==(const JoinGameInfo &info) const
+{
+    return mUsername == info.mUsername;
+}
+
+bool GameStartInfo::operator==(const GameStartInfo &info) const
+{
+    return (mInitHandCards == info.mInitHandCards) && (mFlippedCard == info.mFlippedCard)
+        && (mFirstPlayer == info.mFirstPlayer) && (mUsernames == info.mUsernames);
+}
+
+bool ActionInfo::operator==(const ActionInfo &info) const
+{
+    return (mActionType == info.mActionType) && (mPlayerIndex == info.mPlayerIndex);
+}
+
+bool DrawInfo::operator==(const DrawInfo &info) const
+{
+    return (mNumber == info.mNumber) 
+        && (dynamic_cast<const ActionInfo &>(*this) == dynamic_cast<const ActionInfo &>(info));
+}
+
+bool SkipInfo::operator==(const SkipInfo &info) const
+{
+    return dynamic_cast<const ActionInfo &>(*this) == dynamic_cast<const ActionInfo &>(info);
+}
+
+bool PlayInfo::operator==(const PlayInfo &info) const
+{
+    return (mCard == info.mCard) && (mNextColor == info.mNextColor)
+        && (dynamic_cast<const ActionInfo &>(*this) == dynamic_cast<const ActionInfo &>(info));
+}
+
+bool DrawRspInfo::operator==(const DrawRspInfo &info) const
+{
+    return (mNumber == info.mNumber) && (mCards == info.mCards);
+}
+
+bool GameEndInfo::operator==(const GameEndInfo &info) const
+{
+    return mWinner == info.mWinner;
+}
+
 std::ostream& operator<<(std::ostream& os, const JoinGameInfo& info)
 {
     os << "JoinGameInfo Received: " << std::endl;

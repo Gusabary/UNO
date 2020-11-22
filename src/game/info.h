@@ -24,8 +24,9 @@ struct JoinGameInfo : public Info {
 
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<JoinGameInfo> Deserialize(const uint8_t *buffer);
-  
-    friend std::ostream& operator<<(std::ostream& os, const JoinGameInfo& info);
+
+    bool operator==(const JoinGameInfo &info) const;
+    friend std::ostream &operator<<(std::ostream &os, const JoinGameInfo &info);
 };
 
 struct GameStartInfo : public Info {
@@ -44,6 +45,7 @@ struct GameStartInfo : public Info {
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<GameStartInfo> Deserialize(const uint8_t *buffer);
 
+    bool operator==(const GameStartInfo &info) const;
     friend std::ostream& operator<<(std::ostream& os, const GameStartInfo& info);
 };
 
@@ -57,6 +59,7 @@ struct ActionInfo : public Info {
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<ActionInfo> Deserialize(const uint8_t *buffer);
 
+    bool operator==(const ActionInfo &info) const;
     friend std::ostream& operator<<(std::ostream& os, const ActionInfo& info);
 
     // enable polymorphism
@@ -72,6 +75,7 @@ struct DrawInfo : public ActionInfo {
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<DrawInfo> Deserialize(const uint8_t *buffer);
 
+    bool operator==(const DrawInfo &info) const;
     friend std::ostream& operator<<(std::ostream& os, const DrawInfo& info);
 };
 
@@ -81,6 +85,7 @@ struct SkipInfo : public ActionInfo {
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<SkipInfo> Deserialize(const uint8_t *buffer);
 
+    bool operator==(const SkipInfo &info) const;
     friend std::ostream& operator<<(std::ostream& os, const SkipInfo& info);
 };
 
@@ -96,6 +101,7 @@ struct PlayInfo : public ActionInfo {
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<PlayInfo> Deserialize(const uint8_t *buffer);
 
+    bool operator==(const PlayInfo &info) const;
     friend std::ostream& operator<<(std::ostream& os, const PlayInfo& info);
 };
 
@@ -110,6 +116,7 @@ struct DrawRspInfo : public Info {
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<DrawRspInfo> Deserialize(const uint8_t *buffer);
 
+    bool operator==(const DrawRspInfo &info) const;
     friend std::ostream& operator<<(std::ostream& os, const DrawRspInfo& info);
 };
 
@@ -121,5 +128,7 @@ struct GameEndInfo : public Info {
 
     void Serialize(uint8_t *buffer) const;
     static std::unique_ptr<GameEndInfo> Deserialize(const uint8_t *buffer);
+
+    bool operator==(const GameEndInfo &info) const;
 };
 }}
