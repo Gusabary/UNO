@@ -47,7 +47,7 @@ struct Card {
     Card(const char *str);
     Card(CardColor color, CardText text) : mColor(color), mText(text) {}
 
-    bool CanBePlayedAfter(Card lastPlayedCard, bool isUno);
+    bool CanBePlayedAfter(Card lastPlayedCard, bool isUno = false);
 
     std::string ToString() const;
 
@@ -156,6 +156,10 @@ protected:
     void Swap(CardPile &pile) { std::swap(mPile, pile.mPile); }
 
     bool Empty() const { return mPile.empty(); }
+
+public:
+    // for test
+    std::deque<Card> GetPile() const { return mPile; }
 
 private:
     std::deque<Card> mPile;
