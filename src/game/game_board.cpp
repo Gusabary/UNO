@@ -1,16 +1,11 @@
 #include "game_board.h"
 
-namespace UNO {
+namespace UNO { namespace Game {
 
-int Common::Common::mPlayerNum = 3;
-int Common::Common::mTimeoutPerTurn = 15;
-int Common::Common::mHandCardsNumPerRow = 8;
-
-namespace Game {
-
-GameBoard::GameBoard(std::unique_ptr<Network::Server> &serverUp)
-    : mServer(serverUp.release()), mDeck(std::make_unique<Deck>(*mDiscardPile)),
-    mDiscardPile(std::make_unique<DiscardPile>())
+GameBoard::GameBoard(std::unique_ptr<Network::IServer> &serverUp)
+    : mServer(serverUp.release()), 
+    mDiscardPile(std::make_unique<DiscardPile>()),
+    mDeck(std::make_unique<Deck>(*mDiscardPile))
 {
     mServer->RegisterReceiveJoinGameInfoCallback(
         [this](int index, const JoinGameInfo &info) {
@@ -21,7 +16,7 @@ GameBoard::GameBoard(std::unique_ptr<Network::Server> &serverUp)
     mServer->Run();
 }
 
-std::unique_ptr<Network::Server> GameBoard::CreateServer(const std::string &port)
+std::unique_ptr<Network::IServer> GameBoard::CreateServer(const std::string &port)
 {
     return std::make_unique<Network::Server>(port);
 }

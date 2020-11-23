@@ -14,11 +14,13 @@ using namespace Network;
 
 class GameBoard {
 public:
-    explicit GameBoard(std::unique_ptr<Network::Server> &serverUp);
+    explicit GameBoard(std::unique_ptr<Network::IServer> &serverUp);
 
-    static std::unique_ptr<Network::Server> CreateServer(const std::string &port);
+    static std::unique_ptr<Network::IServer> CreateServer(const std::string &port);
 
-private:
+    static std::pair<std::unique_ptr<DiscardPile>, std::unique_ptr<Deck>> CreateCardPile();
+
+// private:
     void ReceiveUsername(int index, const std::string &username);
 
     void StartGame();
@@ -46,11 +48,11 @@ private:
 
 private:
     constexpr static int PLAYER_NUM = 3;
-    std::unique_ptr<Network::Server> mServer;
+    std::unique_ptr<Network::IServer> mServer;
 
     // state of game board
-    std::unique_ptr<Deck> mDeck;
     std::unique_ptr<DiscardPile> mDiscardPile;
+    std::unique_ptr<Deck> mDeck;
     std::unique_ptr<GameStat> mGameStat;
 
     // state of all players
