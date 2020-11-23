@@ -14,7 +14,9 @@ using namespace Network;
 
 class GameBoard {
 public:
-    explicit GameBoard(std::string port);
+    explicit GameBoard(std::unique_ptr<Network::Server> &serverUp);
+
+    static std::unique_ptr<Network::Server> CreateServer(const std::string &port);
 
 private:
     void ReceiveUsername(int index, const std::string &username);
@@ -37,14 +39,14 @@ private:
         for (int i = 0; i < Common::Common::mPlayerNum; i++) {
             if (i != currentPlayer) {
                 info.mPlayerIndex = Common::Util::WrapWithPlayerNum(currentPlayer - i);
-                mServer.DeliverInfo(typeid(InfoT), i, info);
+                mServer->DeliverInfo(typeid(InfoT), i, info);
             }
         }
     }
 
 private:
     constexpr static int PLAYER_NUM = 3;
-    Network::Server mServer;
+    std::unique_ptr<Network::Server> mServer;
 
     // state of game board
     std::unique_ptr<Deck> mDeck;

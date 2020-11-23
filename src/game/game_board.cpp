@@ -8,15 +8,22 @@ int Common::Common::mHandCardsNumPerRow = 8;
 
 namespace Game {
 
-GameBoard::GameBoard(std::string port)
-    : mServer(port), mDiscardPile(std::make_unique<DiscardPile>()),
-    mDeck(std::make_unique<Deck>(*mDiscardPile))
+GameBoard::GameBoard(std::unique_ptr<Network::Server> &serverUp)
+    : mServer(serverUp.release()), mDeck(std::make_unique<Deck>(*mDiscardPile)),
+    mDiscardPile(std::make_unique<DiscardPile>())
 {
-    mServer.OnReceiveJoinGameInfo = [this](int index, const JoinGameInfo &info) {
-        ReceiveUsername(index, info.mUsername);
-    };
+    mServer->RegisterReceiveJoinGameInfoCallback(
+        [this](int index, const JoinGameInfo &info) {
+            ReceiveUsername(index, info.mUsername);
+        }
+    );
 
-    mServer.Run();
+    mServer->Run();
+}
+
+std::unique_ptr<Network::Server> GameBoard::CreateServer(const std::string &port)
+{
+    return std::make_unique<Network::Server>(port);
 }
 
 void GameBoard::ReceiveUsername(int index, const std::string &username)
@@ -61,7 +68,7 @@ void GameBoard::StartGame()
         }
     );
     for (int player = 0; player < PLAYER_NUM; player++) {
-        mServer.DeliverInfo(typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
+        mServer->DeliverInfo(typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
             flippedCard, Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames});
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
@@ -74,8 +81,8 @@ void GameBoard::StartGame()
 void GameBoard::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
-        std::unique_ptr<Info> info = mServer.ReceiveInfo(typeid(ActionInfo), mGameStat->GetCurrentPlayer());
-        std::unique_ptr<ActionInfo> actionInfo = Common::Util::DynamicCast<ActionInfo>(info);
+        auto info = mServer->ReceiveInfo(typeid(ActionInfo), mGameStat->GetCurrentPlayer());
+        auto actionInfo = Common::Util::DynamicCast<ActionInfo>(info);
         switch (actionInfo->mActionType) {
             case ActionType::DRAW:
                 HandleDraw(Common::Util::DynamicCast<DrawInfo>(actionInfo));
@@ -100,7 +107,7 @@ void GameBoard::HandleDraw(const std::unique_ptr<DrawInfo> &info)
     std::vector<Card> cardsToDraw = mDeck->Draw(info->mNumber);
 
     // respond to the deliverer
-    mServer.DeliverInfo(typeid(DrawRspInfo), mGameStat->GetCurrentPlayer(), DrawRspInfo{
+    mServer->DeliverInfo(typeid(DrawRspInfo), mGameStat->GetCurrentPlayer(), DrawRspInfo{
         info->mNumber, cardsToDraw});
 
     // broadcast to other players
@@ -148,7 +155,7 @@ void GameBoard::HandlePlay(const std::unique_ptr<PlayInfo> &info)
 void GameBoard::Win()
 {
     mGameStat->GameEnds();
-    mServer.Close();
+    mServer->Close();
     std::cout << "Game Ends" << std::endl;
 }
 

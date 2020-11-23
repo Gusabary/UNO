@@ -12,6 +12,10 @@ using namespace Game;
 
 class IClient {
 public:
+    virtual void Connect() = 0;
+
+    virtual void RegisterConnectCallback(const std::function<void()> &callback) = 0;
+
     virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) = 0;
 
     virtual void DeliverInfo(const std::type_info &infoType, const Info &info) = 0;
@@ -21,7 +25,11 @@ class Client : public IClient {
 public:
     explicit Client(std::string host, std::string port);
 
-    void Connect();
+    void Connect() override;
+
+    void RegisterConnectCallback(const std::function<void()> &callback) override {
+        OnConnect = callback;
+    }
 
     std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) override;
 
@@ -38,7 +46,7 @@ private:
         mSession->DeliverInfo<InfoT>(info);
     }
 
-public:
+private:
     std::function<void()> OnConnect;
 
 private:

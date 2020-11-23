@@ -15,7 +15,10 @@ using namespace UI;
 
 class Player {
 public:
-    explicit Player(std::string username, std::string host, std::string port);
+    explicit Player(std::string username, std::unique_ptr<Network::Client> &clientUp);
+
+    static std::unique_ptr<Network::Client> CreateClient(const std::string &host, 
+        const std::string &port);
 
 private:
     void JoinGame();
@@ -40,10 +43,10 @@ private:
 
 private:
     const std::string mUsername;
-    Network::Client mClient;
+    std::unique_ptr<Network::Client> mClient;
 
-    std::unique_ptr<HandCards> mHandCards;
     std::unique_ptr<UIManager> mUIManager;
+    std::unique_ptr<HandCards> mHandCards;
 
     // state of game board
     std::unique_ptr<GameStat> mGameStat;

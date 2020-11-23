@@ -73,10 +73,12 @@ int main(int argc, char **argv)
     const ArgInfo argInfo = ParseArgs(argc, const_cast<const char **>(argv));
 
     if (argInfo.mIsServer) {
-        Game::GameBoard gameBoard(argInfo.mPort);
+        auto serverUp = Game::GameBoard::CreateServer(argInfo.mPort);
+        Game::GameBoard gameBoard(serverUp);
     }
     else {
-        Game::Player player(argInfo.mUsername, argInfo.mHost, argInfo.mPort);
+        auto clientUp = Game::Player::CreateClient(argInfo.mHost, argInfo.mPort);
+        Game::Player player(argInfo.mUsername, clientUp);
     }
 
     return 0;
