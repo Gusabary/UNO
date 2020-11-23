@@ -35,13 +35,13 @@ public:
 
     void Win();
 
-    template <typename InfoT>
-    void Broadcast(InfoT &info) {
+    template <typename ActionInfoT>
+    void Broadcast(ActionInfoT &info) {
         int currentPlayer = mGameStat->GetCurrentPlayer();
         for (int i = 0; i < Common::Common::mPlayerNum; i++) {
             if (i != currentPlayer) {
                 info.mPlayerIndex = Common::Util::WrapWithPlayerNum(currentPlayer - i);
-                mServer->DeliverInfo(typeid(InfoT), i, info);
+                mServer->DeliverInfo(typeid(ActionInfoT), i, info);
             }
         }
     }

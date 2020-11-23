@@ -22,7 +22,9 @@ public:
     Outputter(std::unique_ptr<GameStat> &gameStat,
               std::vector<PlayerStat> &playerStats,
               std::unique_ptr<HandCards> &handCards);
-    
+
+    void PrintRawView(const View &view) const;
+
     void PrintView(const View &view) const;
 
     void PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlayed,

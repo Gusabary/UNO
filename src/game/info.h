@@ -31,6 +31,21 @@ struct JoinGameInfo : public Info {
     friend std::ostream &operator<<(std::ostream &os, const JoinGameInfo &info);
 };
 
+struct JoinGameRspInfo : public Info {
+    int mPlayerNum;
+    std::vector<std::string> mUsernames;
+
+    JoinGameRspInfo() {}
+    JoinGameRspInfo(int playerNum, const std::vector<std::string> &usernames)
+        : mPlayerNum(playerNum), mUsernames(usernames) {}
+
+    void Serialize(uint8_t *buffer) const;
+    static std::unique_ptr<JoinGameRspInfo> Deserialize(const uint8_t *buffer);
+
+    bool operator==(const JoinGameRspInfo &info) const;
+    friend std::ostream &operator<<(std::ostream &os, const JoinGameRspInfo &info);
+};
+
 struct GameStartInfo : public Info {
     std::array<Card, 7> mInitHandCards;
     Card mFlippedCard;

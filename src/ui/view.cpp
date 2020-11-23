@@ -38,6 +38,31 @@ void View::Clear(bool doClearIndicator, int currentPlayer)
     }
 }
 
+void View::DrawWhenInitWaiting(const std::vector<std::string> &usernames)
+{
+    static int myIndex = usernames.size() - 1;
+    for (int playerIndex = 0; playerIndex < Common::Common::mPlayerNum; playerIndex++) {
+        auto [row, col] = ViewFormatter::GetPosOfPlayerBox(playerIndex);
+        auto [height, width] = ViewFormatter::GetBaseScaleOfBox(playerIndex);
+        int curNum = usernames.size();
+        int absoluteIndex = Common::Util::WrapWithPlayerNum(playerIndex + myIndex);
+        if (absoluteIndex >= curNum) {
+            // username unknown yet
+            DrawBorder(row, col, width, height - 2);
+        }
+        else {
+            DrawBorderAndUsername(row, col, width, height - 2, usernames[absoluteIndex]);
+        }
+        if (playerIndex == 0) {
+            AlignCenter(row + 3, col, width, "Waiting for players to join...");
+        }
+        else {
+            Copy(row + 3, col + 2, CARDS_REMAINED_STR);
+            Copy(row + 4, col + 2, LAST_PLAYED_STR);
+        }
+    }
+}
+
 /**
  * draw a box of other player (instead of the player himself), whose top left corner is
  * located by \p row and \p col, and contains the information of \p gameStat and \p playerStat.
@@ -131,6 +156,15 @@ void View::DrawHandCards(int row, int col, int width, const HandCards &handcards
     }
 }
 
+void View::DrawBorder(int row, int col, int width, int height)
+{
+    DrawHorizontalBorder(row, col, width);
+    DrawHorizontalBorder(row + height + 1, col, width);
+    DrawVerticalBorder(row + 1, col, height);
+    DrawVerticalBorder(row + 1, col + width - 1, height);
+    DrawHorizontalBorder(row + 2, col, width);
+}
+
 /**
  * draw the border and username of a box, whose top left corner is located by \p row and \p col,
  * with width (including '+' at both sides) of \p width, height (not including '+' at both sides) 
@@ -138,11 +172,7 @@ void View::DrawHandCards(int row, int col, int width, const HandCards &handcards
  */
 void View::DrawBorderAndUsername(int row, int col, int width, int height, const std::string &username)
 {
-    DrawHorizontalBorder(row, col, width);
-    DrawHorizontalBorder(row + height + 1, col, width);
-    DrawVerticalBorder(row + 1, col, height);
-    DrawVerticalBorder(row + 1, col + width - 1, height);
-    DrawHorizontalBorder(row + 2, col, width);
+    DrawBorder(row, col, width, height);
     AlignCenter(row + 1, col, width, username);
 }
 

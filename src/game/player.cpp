@@ -21,6 +21,18 @@ void Player::JoinGame()
     std::cout << "connect success, sending username to server" << std::endl;
     mClient->DeliverInfo(typeid(JoinGameInfo), JoinGameInfo{mUsername});
 
+    auto joinRsp = Common::Util::DynamicCast<JoinGameRspInfo>(mClient->ReceiveInfo(typeid(JoinGameRspInfo)));
+    auto initUsernames = joinRsp->mUsernames;
+    auto initSize = initUsernames.size();
+    // don't forget to update common config
+    Common::Common::mPlayerNum = joinRsp->mPlayerNum;
+    mUIManager->RenderWhenInitWaiting(initUsernames);
+    for (auto i = 0; i < Common::Common::mPlayerNum - initSize; i++) {
+        auto joinInfo = Common::Util::DynamicCast<JoinGameInfo>(mClient->ReceiveInfo(typeid(JoinGameInfo)));
+        initUsernames.push_back(joinInfo->mUsername);
+        mUIManager->RenderWhenInitWaiting(initUsernames);
+    }
+
     // wait for game start
     auto info = Common::Util::DynamicCast<GameStartInfo>(mClient->ReceiveInfo(typeid(GameStartInfo)));
     std::cout << *info << std::endl;

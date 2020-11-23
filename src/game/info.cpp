@@ -20,6 +20,37 @@ std::unique_ptr<JoinGameInfo> JoinGameInfo::Deserialize(const uint8_t *buffer)
     return info;
 }
 
+void JoinGameRspInfo::Serialize(uint8_t *buffer) const
+{
+    JoinGameRspMsg *msg = reinterpret_cast<JoinGameRspMsg *>(buffer);
+    msg->mType = MsgType::JOIN_GAME_RSP;
+
+    std::string usernames{};
+    std::for_each(mUsernames.begin(), mUsernames.end(),
+        [&usernames](const std::string &username) {
+            usernames.append(username).push_back(' ');
+        }
+    );
+    msg->mLen = sizeof(int) + usernames.size();
+
+    msg->mPlayerNum = mPlayerNum;
+    std::strcpy(msg->mUsernames, usernames.c_str());
+}
+
+std::unique_ptr<JoinGameRspInfo> JoinGameRspInfo::Deserialize(const uint8_t *buffer)
+{
+    const JoinGameRspMsg *msg = reinterpret_cast<const JoinGameRspMsg *>(buffer);
+    std::unique_ptr<JoinGameRspInfo> info = std::make_unique<JoinGameRspInfo>();
+    info->mPlayerNum = msg->mPlayerNum;
+    std::string usernames(msg->mUsernames);
+    while (!usernames.empty()) {
+        int pos = usernames.find(' ');
+        info->mUsernames.emplace_back(usernames, 0, pos);
+        usernames.erase(0, pos + 1);
+    }
+    return info;
+}
+
 void GameStartInfo::Serialize(uint8_t *buffer) const
 {
     GameStartMsg *msg = reinterpret_cast<GameStartMsg *>(buffer);
@@ -181,6 +212,11 @@ bool JoinGameInfo::operator==(const JoinGameInfo &info) const
     return mUsername == info.mUsername;
 }
 
+bool JoinGameRspInfo::operator==(const JoinGameRspInfo &info) const
+{
+    return (mPlayerNum == info.mPlayerNum) && (mUsernames == info.mUsernames);
+}
+
 bool GameStartInfo::operator==(const GameStartInfo &info) const
 {
     return (mInitHandCards == info.mInitHandCards) && (mFlippedCard == info.mFlippedCard)
@@ -223,6 +259,12 @@ std::ostream& operator<<(std::ostream& os, const JoinGameInfo& info)
 {
     os << "JoinGameInfo Received: " << std::endl;
     os << "\t mUsername: " << info.mUsername << std::endl;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const JoinGameRspInfo& info)
+{
+    os << "JoinGameRspInfo Received!" << std::endl;
     return os;
 }
 

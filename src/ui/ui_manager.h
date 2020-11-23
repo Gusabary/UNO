@@ -22,6 +22,8 @@ public:
 
     void RunTimerThread();
 
+    void RenderWhenInitWaiting(const std::vector<std::string> &usernames);
+
     void Render();
 
     std::pair<InputAction, int> GetAction(bool lastCardCanBePlayed, 

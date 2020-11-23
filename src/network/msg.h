@@ -8,6 +8,7 @@ using namespace Game;
 
 enum class MsgType : uint8_t {
     JOIN_GAME,
+    JOIN_GAME_RSP,
     GAME_START,
     ACTION,
     DRAW_RSP,
@@ -21,6 +22,12 @@ struct Msg {
 
 struct JoinGameMsg : public Msg {
     char mUsername[];
+};
+
+struct JoinGameRspMsg : public Msg {
+    int mPlayerNum;
+    // including player himself
+    char mUsernames[];
 };
 
 struct GameStartMsg : public Msg {

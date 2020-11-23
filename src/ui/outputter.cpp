@@ -14,6 +14,17 @@ Outputter::Outputter(std::unique_ptr<GameStat> &gameStat,
     : mGameStat(gameStat), mPlayerStats(playerStats), mHandCards(handCards) 
 {}
 
+void Outputter::PrintRawView(const View &view) const
+{
+    auto [height, width] = ViewFormatter::GetBaseScaleOfView();
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            std::cout << view.At(row, col);
+        }
+        std::cout << std::endl;
+    }
+}
+
 void Outputter::PrintView(const View &view) const
 {
     auto [baseHeight, width] = ViewFormatter::GetBaseScaleOfView();

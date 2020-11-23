@@ -25,6 +25,17 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
 {
     std::cout << "receive, index: " << index << ", username: " << username << std::endl;
     mPlayerStats.emplace_back(username, 7);
+    std::vector<std::string> tmpUsernames;
+    std::for_each(mPlayerStats.begin(), mPlayerStats.end(),
+        [&tmpUsernames](const PlayerStat &stat) {
+            tmpUsernames.push_back(stat.GetUsername());
+        }
+    );
+    mServer->DeliverInfo(typeid(JoinGameRspInfo), index, JoinGameRspInfo{
+        Common::Common::mPlayerNum, tmpUsernames});
+    for (int i = 0; i < index; i++) {
+        mServer->DeliverInfo(typeid(JoinGameInfo), i, JoinGameInfo{username});
+    }
     if (index == PLAYER_NUM - 1) {
         StartGame();
     }

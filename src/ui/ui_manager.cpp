@@ -28,6 +28,13 @@ void UIManager::TimerThreadLoop()
     }
 }
 
+void UIManager::RenderWhenInitWaiting(const std::vector<std::string> &usernames)
+{
+    mView->Clear(true);
+    mView->DrawWhenInitWaiting(usernames);
+    mOutputter->PrintRawView(*mView);
+}
+
 void UIManager::Render()
 {
     // before render, mView should be cleared first

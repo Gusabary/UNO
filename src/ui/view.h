@@ -17,6 +17,8 @@ public:
 
     void Clear(bool doClearIndicator, int currentPlayer = 0);
 
+    void DrawWhenInitWaiting(const std::vector<std::string> &usernames);
+
     void DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerStat &playerStat);
 
     void DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
@@ -33,6 +35,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const View& view);
 
 private:
+    void DrawBorder(int row, int col, int width, int height);
+    
     void DrawBorderAndUsername(int row, int col, int width, int height, const std::string &username);
 
     void DrawHorizontalBorder(int row, int col, int length);
