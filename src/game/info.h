@@ -13,8 +13,10 @@ namespace UNO { namespace Game {
 
 using namespace Network;
 
-struct Info
-{};
+struct Info {
+    // enable polymorphism
+    virtual ~Info() {}
+};
 
 struct JoinGameInfo : public Info {
     std::string mUsername;

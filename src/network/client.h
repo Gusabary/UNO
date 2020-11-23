@@ -10,20 +10,32 @@ namespace UNO { namespace Network {
 using asio::ip::tcp;
 using namespace Game;
 
-class Client {
+class IClient {
+public:
+    virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) = 0;
+
+    virtual void DeliverInfo(const std::type_info &infoType, const Info &info) = 0;
+};
+
+class Client : public IClient {
 public:
     explicit Client(std::string host, std::string port);
 
     void Connect();
 
+    std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) override;
+
+    void DeliverInfo(const std::type_info &infoType, const Info &info) override;
+
+private:
     template <typename InfoT>
-    std::unique_ptr<InfoT> ReceiveInfo() {
+    std::unique_ptr<InfoT> ReceiveInfoImpl() {
         return mSession->ReceiveInfo<InfoT>();
     }
 
-    template <typename InfoT, typename... Types>
-    void DeliverInfo(Types&&... args) {
-        mSession->DeliverInfo<InfoT>(args...);
+    template <typename InfoT>
+    void DeliverInfoImpl(const InfoT &info) {
+        mSession->DeliverInfo<InfoT>(info);
     }
 
 public:

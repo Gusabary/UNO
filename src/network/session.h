@@ -32,6 +32,12 @@ public:
         Write();
     }
 
+    template <typename InfoT>
+    void DeliverInfo(const InfoT &info) {
+        info.Serialize(mWriteBuffer);
+        Write();
+    }
+
 private:
     // read from mSocket to mReadBuffer
     void Read();

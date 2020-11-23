@@ -22,5 +22,10 @@ public:
     static int GetSegmentIndex(int handcardIndex);
 
     static int GetIndexInSegment(int handcardIndex);
+
+    template<typename DstInfoT, typename SrcInfoUp>
+    static std::unique_ptr<DstInfoT> DynamicCast(SrcInfoUp &&srcInfo) {
+        return std::unique_ptr<DstInfoT>(dynamic_cast<DstInfoT *>(srcInfo.release()));
+    }
 };
 }}

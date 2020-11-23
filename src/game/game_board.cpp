@@ -61,8 +61,8 @@ void GameBoard::StartGame()
         }
     );
     for (int player = 0; player < PLAYER_NUM; player++) {
-        mServer.DeliverInfo<GameStartInfo>(player, initHandCards[player], 
-            flippedCard, Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames);
+        mServer.DeliverInfo(typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
+            flippedCard, Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames});
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
     }
@@ -74,16 +74,17 @@ void GameBoard::StartGame()
 void GameBoard::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
-        std::unique_ptr<ActionInfo> info = mServer.ReceiveInfo<ActionInfo>(mGameStat->GetCurrentPlayer());
-        switch (info->mActionType) {
+        std::unique_ptr<Info> info = mServer.ReceiveInfo(typeid(ActionInfo), mGameStat->GetCurrentPlayer());
+        std::unique_ptr<ActionInfo> actionInfo = Common::Util::DynamicCast<ActionInfo>(info);
+        switch (actionInfo->mActionType) {
             case ActionType::DRAW:
-                HandleDraw(std::unique_ptr<DrawInfo>(dynamic_cast<DrawInfo *>(info.release())));
+                HandleDraw(Common::Util::DynamicCast<DrawInfo>(actionInfo));
                 break;
             case ActionType::SKIP:
-                HandleSkip(std::unique_ptr<SkipInfo>(dynamic_cast<SkipInfo *>(info.release())));
+                HandleSkip(Common::Util::DynamicCast<SkipInfo>(actionInfo));
                 break;
             case ActionType::PLAY:
-                HandlePlay(std::unique_ptr<PlayInfo>(dynamic_cast<PlayInfo *>(info.release())));
+                HandlePlay(Common::Util::DynamicCast<PlayInfo>(actionInfo));
                 break;
             default:
                 assert(0);
@@ -99,7 +100,8 @@ void GameBoard::HandleDraw(const std::unique_ptr<DrawInfo> &info)
     std::vector<Card> cardsToDraw = mDeck->Draw(info->mNumber);
 
     // respond to the deliverer
-    mServer.DeliverInfo<DrawRspInfo>(mGameStat->GetCurrentPlayer(), info->mNumber, cardsToDraw);
+    mServer.DeliverInfo(typeid(DrawRspInfo), mGameStat->GetCurrentPlayer(), DrawRspInfo{
+        info->mNumber, cardsToDraw});
 
     // broadcast to other players
     Broadcast<DrawInfo>(*info);

@@ -37,7 +37,7 @@ private:
         for (int i = 0; i < Common::Common::mPlayerNum; i++) {
             if (i != currentPlayer) {
                 info.mPlayerIndex = Common::Util::WrapWithPlayerNum(currentPlayer - i);
-                mServer.DeliverInfo<InfoT>(i, info);
+                mServer.DeliverInfo(typeid(InfoT), i, info);
             }
         }
     }

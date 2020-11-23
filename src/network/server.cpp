@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 
 #include "server.h"
 
@@ -39,4 +40,57 @@ void Server::Close()
 {
     mContext.stop();
 }
+
+std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info &infoType, int index)
+{
+    using funcType = std::function<std::unique_ptr<Info>(int)>;
+    static std::map<const std::type_info *, funcType> mapping{
+        {&typeid(JoinGameInfo),  [this](int index) { return ReceiveInfoImpl<JoinGameInfo>(index); }},
+        {&typeid(GameStartInfo), [this](int index) { return ReceiveInfoImpl<GameStartInfo>(index); }},
+        {&typeid(ActionInfo),    [this](int index) { return ReceiveInfoImpl<ActionInfo>(index); }},
+        {&typeid(DrawInfo),      [this](int index) { return ReceiveInfoImpl<DrawInfo>(index); }},
+        {&typeid(SkipInfo),      [this](int index) { return ReceiveInfoImpl<SkipInfo>(index); }},
+        {&typeid(PlayInfo),      [this](int index) { return ReceiveInfoImpl<PlayInfo>(index); }},
+        {&typeid(DrawRspInfo),   [this](int index) { return ReceiveInfoImpl<DrawRspInfo>(index); }}
+        // {&typeid(GameEndInfo),   [this, index] { return ReceiveInfoImpl<GameEndInfo>(index); }}
+    };
+    auto it = mapping.find(&infoType);
+    assert(it != mapping.end());
+    return it->second(index);
+}
+
+void Server::DeliverInfo(const std::type_info &infoType, int index, const Info &info)
+{
+    using funcType = std::function<void(int, const Info &)>;
+    static std::map<const std::type_info *, funcType> mapping{
+        {&typeid(JoinGameInfo),  [this](int index, const Info &info) { 
+            DeliverInfoImpl<JoinGameInfo>(index, dynamic_cast<const JoinGameInfo &>(info)); 
+        }},
+        {&typeid(GameStartInfo), [this](int index, const Info &info) { 
+            DeliverInfoImpl<GameStartInfo>(index, dynamic_cast<const GameStartInfo &>(info)); 
+        }},
+        {&typeid(ActionInfo),    [this](int index, const Info &info) { 
+            DeliverInfoImpl<ActionInfo>(index, dynamic_cast<const ActionInfo &>(info)); 
+        }},
+        {&typeid(DrawInfo),      [this](int index, const Info &info) { 
+            DeliverInfoImpl<DrawInfo>(index, dynamic_cast<const DrawInfo &>(info)); 
+        }},
+        {&typeid(SkipInfo),      [this](int index, const Info &info) { 
+            DeliverInfoImpl<SkipInfo>(index, dynamic_cast<const SkipInfo &>(info)); 
+        }},
+        {&typeid(PlayInfo),      [this](int index, const Info &info) { 
+            DeliverInfoImpl<PlayInfo>(index, dynamic_cast<const PlayInfo &>(info)); 
+        }},
+        {&typeid(DrawRspInfo),   [this](int index, const Info &info) { 
+            DeliverInfoImpl<DrawRspInfo>(index, dynamic_cast<const DrawRspInfo &>(info)); 
+        }}
+        // {&typeid(GameEndInfo),   [this, index, &info]() { 
+        //     DeliverInfoImpl<GameEndInfo>(index, dynamic_cast<const GameEndInfo &>(info));
+        // }}
+    };
+    auto it = mapping.find(&infoType);
+    assert(it != mapping.end());
+    return it->second(index, info);
+}
+
 }}

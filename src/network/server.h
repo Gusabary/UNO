@@ -10,26 +10,37 @@ namespace UNO { namespace Network {
 using asio::ip::tcp;
 using namespace Game;
 
-class Server {
+class IServer {
+public:
+    virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType, int index) = 0;
+
+    virtual void DeliverInfo(const std::type_info &infoType, int index, const Info &info) = 0;
+};
+
+class Server : public IServer {
 public:
     explicit Server(std::string port);
 
     void Run();
 
-    template <typename InfoT>
-    std::unique_ptr<InfoT> ReceiveInfo(int index) {
-        return mSessions[index]->ReceiveInfo<InfoT>();
-    }
-
-    template <typename InfoT, typename... Types>
-    void DeliverInfo(int index, Types&&... args) {
-        mSessions[index]->DeliverInfo<InfoT>(args...);
-    }
-
     void Close();
+
+    std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType, int index) override;
+
+    void DeliverInfo(const std::type_info &infoType, int index, const Info &info) override;
 
 private:
     void Accept();
+
+    template <typename InfoT>
+    std::unique_ptr<InfoT> ReceiveInfoImpl(int index) {
+        return mSessions[index]->ReceiveInfo<InfoT>();
+    }
+
+    template <typename InfoT>
+    void DeliverInfoImpl(int index, const InfoT &info) {
+        mSessions[index]->DeliverInfo<InfoT>(info);
+    }
 
 public:
     // callbacks in server side should always take index of session as the first parameter
