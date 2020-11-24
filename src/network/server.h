@@ -54,12 +54,12 @@ public:
 private:
     void Accept();
 
-    template <typename InfoT>
+    template<typename InfoT>
     std::unique_ptr<InfoT> ReceiveInfoImpl(int index) {
         return mSessions[index]->ReceiveInfo<InfoT>();
     }
 
-    template <typename InfoT>
+    template<typename InfoT>
     void DeliverInfoImpl(int index, const InfoT &info) {
         mSessions[index]->DeliverInfo<InfoT>(info);
     }

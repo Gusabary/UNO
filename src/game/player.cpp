@@ -2,7 +2,7 @@
 
 namespace UNO { namespace Game {
 
-Player::Player(std::string username, std::shared_ptr<Network::Client> clientSp)
+Player::Player(std::string username, std::shared_ptr<Network::IClient> clientSp)
     : mUsername(username), mClient(clientSp), 
     mUIManager(std::make_unique<UIManager>(mGameStat, mPlayerStats, mHandCards))
 {
@@ -11,7 +11,7 @@ Player::Player(std::string username, std::shared_ptr<Network::Client> clientSp)
     mClient->Connect();
 }
 
-std::shared_ptr<Network::Client> Player::CreateClient(const std::string &host, const std::string &port)
+std::shared_ptr<Network::IClient> Player::CreateClient(const std::string &host, const std::string &port)
 {
     return std::make_shared<Network::Client>(host, port);
 }
@@ -25,9 +25,9 @@ void Player::ResetGame()
 void Player::JoinGame()
 {
     std::cout << "connect success, sending username to server" << std::endl;
-    mClient->DeliverInfo(&typeid(JoinGameInfo), JoinGameInfo{mUsername});
+    Common::Util::Deliver<JoinGameInfo>(mClient, mUsername);
 
-    auto joinRsp = Common::Util::DynamicCast<JoinGameRspInfo>(mClient->ReceiveInfo(&typeid(JoinGameRspInfo)));
+    auto joinRsp = Common::Util::Receive<JoinGameRspInfo>(mClient);
     // std::cout << *joinRsp << std::endl;
     auto initUsernames = joinRsp->mUsernames;
     auto initSize = initUsernames.size();
@@ -35,13 +35,13 @@ void Player::JoinGame()
     Common::Common::mPlayerNum = joinRsp->mPlayerNum;
     mUIManager->RenderWhenInitWaiting(initUsernames, true);
     for (auto i = 0; i < Common::Common::mPlayerNum - initSize; i++) {
-        auto joinInfo = Common::Util::DynamicCast<JoinGameInfo>(mClient->ReceiveInfo(&typeid(JoinGameInfo)));
+        auto joinInfo = Common::Util::Receive<JoinGameInfo>(mClient);
         initUsernames.push_back(joinInfo->mUsername);
         mUIManager->RenderWhenInitWaiting(initUsernames, false);
     }
 
     // wait for game start
-    auto info = Common::Util::DynamicCast<GameStartInfo>(mClient->ReceiveInfo(&typeid(GameStartInfo)));
+    auto info = Common::Util::Receive<GameStartInfo>(mClient);
     std::cout << *info << std::endl;
 
     mHandCards.reset(new HandCards(info->mInitHandCards));
@@ -100,7 +100,7 @@ void Player::GameLoop()
             }
             mUIManager->Render();
             // wait for gameboard state update from server
-            auto info = Common::Util::DynamicCast<ActionInfo>(mClient->ReceiveInfo(&typeid(ActionInfo)));
+            auto info = Common::Util::Receive<ActionInfo>(mClient);
             switch (info->mActionType) {
                 case ActionType::DRAW: {
                     auto drawInfo = Common::Util::DynamicCast<DrawInfo>(info);
@@ -149,9 +149,9 @@ void Player::GameEnds()
 
 void Player::HandleSelfDraw()
 {
-    mClient->DeliverInfo(&typeid(DrawInfo), DrawInfo{mGameStat->GetCardsNumToDraw()});
+    Common::Util::Deliver<DrawInfo>(mClient, mGameStat->GetCardsNumToDraw());
     // wait for draw rsp msg
-    auto info = Common::Util::DynamicCast<DrawRspInfo>(mClient->ReceiveInfo(&typeid(DrawRspInfo)));
+    auto info = Common::Util::Receive<DrawRspInfo>(mClient);
     auto handcardsBeforeDraw = *mHandCards;
     int indexOfNewlyDrawn;
     mHandCards->Draw(info->mCards);
@@ -175,7 +175,7 @@ void Player::HandleSelfDraw()
 
 void Player::HandleSelfSkip()
 {
-    mClient->DeliverInfo(&typeid(SkipInfo), SkipInfo{});
+    Common::Util::Deliver<SkipInfo>(mClient);
     UpdateStateAfterSkip(0);
 }
 
@@ -187,7 +187,7 @@ bool Player::HandleSelfPlay(int cardIndex)
         // the card to play should be erased **after** specifying next color if it's wild card
         CardColor nextColor = (cardToPlay.mColor != CardColor::BLACK) ?
             cardToPlay.mColor : mUIManager->SpecifyNextColor();
-        mClient->DeliverInfo(&typeid(PlayInfo), PlayInfo{cardToPlay, nextColor});
+        Common::Util::Deliver<PlayInfo>(mClient, cardToPlay, nextColor);
         cardToPlay.mColor = nextColor;
         UpdateStateAfterPlay(0, cardToPlay);
         mHandCards->Erase(cardIndex);

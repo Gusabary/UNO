@@ -19,21 +19,22 @@ class Session {
 public:
     explicit Session(tcp::socket socket);
 
-    template <typename InfoT>
+    template<typename InfoT>
     std::unique_ptr<InfoT> ReceiveInfo() {
         Read();
         return InfoT::Deserialize(mReadBuffer);
     }
 
-    template <typename InfoT, typename... Types>
-    void DeliverInfo(Types&&... args) {
-        InfoT info(args...);
+    template<typename InfoT>
+    void DeliverInfo(const InfoT &info) {
         info.Serialize(mWriteBuffer);
         Write();
     }
 
-    template <typename InfoT>
-    void DeliverInfo(const InfoT &info) {
+    // for test
+    template<typename InfoT, typename... Types>
+    void DeliverInfo(Types&&... args) {
+        InfoT info(args...);
         info.Serialize(mWriteBuffer);
         Write();
     }

@@ -38,10 +38,9 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
             tmpUsernames.push_back(stat.GetUsername());
         }
     );
-    mServer->DeliverInfo(&typeid(JoinGameRspInfo), index, JoinGameRspInfo{
-        Common::Common::mPlayerNum, tmpUsernames});
+    Common::Util::Deliver<JoinGameRspInfo>(mServer, index, Common::Common::mPlayerNum, tmpUsernames);
     for (int i = 0; i < index; i++) {
-        mServer->DeliverInfo(&typeid(JoinGameInfo), i, JoinGameInfo{username});
+        Common::Util::Deliver<JoinGameInfo>(mServer, i, username);
     }
 }
 
@@ -79,8 +78,8 @@ void GameBoard::StartGame()
         }
     );
     for (int player = 0; player < Common::Common::mPlayerNum; player++) {
-        mServer->DeliverInfo(&typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
-            flippedCard, Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames});
+        Common::Util::Deliver<GameStartInfo>(mServer, player, initHandCards[player], flippedCard,
+            Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames);
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
     }
@@ -92,8 +91,7 @@ void GameBoard::StartGame()
 void GameBoard::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
-        auto info = mServer->ReceiveInfo(&typeid(ActionInfo), mGameStat->GetCurrentPlayer());
-        auto actionInfo = Common::Util::DynamicCast<ActionInfo>(info);
+        auto actionInfo = Common::Util::Receive<ActionInfo>(mServer, mGameStat->GetCurrentPlayer());
         switch (actionInfo->mActionType) {
             case ActionType::DRAW:
                 HandleDraw(Common::Util::DynamicCast<DrawInfo>(actionInfo));
@@ -119,8 +117,8 @@ void GameBoard::HandleDraw(const std::unique_ptr<DrawInfo> &info)
     std::vector<Card> cardsToDraw = mDeck->Draw(info->mNumber);
 
     // respond to the deliverer
-    mServer->DeliverInfo(&typeid(DrawRspInfo), mGameStat->GetCurrentPlayer(), DrawRspInfo{
-        info->mNumber, cardsToDraw});
+    Common::Util::Deliver<DrawRspInfo>(mServer, mGameStat->GetCurrentPlayer(), 
+        info->mNumber, cardsToDraw);
 
     // broadcast to other players
     Broadcast<DrawInfo>(*info);

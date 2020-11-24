@@ -40,12 +40,12 @@ public:
     void DeliverInfo(const std::type_info *infoType, const Info &info) override;
 
 private:
-    template <typename InfoT>
+    template<typename InfoT>
     std::unique_ptr<InfoT> ReceiveInfoImpl() {
         return mSession->ReceiveInfo<InfoT>();
     }
 
-    template <typename InfoT>
+    template<typename InfoT>
     void DeliverInfoImpl(const InfoT &info) {
         mSession->DeliverInfo<InfoT>(info);
     }
