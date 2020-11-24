@@ -22,7 +22,9 @@ public:
 
     void RunTimerThread();
 
-    void RenderWhenInitWaiting(const std::vector<std::string> &usernames);
+    void StopTimerThread();
+
+    void RenderWhenInitWaiting(const std::vector<std::string> &usernames, bool isFirstTime);
 
     void Render();
 
@@ -68,5 +70,7 @@ private:
     bool mLastCardCanBePlayed;
     bool mHasChanceToPlayAfterDraw;
     bool mIsSpecifyingNextColor;
+
+    bool mTimerThreadShouldStop{false};
 };
 }}

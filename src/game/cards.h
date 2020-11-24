@@ -155,6 +155,8 @@ protected:
 
     void Swap(CardPile &pile) { std::swap(mPile, pile.mPile); }
 
+    void Clear() { mPile.clear(); }
+
     bool Empty() const { return mPile.empty(); }
 
 public:
@@ -168,6 +170,8 @@ private:
 class DiscardPile : public CardPile {
 public:
     void Add(Card card) { PushFront(card); }
+
+    void Clear() { CardPile::Clear(); }
 };
 
 class Deck : public CardPile {

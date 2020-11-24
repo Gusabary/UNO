@@ -15,18 +15,27 @@ void Client::Connect()
 {
     tcp::resolver resolver(mContext);
     auto endpoints = resolver.resolve(mHost, mPort);
-    tcp::socket socket(mContext);
 
-    asio::async_connect(socket, endpoints,
-        [this, &socket](std::error_code ec, tcp::endpoint) {
-            if (!ec) {
-                mSession = std::make_unique<Session>(std::move(socket));
-                OnConnect();
+    while (mShouldReset) {
+        mShouldReset = false;
+        tcp::socket socket(mContext);
+        asio::async_connect(socket, endpoints,
+            [this, &socket](std::error_code ec, tcp::endpoint) {
+                if (!ec) {
+                    mSession = std::make_unique<Session>(std::move(socket));
+                }
             }
-        }
-    );
+        );
 
-    mContext.run();
+        mContext.run();
+        OnConnect();
+    }
+}
+
+void Client::Reset()
+{
+    mShouldReset = true;
+    mContext.restart();
 }
 
 std::unique_ptr<Info> Client::ReceiveInfo(const std::type_info &infoType)

@@ -12,6 +12,7 @@ GameBoard::GameBoard(std::unique_ptr<Network::IServer> &serverUp)
             ReceiveUsername(index, info.mUsername);
         }
     );
+    mServer->RegisterAllPlayersJoinedCallback([this] { StartGame(); });
 
     mServer->Run();
 }
@@ -19,6 +20,12 @@ GameBoard::GameBoard(std::unique_ptr<Network::IServer> &serverUp)
 std::unique_ptr<Network::IServer> GameBoard::CreateServer(const std::string &port)
 {
     return std::make_unique<Network::Server>(port);
+}
+
+void GameBoard::ResetGame()
+{
+    mServer->Reset();
+    mPlayerStats.clear();
 }
 
 void GameBoard::ReceiveUsername(int index, const std::string &username)
@@ -35,9 +42,6 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
         Common::Common::mPlayerNum, tmpUsernames});
     for (int i = 0; i < index; i++) {
         mServer->DeliverInfo(typeid(JoinGameInfo), i, JoinGameInfo{username});
-    }
-    if (index == PLAYER_NUM - 1) {
-        StartGame();
     }
 }
 
@@ -103,6 +107,7 @@ void GameBoard::GameLoop()
                 assert(0);
         }
     }
+    ResetGame();
 }
 
 void GameBoard::HandleDraw(const std::unique_ptr<DrawInfo> &info)
@@ -161,7 +166,6 @@ void GameBoard::HandlePlay(const std::unique_ptr<PlayInfo> &info)
 void GameBoard::Win()
 {
     mGameStat->GameEnds();
-    mServer->Close();
     std::cout << "Game Ends" << std::endl;
 }
 

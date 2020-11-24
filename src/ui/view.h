@@ -17,7 +17,7 @@ public:
 
     void Clear(bool doClearIndicator, int currentPlayer = 0);
 
-    void DrawWhenInitWaiting(const std::vector<std::string> &usernames);
+    void DrawWhenInitWaiting(const std::vector<std::string> &usernames, bool isFirstTime);
 
     void DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerStat &playerStat);
 
@@ -60,6 +60,7 @@ private:
 
     ViewT mView;
 
-    int mExtraRowNum;  // due to more than one handcard segment
+    int mExtraRowNum{0};  // due to more than one handcard segment
+    int mMyIndex;
 };
 }}

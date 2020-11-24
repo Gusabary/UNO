@@ -38,14 +38,16 @@ void View::Clear(bool doClearIndicator, int currentPlayer)
     }
 }
 
-void View::DrawWhenInitWaiting(const std::vector<std::string> &usernames)
+void View::DrawWhenInitWaiting(const std::vector<std::string> &usernames, bool isFirstTime)
 {
-    static int myIndex = usernames.size() - 1;
+    if (isFirstTime) {
+        mMyIndex = usernames.size() - 1;
+    }
     for (int playerIndex = 0; playerIndex < Common::Common::mPlayerNum; playerIndex++) {
         auto [row, col] = ViewFormatter::GetPosOfPlayerBox(playerIndex);
         auto [height, width] = ViewFormatter::GetBaseScaleOfBox(playerIndex);
         int curNum = usernames.size();
-        int absoluteIndex = Common::Util::WrapWithPlayerNum(playerIndex + myIndex);
+        int absoluteIndex = Common::Util::WrapWithPlayerNum(playerIndex + mMyIndex);
         if (absoluteIndex >= curNum) {
             // username unknown yet
             DrawBorder(row, col, width, height - 2);

@@ -16,21 +16,28 @@ std::unique_ptr<Network::Client> Player::CreateClient(const std::string &host, c
     return std::make_unique<Network::Client>(host, port);
 }
 
+void Player::ResetGame()
+{
+    mClient->Reset();
+    mPlayerStats.clear();
+}
+
 void Player::JoinGame()
 {
     std::cout << "connect success, sending username to server" << std::endl;
     mClient->DeliverInfo(typeid(JoinGameInfo), JoinGameInfo{mUsername});
 
     auto joinRsp = Common::Util::DynamicCast<JoinGameRspInfo>(mClient->ReceiveInfo(typeid(JoinGameRspInfo)));
+    // std::cout << *joinRsp << std::endl;
     auto initUsernames = joinRsp->mUsernames;
     auto initSize = initUsernames.size();
     // don't forget to update common config
     Common::Common::mPlayerNum = joinRsp->mPlayerNum;
-    mUIManager->RenderWhenInitWaiting(initUsernames);
+    mUIManager->RenderWhenInitWaiting(initUsernames, true);
     for (auto i = 0; i < Common::Common::mPlayerNum - initSize; i++) {
         auto joinInfo = Common::Util::DynamicCast<JoinGameInfo>(mClient->ReceiveInfo(typeid(JoinGameInfo)));
         initUsernames.push_back(joinInfo->mUsername);
-        mUIManager->RenderWhenInitWaiting(initUsernames);
+        mUIManager->RenderWhenInitWaiting(initUsernames, false);
     }
 
     // wait for game start
@@ -118,6 +125,26 @@ void Player::GameLoop()
             }
         }
     }
+    GameEnds();
+}
+
+void Player::GameEnds()
+{
+    // let the server resets game first
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    while (true) {
+        std::cout << "want to play again? (Y/n) ";
+        char ch;
+        std::cin.get(ch);
+        if (ch == 'y' || ch == 'Y') {
+            break;
+        }
+        else if (ch == 'n' || ch == 'N') {
+            std::exit(0);
+        }
+        std::cin.get(ch);  // consume the \n
+    }
+    ResetGame();
 }
 
 void Player::HandleSelfDraw()
@@ -194,6 +221,7 @@ void Player::UpdateStateAfterPlay(int playerIndex, Card cardPlayed)
 
 void Player::Win(int playerIndex)
 {
+    mUIManager->StopTimerThread();
     mGameStat->GameEnds();
     if (playerIndex == 0) {
         std::cout << "You win!" << std::endl;

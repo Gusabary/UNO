@@ -15,23 +15,34 @@ UIManager::UIManager(std::unique_ptr<GameStat> &gameStat,
 
 void UIManager::RunTimerThread()
 {
+    mTimerThreadShouldStop = false;
     mTimerThread.reset(new std::thread([this]() { TimerThreadLoop(); }));
+}
+
+void UIManager::StopTimerThread()
+{
+    mTimerThreadShouldStop = true;
+    // don't forget to join the thread
+    mTimerThread->join();
 }
 
 void UIManager::TimerThreadLoop()
 {
-    while (true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    while (!mTimerThreadShouldStop) {
         mGameStat->Tick();
         mView->DrawTimeIndicator(mGameStat->GetCurrentPlayer(), mGameStat->GetTimeElapsed());
+        /// XXX: race condition. it may print before main thread prints first time, 
+        /// in which case some states are not initialized yet such as mExtraRowNum of View.
+        /// current workaround: init mExtraRowNum with 0
         Print();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
-void UIManager::RenderWhenInitWaiting(const std::vector<std::string> &usernames)
+void UIManager::RenderWhenInitWaiting(const std::vector<std::string> &usernames, bool isFirstTime)
 {
     mView->Clear(true);
-    mView->DrawWhenInitWaiting(usernames);
+    mView->DrawWhenInitWaiting(usernames, isFirstTime);
     mOutputter->PrintRawView(*mView);
 }
 

@@ -264,7 +264,14 @@ std::ostream& operator<<(std::ostream& os, const JoinGameInfo& info)
 
 std::ostream& operator<<(std::ostream& os, const JoinGameRspInfo& info)
 {
-    os << "JoinGameRspInfo Received!" << std::endl;
+    os << "JoinGameRspInfo Received: " << std::endl;
+    os << "\t mPlayerNum: " << info.mPlayerNum << std::endl;
+    os << "\t mUsernames: [";
+    assert(!info.mUsernames.empty());
+    for (int i = 0; i < info.mUsernames.size() - 1; i++) {
+        os << info.mUsernames[i] << ", ";
+    }
+    os << info.mUsernames.back() << "]" << std::endl;
     return os;
 }
 

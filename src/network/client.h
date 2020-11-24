@@ -14,6 +14,8 @@ class IClient {
 public:
     virtual void Connect() = 0;
 
+    virtual void Reset() = 0;
+
     virtual void RegisterConnectCallback(const std::function<void()> &callback) = 0;
 
     virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) = 0;
@@ -26,6 +28,8 @@ public:
     explicit Client(std::string host, std::string port);
 
     void Connect() override;
+    
+    void Reset() override;
 
     void RegisterConnectCallback(const std::function<void()> &callback) override {
         OnConnect = callback;
@@ -55,5 +59,7 @@ private:
 
     asio::io_context mContext;
     std::unique_ptr<Session> mSession;
+
+    bool mShouldReset{true};
 };
 }}

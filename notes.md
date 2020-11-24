@@ -104,3 +104,5 @@
             }
         };
         ```
+
++ when using asio, invocation to `io_context::run()` will block if there is still some async work to complete. *[reference](https://think-async.com/Asio/asio-1.18.0/doc/asio/tutorial/tuttimer2.html)*

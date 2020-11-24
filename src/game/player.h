@@ -39,6 +39,10 @@ private:
 
     void Win(int playerIndex);
 
+    void GameEnds();
+
+    void ResetGame();
+
     void PrintLocalState();
 
 private:

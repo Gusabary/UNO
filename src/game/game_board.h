@@ -35,6 +35,8 @@ public:
 
     void Win();
 
+    void ResetGame();
+
     template <typename ActionInfoT>
     void Broadcast(ActionInfoT &info) {
         int currentPlayer = mGameStat->GetCurrentPlayer();
@@ -47,6 +49,7 @@ public:
     }
 
 private:
+    /// XXX: drop this, use common config
     constexpr static int PLAYER_NUM = 3;
     std::unique_ptr<Network::IServer> mServer;
 

@@ -15,9 +15,15 @@ void Server::Run()
     tcp::endpoint endpoint(tcp::v4(), std::atoi(mPort.c_str()));
 
     mAcceptor = std::make_unique<tcp::acceptor>(mContext, endpoint);
-    Accept();
+    while (mShouldReset) {
+        mShouldReset = false;
+        Accept();
+        mContext.run();
 
-    mContext.run();
+        std::cout << "All players have joined. Game Start!" << std::endl;
+        OnAllPlayersJoined();
+        Close();
+    }
 }
 
 void Server::Accept() 
@@ -32,13 +38,23 @@ void Server::Accept()
             std::unique_ptr<JoinGameInfo> info = mSessions.back()->ReceiveInfo<JoinGameInfo>();
             OnReceiveJoinGameInfo(index, *info);
         }
-        Accept();
+        if (mSessions.size() < Common::Common::mPlayerNum) {
+            Accept();
+        }
     });
 }
 
 void Server::Close()
 {
-    mContext.stop();
+    mAcceptor->cancel();
+    mSessions.clear();
+}
+
+void Server::Reset()
+{
+    mShouldReset = true;
+    // a invokation to restart is needed for subsequent run
+    mContext.restart();
 }
 
 std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info &infoType, int index)
