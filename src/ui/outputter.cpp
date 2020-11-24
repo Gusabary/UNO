@@ -7,7 +7,7 @@ const std::string ColorEscape::RED    = "\033[31m";
 const std::string ColorEscape::YELLOW = "\033[33m";
 const std::string ColorEscape::GREEN  = "\033[32m";
 const std::string ColorEscape::BLUE   = "\033[34m";
-const std::string ColorEscape::BLACK  = "\033[30m";
+// const std::string ColorEscape::BLACK  = "\033[30m";
 
 Outputter::Outputter(std::unique_ptr<GameStat> &gameStat, 
     std::vector<PlayerStat> &playerStats, std::unique_ptr<HandCards> &handCards) 
@@ -86,7 +86,7 @@ std::string Outputter::ToColorEscape(CardColor color) const
         case CardColor::YELLOW: return ColorEscape::YELLOW;
         case CardColor::GREEN:  return ColorEscape::GREEN;
         case CardColor::BLUE:   return ColorEscape::BLUE;
-        case CardColor::BLACK:  return ColorEscape::BLACK;
+        // case CardColor::BLACK:  return ColorEscape::BLACK;
         default: return ColorEscape::RESET;
     }
 }

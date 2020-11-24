@@ -14,7 +14,7 @@ struct ColorEscape {
     const static std::string YELLOW;
     const static std::string GREEN;
     const static std::string BLUE;
-    const static std::string BLACK;
+    // const static std::string BLACK;
 };
 
 class Outputter {

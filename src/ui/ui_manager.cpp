@@ -73,7 +73,7 @@ void UIManager::NextTurn()
 void UIManager::Print() const
 {
     // before print, it needs to clear screen first
-    // ClearScreen();
+    ClearScreen();
     mOutputter->PrintView(*mView);
 
     if (mGameStat->IsMyTurn()) {
