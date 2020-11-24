@@ -54,7 +54,7 @@ std::unique_ptr<Info> Client::ReceiveInfo(const std::type_info *infoType)
 
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[RECEIVE INFO] " << infoType->name() << std::endl;
+    // std::cout << "[RECEIVE INFO] " << infoType->name() << std::endl;
     return it->second();
 }
 
@@ -89,7 +89,7 @@ void Client::DeliverInfo(const std::type_info *infoType, const Info &info)
     };
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[DELIVER INFO] " << infoType->name() << std::endl;
+    // std::cout << "[DELIVER INFO] " << infoType->name() << std::endl;
     return it->second(info);
 }
 }}

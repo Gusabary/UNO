@@ -73,7 +73,7 @@ std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info *infoType, int in
     };
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[RECEIVE INFO from " << index << "] " << infoType->name() << std::endl;
+    // std::cout << "[RECEIVE INFO from " << index << "] " << infoType->name() << std::endl;
     return it->second(index);
 }
 
@@ -111,7 +111,7 @@ void Server::DeliverInfo(const std::type_info *infoType, int index, const Info &
     };
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[DELIVER INFO to   " << index << "] " << infoType->name() << std::endl;
+    // std::cout << "[DELIVER INFO to   " << index << "] " << infoType->name() << std::endl;
     return it->second(index, info);
 }
 

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <cassert>
+#include <spdlog/spdlog.h>
 
 #include "common.h"
 #include "terminal.h"
