@@ -49,8 +49,6 @@ public:
     }
 
 private:
-    /// XXX: drop this, use common config
-    constexpr static int PLAYER_NUM = 3;
     std::unique_ptr<Network::IServer> mServer;
 
     // state of game board

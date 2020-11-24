@@ -48,7 +48,8 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
 void GameBoard::StartGame()
 {
     mDeck->Init();
-    std::vector<std::array<Card, 7>> initHandCards = mDeck->DealInitHandCards(PLAYER_NUM);
+    std::vector<std::array<Card, 7>> initHandCards = 
+        mDeck->DealInitHandCards(Common::Common::mPlayerNum);
 
     // flip a card
     Card flippedCard;
@@ -69,7 +70,7 @@ void GameBoard::StartGame()
 
     // choose the first player randomly
     std::srand(std::time(nullptr));
-    int firstPlayer = std::rand() % PLAYER_NUM;
+    int firstPlayer = std::rand() % Common::Common::mPlayerNum;
 
     std::vector<std::string> tmpUsernames;
     std::for_each(mPlayerStats.begin(), mPlayerStats.end(),
@@ -77,7 +78,7 @@ void GameBoard::StartGame()
             tmpUsernames.push_back(stat.GetUsername());
         }
     );
-    for (int player = 0; player < PLAYER_NUM; player++) {
+    for (int player = 0; player < Common::Common::mPlayerNum; player++) {
         mServer->DeliverInfo(typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
             flippedCard, Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames});
 
