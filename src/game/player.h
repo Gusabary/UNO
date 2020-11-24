@@ -15,9 +15,9 @@ using namespace UI;
 
 class Player {
 public:
-    explicit Player(std::string username, std::unique_ptr<Network::Client> &clientUp);
+    explicit Player(std::string username, std::shared_ptr<Network::Client> clientSp);
 
-    static std::unique_ptr<Network::Client> CreateClient(const std::string &host, 
+    static std::shared_ptr<Network::Client> CreateClient(const std::string &host, 
         const std::string &port);
 
 private:
@@ -47,7 +47,7 @@ private:
 
 private:
     const std::string mUsername;
-    std::unique_ptr<Network::Client> mClient;
+    std::shared_ptr<Network::Client> mClient;
 
     std::unique_ptr<UIManager> mUIManager;
     std::unique_ptr<HandCards> mHandCards;

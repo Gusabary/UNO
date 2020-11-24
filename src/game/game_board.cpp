@@ -2,8 +2,8 @@
 
 namespace UNO { namespace Game {
 
-GameBoard::GameBoard(std::unique_ptr<Network::IServer> &serverUp)
-    : mServer(serverUp.release()), 
+GameBoard::GameBoard(std::shared_ptr<Network::IServer> serverSp)
+    : mServer(serverSp), 
     mDiscardPile(std::make_unique<DiscardPile>()),
     mDeck(std::make_unique<Deck>(*mDiscardPile))
 {
@@ -17,9 +17,9 @@ GameBoard::GameBoard(std::unique_ptr<Network::IServer> &serverUp)
     mServer->Run();
 }
 
-std::unique_ptr<Network::IServer> GameBoard::CreateServer(const std::string &port)
+std::shared_ptr<Network::IServer> GameBoard::CreateServer(const std::string &port)
 {
-    return std::make_unique<Network::Server>(port);
+    return std::make_shared<Network::Server>(port);
 }
 
 void GameBoard::ResetGame()
@@ -38,10 +38,10 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
             tmpUsernames.push_back(stat.GetUsername());
         }
     );
-    mServer->DeliverInfo(typeid(JoinGameRspInfo), index, JoinGameRspInfo{
+    mServer->DeliverInfo(&typeid(JoinGameRspInfo), index, JoinGameRspInfo{
         Common::Common::mPlayerNum, tmpUsernames});
     for (int i = 0; i < index; i++) {
-        mServer->DeliverInfo(typeid(JoinGameInfo), i, JoinGameInfo{username});
+        mServer->DeliverInfo(&typeid(JoinGameInfo), i, JoinGameInfo{username});
     }
 }
 
@@ -79,7 +79,7 @@ void GameBoard::StartGame()
         }
     );
     for (int player = 0; player < Common::Common::mPlayerNum; player++) {
-        mServer->DeliverInfo(typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
+        mServer->DeliverInfo(&typeid(GameStartInfo), player, GameStartInfo{initHandCards[player],
             flippedCard, Common::Util::WrapWithPlayerNum(firstPlayer - player), tmpUsernames});
 
         std::rotate(tmpUsernames.begin(), tmpUsernames.begin() + 1, tmpUsernames.end());
@@ -92,7 +92,7 @@ void GameBoard::StartGame()
 void GameBoard::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
-        auto info = mServer->ReceiveInfo(typeid(ActionInfo), mGameStat->GetCurrentPlayer());
+        auto info = mServer->ReceiveInfo(&typeid(ActionInfo), mGameStat->GetCurrentPlayer());
         auto actionInfo = Common::Util::DynamicCast<ActionInfo>(info);
         switch (actionInfo->mActionType) {
             case ActionType::DRAW:
@@ -119,7 +119,7 @@ void GameBoard::HandleDraw(const std::unique_ptr<DrawInfo> &info)
     std::vector<Card> cardsToDraw = mDeck->Draw(info->mNumber);
 
     // respond to the deliverer
-    mServer->DeliverInfo(typeid(DrawRspInfo), mGameStat->GetCurrentPlayer(), DrawRspInfo{
+    mServer->DeliverInfo(&typeid(DrawRspInfo), mGameStat->GetCurrentPlayer(), DrawRspInfo{
         info->mNumber, cardsToDraw});
 
     // broadcast to other players

@@ -38,7 +38,7 @@ void Client::Reset()
     mContext.restart();
 }
 
-std::unique_ptr<Info> Client::ReceiveInfo(const std::type_info &infoType)
+std::unique_ptr<Info> Client::ReceiveInfo(const std::type_info *infoType)
 {
     using funcType = std::function<std::unique_ptr<Info>()>;
     static std::map<const std::type_info *, funcType> mapping{
@@ -52,13 +52,13 @@ std::unique_ptr<Info> Client::ReceiveInfo(const std::type_info &infoType)
         {&typeid(DrawRspInfo),     [this] { return ReceiveInfoImpl<DrawRspInfo>(); }}
     };
 
-    auto it = mapping.find(&infoType);
+    auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[RECEIVE INFO] " << infoType.name() << std::endl;
+    std::cout << "[RECEIVE INFO] " << infoType->name() << std::endl;
     return it->second();
 }
 
-void Client::DeliverInfo(const std::type_info &infoType, const Info &info)
+void Client::DeliverInfo(const std::type_info *infoType, const Info &info)
 {
     using funcType = std::function<void(const Info &)>;
     static std::map<const std::type_info *, funcType> mapping{
@@ -87,9 +87,9 @@ void Client::DeliverInfo(const std::type_info &infoType, const Info &info)
             DeliverInfoImpl<DrawRspInfo>(dynamic_cast<const DrawRspInfo &>(info)); 
         }}
     };
-    auto it = mapping.find(&infoType);
+    auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[DELIVER INFO] " << infoType.name() << std::endl;
+    std::cout << "[DELIVER INFO] " << infoType->name() << std::endl;
     return it->second(info);
 }
 }}

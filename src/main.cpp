@@ -16,8 +16,8 @@ int main(int argc, char **argv)
     auto configInfo = Common::Config(argc, const_cast<const char **>(argv)).Parse();
 
     if (configInfo->mIsServer) {
-        auto serverUp = Game::GameBoard::CreateServer(configInfo->mPort);
-        Game::GameBoard gameBoard(serverUp);
+        auto serverSp = Game::GameBoard::CreateServer(configInfo->mPort);
+        Game::GameBoard gameBoard(serverSp);
     }
     else {
         auto clientUp = Game::Player::CreateClient(configInfo->mHost, configInfo->mPort);

@@ -23,9 +23,9 @@ public:
 
     virtual void RegisterAllPlayersJoinedCallback(const std::function<void()> &callback) = 0;
 
-    virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType, int index) = 0;
+    virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info *infoType, int index) = 0;
 
-    virtual void DeliverInfo(const std::type_info &infoType, int index, const Info &info) = 0;
+    virtual void DeliverInfo(const std::type_info *infoType, int index, const Info &info) = 0;
 };
 
 class Server : public IServer {
@@ -47,9 +47,9 @@ public:
         OnAllPlayersJoined = callback;
     }
 
-    std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType, int index) override;
+    std::unique_ptr<Info> ReceiveInfo(const std::type_info *infoType, int index) override;
 
-    void DeliverInfo(const std::type_info &infoType, int index, const Info &info) override;
+    void DeliverInfo(const std::type_info *infoType, int index, const Info &info) override;
 
 private:
     void Accept();

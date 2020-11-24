@@ -57,7 +57,7 @@ void Server::Reset()
     mContext.restart();
 }
 
-std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info &infoType, int index)
+std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info *infoType, int index)
 {
     using funcType = std::function<std::unique_ptr<Info>(int)>;
     static std::map<const std::type_info *, funcType> mapping{
@@ -71,13 +71,13 @@ std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info &infoType, int in
         {&typeid(DrawRspInfo),     [this](int index) { return ReceiveInfoImpl<DrawRspInfo>(index); }}
         // {&typeid(GameEndInfo),   [this, index] { return ReceiveInfoImpl<GameEndInfo>(index); }}
     };
-    auto it = mapping.find(&infoType);
+    auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[RECEIVE INFO from " << index << "] " << infoType.name() << std::endl;
+    std::cout << "[RECEIVE INFO from " << index << "] " << infoType->name() << std::endl;
     return it->second(index);
 }
 
-void Server::DeliverInfo(const std::type_info &infoType, int index, const Info &info)
+void Server::DeliverInfo(const std::type_info *infoType, int index, const Info &info)
 {
     using funcType = std::function<void(int, const Info &)>;
     static std::map<const std::type_info *, funcType> mapping{
@@ -109,9 +109,9 @@ void Server::DeliverInfo(const std::type_info &infoType, int index, const Info &
         //     DeliverInfoImpl<GameEndInfo>(index, dynamic_cast<const GameEndInfo &>(info));
         // }}
     };
-    auto it = mapping.find(&infoType);
+    auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    std::cout << "[DELIVER INFO to   " << index << "] " << infoType.name() << std::endl;
+    std::cout << "[DELIVER INFO to   " << index << "] " << infoType->name() << std::endl;
     return it->second(index, info);
 }
 

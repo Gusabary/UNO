@@ -14,9 +14,9 @@ using namespace Network;
 
 class GameBoard {
 public:
-    explicit GameBoard(std::unique_ptr<Network::IServer> &serverUp);
+    explicit GameBoard(std::shared_ptr<Network::IServer> serverSp);
 
-    static std::unique_ptr<Network::IServer> CreateServer(const std::string &port);
+    static std::shared_ptr<Network::IServer> CreateServer(const std::string &port);
 
     static std::pair<std::unique_ptr<DiscardPile>, std::unique_ptr<Deck>> CreateCardPile();
 
@@ -43,13 +43,25 @@ public:
         for (int i = 0; i < Common::Common::mPlayerNum; i++) {
             if (i != currentPlayer) {
                 info.mPlayerIndex = Common::Util::WrapWithPlayerNum(currentPlayer - i);
-                mServer->DeliverInfo(typeid(ActionInfoT), i, info);
+                mServer->DeliverInfo(&typeid(ActionInfoT), i, info);
             }
         }
     }
 
+public:
+    // for tests
+    // const std::unique_ptr<Network::IServer> &GetServer() const { return mServer; }
+
+    const std::unique_ptr<DiscardPile> &GetDiscardPile() const { return mDiscardPile; }
+
+    const std::unique_ptr<Deck> &GetDeck() const { return mDeck; }
+
+    const std::unique_ptr<GameStat> &GetGameStat() const { return mGameStat; }
+
+    const std::vector<PlayerStat> &GetPlayerStats() const { return mPlayerStats; }
+
 private:
-    std::unique_ptr<Network::IServer> mServer;
+    std::shared_ptr<Network::IServer> mServer;
 
     // state of game board
     std::unique_ptr<DiscardPile> mDiscardPile;

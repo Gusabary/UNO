@@ -18,9 +18,9 @@ public:
 
     virtual void RegisterConnectCallback(const std::function<void()> &callback) = 0;
 
-    virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) = 0;
+    virtual std::unique_ptr<Info> ReceiveInfo(const std::type_info *infoType) = 0;
 
-    virtual void DeliverInfo(const std::type_info &infoType, const Info &info) = 0;
+    virtual void DeliverInfo(const std::type_info *infoType, const Info &info) = 0;
 };
 
 class Client : public IClient {
@@ -35,9 +35,9 @@ public:
         OnConnect = callback;
     }
 
-    std::unique_ptr<Info> ReceiveInfo(const std::type_info &infoType) override;
+    std::unique_ptr<Info> ReceiveInfo(const std::type_info *infoType) override;
 
-    void DeliverInfo(const std::type_info &infoType, const Info &info) override;
+    void DeliverInfo(const std::type_info *infoType, const Info &info) override;
 
 private:
     template <typename InfoT>
