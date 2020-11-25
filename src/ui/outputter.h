@@ -37,6 +37,8 @@ private:
 
     std::string ToColorEscape(CardColor color) const;
 
+    void ClearScreen() const;
+
 private:
     std::unique_ptr<GameStat> &mGameStat;
     std::vector<PlayerStat> &mPlayerStats;

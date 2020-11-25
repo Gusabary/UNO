@@ -16,6 +16,7 @@ Outputter::Outputter(std::unique_ptr<GameStat> &gameStat,
 
 void Outputter::PrintRawView(const View &view) const
 {
+    // ClearScreen();
     auto [height, width] = ViewFormatter::GetBaseScaleOfView();
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
@@ -27,6 +28,7 @@ void Outputter::PrintRawView(const View &view) const
 
 void Outputter::PrintView(const View &view) const
 {
+    // ClearScreen();
     auto [baseHeight, width] = ViewFormatter::GetBaseScaleOfView();
     int height = baseHeight + view.GetExtraRowNum();
 
@@ -56,7 +58,11 @@ void Outputter::PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlay
     bool hasChanceToPlayAfterDraw) const
 {
     if (isSpecifyingNextColor) {
-        std::cout << "Specify the next color (R/Y/G/B): ";
+        std::cout << "Specify the next color (" 
+                  << ToColorEscape(CardColor::RED)    << "R" << ColorEscape::RESET << "/"
+                  << ToColorEscape(CardColor::YELLOW) << "Y" << ColorEscape::RESET << "/"
+                  << ToColorEscape(CardColor::GREEN)  << "G" << ColorEscape::RESET << "/"
+                  << ToColorEscape(CardColor::BLUE)   << "B" << ColorEscape::RESET << "): ";
         // without std::endl, so a flush is needed
         std::cout.flush();
     }
@@ -115,6 +121,15 @@ std::vector<ViewFormatter::PosT> Outputter::GetPosesToRender() const
         poses.emplace_back(ViewFormatter::GetPosOfHandCard(i, *mHandCards));
     }
     return poses;
+}
+
+void Outputter::ClearScreen() const
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 }}

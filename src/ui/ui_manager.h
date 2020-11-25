@@ -44,15 +44,11 @@ private:
 
     void ResetCursor() { MoveCursorTo(0); }
 
-    void ResetTimeLeft() { mTimeLeft = 15000; }
+    void ResetTimeLeft() { mTimeLeft = Common::Common::mTimeoutPerTurn * 1000; }
 
     int PlayerNum() const { return mPlayerStats.size(); }
 
-    void RenderSelf();
-
-    void RenderOthers();
-
-    void ClearScreen() const;
+    void ExecuteWithTimePassing(const std::function<void()> &func);
 
 private:
     std::unique_ptr<View> mView;
@@ -63,7 +59,7 @@ private:
     std::vector<PlayerStat> &mPlayerStats;
     std::unique_ptr<HandCards> &mHandCards;
     int mCursorIndex{0};
-    int mTimeLeft;
+    int mTimeLeft;  // in milliseconds
 
     std::unique_ptr<std::thread> mTimerThread;
 
@@ -72,5 +68,7 @@ private:
     bool mIsSpecifyingNextColor;
 
     bool mTimerThreadShouldStop{false};
+    // when printing view, it shouldn't be modified
+    std::mutex mMutex;
 };
 }}

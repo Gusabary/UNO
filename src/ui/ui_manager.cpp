@@ -30,12 +30,14 @@ void UIManager::TimerThreadLoop()
 {
     while (!mTimerThreadShouldStop) {
         mGameStat->Tick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+        std::lock_guard<std::mutex> lock(mMutex);
         mView->DrawTimeIndicator(mGameStat->GetCurrentPlayer(), mGameStat->GetTimeElapsed());
         /// XXX: race condition. it may print before main thread prints first time, 
         /// in which case some states are not initialized yet such as mExtraRowNum of View.
         /// current workaround: init mExtraRowNum with 0
         Print();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 }
 
@@ -48,10 +50,13 @@ void UIManager::RenderWhenInitWaiting(const std::vector<std::string> &usernames,
 
 void UIManager::Render()
 {
+    std::lock_guard<std::mutex> lock(mMutex);
     // before render, mView should be cleared first
     mView->Clear(false, mGameStat->GetCurrentPlayer());
-    RenderOthers();
-    RenderSelf();
+    mView->DrawSelfBox(*mGameStat, mPlayerStats[0], *mHandCards, mCursorIndex);
+    for (int i = 1; i < mPlayerStats.size(); i++) {
+        mView->DrawOtherBox(i, *mGameStat, mPlayerStats[i]);
+    }
     mView->DrawLastPlayedCard(mGameStat->GetLastPlayedCard());
 
     Print();
@@ -67,13 +72,13 @@ void UIManager::NextTurn()
     else {
         Common::Terminal::DisableInput();
     }
+
+    std::lock_guard<std::mutex> lock(mMutex);
     mView->Clear(true);
 }
 
 void UIManager::Print() const
 {
-    // before print, it needs to clear screen first
-    ClearScreen();
     mOutputter->PrintView(*mView);
 
     if (mGameStat->IsMyTurn()) {
@@ -90,13 +95,10 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
     while (true) {
         Render();
 
-        auto startTime = std::chrono::system_clock::now();
-        InputAction action = mInputter->GetAction(mTimeLeft);
-        auto endTime = std::chrono::system_clock::now();
-        std::chrono::duration<double> secondsElapsed = endTime - startTime;
-        mTimeLeft -= static_cast<int>(secondsElapsed.count() * 1000);
-        // mTimeLeft shouldn't be negative
-        mTimeLeft = std::max(mTimeLeft, 0);
+        InputAction action;
+        ExecuteWithTimePassing([this, &action] {
+            action = mInputter->GetAction(mTimeLeft);
+        });
 
         switch (action) {
             case InputAction::CURSOR_MOVE_LEFT: {
@@ -130,36 +132,25 @@ CardColor UIManager::SpecifyNextColor()
 {
     mIsSpecifyingNextColor = true;
     Print();
-    auto startTime = std::chrono::system_clock::now();
-    auto nextColor = mInputter->SpecifyNextColor(mTimeLeft);
-    auto endTime = std::chrono::system_clock::now();
+
+    CardColor nextColor;
+    ExecuteWithTimePassing([this, &nextColor] {
+        nextColor = mInputter->SpecifyNextColor(mTimeLeft); 
+    });
+
     mIsSpecifyingNextColor = false;
-    std::chrono::duration<double> secondsElapsed = endTime - startTime;
-    mTimeLeft -= static_cast<int>(secondsElapsed.count() * 1000);
-    mTimeLeft = std::max(mTimeLeft, 0);
     return nextColor;
 }
 
-void UIManager::RenderOthers()
+void UIManager::ExecuteWithTimePassing(const std::function<void()> &func)
 {
-    // start from i == 1, since i == 0 is player himself
-    for (int i = 1; i < mPlayerStats.size(); i++) {
-        mView->DrawOtherBox(i, *mGameStat, mPlayerStats[i]);
-    }
-}
-
-void UIManager::RenderSelf()
-{
-    mView->DrawSelfBox(*mGameStat, mPlayerStats[0], *mHandCards, mCursorIndex);
-}
-
-void UIManager::ClearScreen() const
-{
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
+    auto startTime = std::chrono::system_clock::now();
+    func();
+    auto endTime = std::chrono::system_clock::now();
+    std::chrono::duration<double> secondsElapsed = endTime - startTime;
+    mTimeLeft -= static_cast<int>(secondsElapsed.count() * 1000);
+    // mTimeLeft shouldn't be negative
+    mTimeLeft = std::max(mTimeLeft, 0);
 }
 
 }}
