@@ -38,7 +38,8 @@ void Outputter::PrintView(const View &view) const
     int charsLeftToReset = 0;
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
-            if (row == posesToRender[curRenderIndex].first &&
+            if (curRenderIndex < posesToRender.size() &&
+                row == posesToRender[curRenderIndex].first &&
                 col == posesToRender[curRenderIndex].second) {
                 std::cout << ToColorEscape(cardsToRender[curRenderIndex].mColor);
                 charsLeftToReset = cardsToRender[curRenderIndex].Length();
