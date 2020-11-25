@@ -91,19 +91,26 @@ void GameBoard::StartGame()
 void GameBoard::GameLoop()
 {
     while (!mGameStat->DoesGameEnd()) {
-        auto actionInfo = Common::Util::Receive<ActionInfo>(mServer, mGameStat->GetCurrentPlayer());
-        switch (actionInfo->mActionType) {
-            case ActionType::DRAW:
-                HandleDraw(Common::Util::DynamicCast<DrawInfo>(actionInfo));
-                break;
-            case ActionType::SKIP:
-                HandleSkip(Common::Util::DynamicCast<SkipInfo>(actionInfo));
-                break;
-            case ActionType::PLAY:
-                HandlePlay(Common::Util::DynamicCast<PlayInfo>(actionInfo));
-                break;
-            default:
-                assert(0);
+        try {
+            auto actionInfo = Common::Util::Receive<ActionInfo>(mServer, mGameStat->GetCurrentPlayer());
+            switch (actionInfo->mActionType) {
+                case ActionType::DRAW:
+                    HandleDraw(Common::Util::DynamicCast<DrawInfo>(actionInfo));
+                    break;
+                case ActionType::SKIP:
+                    HandleSkip(Common::Util::DynamicCast<SkipInfo>(actionInfo));
+                    break;
+                case ActionType::PLAY:
+                    HandlePlay(Common::Util::DynamicCast<PlayInfo>(actionInfo));
+                    break;
+                default:
+                    assert(0);
+            }
+        }
+        catch (const std::exception &e) {
+            /// TODO: handle the condition that someone has disconnected
+            std::cout << "someone has disconnected, shutdown server" << std::endl;
+            std::exit(-1);
         }
     }
     ResetGame();

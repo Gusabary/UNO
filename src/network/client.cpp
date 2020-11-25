@@ -55,7 +55,16 @@ std::unique_ptr<Info> Client::ReceiveInfo(const std::type_info *infoType)
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
     // std::cout << "[RECEIVE INFO] " << infoType->name() << std::endl;
-    return it->second();
+    std::unique_ptr<Info> info;
+    try {
+        info = it->second();
+    }
+    catch (const std::exception &e) {
+        /// TODO: handle the condition that server has shutdown
+        std::cout << "oops, server has shutdown" << std::endl;
+        std::exit(-1);
+    }
+    return info;
 }
 
 void Client::DeliverInfo(const std::type_info *infoType, const Info &info)

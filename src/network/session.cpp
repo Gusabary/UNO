@@ -4,6 +4,9 @@ namespace UNO { namespace Network {
 
 Session::Session(tcp::socket socket) : mSocket(std::move(socket)) {}
 
+/**
+ * Read will throw end-of-file exception if the corresponding client has disconnected
+ */
 void Session::Read()
 {
     std::memset(mReadBuffer, 0, MAX_BUFFER_SIZE);
