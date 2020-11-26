@@ -144,8 +144,8 @@ void View::DrawLastPlayedCard(Card lastPlayedCard)
 
 void View::DrawUNO()
 {
-    auto [row, col] = ViewFormatter::GetPosOfLastPlayedCard();
-    Copy(row, col + 4, UNO_STR);
+    auto [row, col] = ViewFormatter::GetPosOfUNOText('U');
+    Copy(row, col, UNO_STR);
 }
 
 void View::DrawTimeIndicator(int currentPlayer, int timeElapsed)

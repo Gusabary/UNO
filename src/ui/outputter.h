@@ -31,9 +31,7 @@ public:
         bool hasChanceToPlayAfterDraw) const;
 
 private:
-    std::vector<Card> GetCardsToRender() const;
-
-    std::vector<ViewFormatter::PosT> GetPosesToRender() const;
+    std::vector<RenderInfo> GetRenderInfos() const;
 
     std::string ToColorEscape(CardColor color) const;
 

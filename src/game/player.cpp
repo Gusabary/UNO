@@ -3,8 +3,7 @@
 namespace UNO { namespace Game {
 
 Player::Player(std::string username, std::shared_ptr<Network::IClient> clientSp)
-    : mUsername(username), mClient(clientSp), 
-    mUIManager(std::make_unique<UIManager>(mGameStat, mPlayerStats, mHandCards))
+    : mUsername(username), mClient(clientSp)
 {
     mClient->RegisterConnectCallback([this] { JoinGame(); });
 
@@ -33,6 +32,8 @@ void Player::JoinGame()
     auto initSize = initUsernames.size();
     // don't forget to update common config
     Common::Common::mPlayerNum = joinRsp->mPlayerNum;
+    // UIManager should be initialized after common config being loaded
+    mUIManager = std::make_unique<UIManager>(mGameStat, mPlayerStats, mHandCards);
     mUIManager->RenderWhenInitWaiting(initUsernames, true);
     for (auto i = 0; i < Common::Common::mPlayerNum - initSize; i++) {
         auto joinInfo = Common::Util::Receive<JoinGameInfo>(mClient);

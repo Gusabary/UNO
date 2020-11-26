@@ -16,7 +16,7 @@ Outputter::Outputter(std::unique_ptr<GameStat> &gameStat,
 
 void Outputter::PrintRawView(const View &view) const
 {
-    ClearScreen();
+    // ClearScreen();
     auto [height, width] = ViewFormatter::GetBaseScaleOfView();
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
@@ -28,34 +28,23 @@ void Outputter::PrintRawView(const View &view) const
 
 void Outputter::PrintView(const View &view) const
 {
-    ClearScreen();
+    // ClearScreen();
     auto [baseHeight, width] = ViewFormatter::GetBaseScaleOfView();
     int height = baseHeight + view.GetExtraRowNum();
 
-    auto cardsToRender = GetCardsToRender();
-    auto posesToRender = GetPosesToRender();
+    auto renderInfos = GetRenderInfos();
     int curRenderIndex = 0;
     int charsLeftToReset = 0;
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
-            if (curRenderIndex < posesToRender.size() &&
-                row == posesToRender[curRenderIndex].first &&
-                col == posesToRender[curRenderIndex].second) {
-                std::cout << ToColorEscape(cardsToRender[curRenderIndex].mColor);
-                charsLeftToReset = cardsToRender[curRenderIndex].Length();
+            auto curRenderInfo = renderInfos[curRenderIndex];
+            if (curRenderIndex < renderInfos.size() &&
+                row == curRenderInfo.mPos.first &&
+                col == curRenderInfo.mPos.second)
+            {
+                std::cout << ToColorEscape(curRenderInfo.mCard.mColor);
+                charsLeftToReset = curRenderInfo.mCard.Length();
                 curRenderIndex++;
-            }
-            if (curRenderIndex == Common::Common::mPlayerNum &&
-                row == posesToRender[curRenderIndex - 1].first &&
-                col == posesToRender[curRenderIndex - 1].second + 4) {
-                    // render UNO! potentially
-                    std::cout << ToColorEscape(CardColor::RED) << view.At(row, col)
-                              << ToColorEscape(CardColor::YELLOW) << view.At(row, col + 1)
-                              << ToColorEscape(CardColor::GREEN) << view.At(row, col + 2)
-                              << ToColorEscape(CardColor::BLUE) << view.At(row, col + 3)
-                              << ColorEscape::RESET;
-                    col += 3;
-                    continue;
             }
             std::cout << view.At(row, col);
             charsLeftToReset--;
@@ -111,30 +100,32 @@ std::string Outputter::ToColorEscape(CardColor color) const
     }
 }
 
-std::vector<Card> Outputter::GetCardsToRender() const
+std::vector<RenderInfo> Outputter::GetRenderInfos() const
 {
-    std::vector<Card> cards;
+    std::vector<RenderInfo> renderInfos;
     for (int i = 1; i < Common::Common::mPlayerNum; i++) {
-        cards.emplace_back(mPlayerStats[i].GetLastPlayedCard());
+        renderInfos.emplace_back(ViewFormatter::GetPosOfPlayerLastPlayedCard(i), 
+            mPlayerStats[i].GetLastPlayedCard());
     }
-    cards.emplace_back(mGameStat->GetLastPlayedCard());
+    renderInfos.emplace_back(ViewFormatter::GetPosOfLastPlayedCard(), 
+        mGameStat->GetLastPlayedCard());
     for (int i = 0; i < mHandCards->Number(); i++) {
-        cards.emplace_back(mHandCards->At(i));
+        renderInfos.emplace_back(ViewFormatter::GetPosOfHandCard(i, *mHandCards), 
+            mHandCards->At(i));
     }
-    return cards;
-}
-
-std::vector<ViewFormatter::PosT> Outputter::GetPosesToRender() const
-{
-    std::vector<ViewFormatter::PosT> poses;
-    for (int i = 1; i < Common::Common::mPlayerNum; i++) {
-        poses.emplace_back(ViewFormatter::GetPosOfPlayerLastPlayedCard(i));
-    }
-    poses.emplace_back(ViewFormatter::GetPosOfLastPlayedCard());
-    for (int i = 0; i < mHandCards->Number(); i++) {
-        poses.emplace_back(ViewFormatter::GetPosOfHandCard(i, *mHandCards));
-    }
-    return poses;
+    // 'U' is red, 'N' is yellow, 'O' is green and '!' is blue.
+    // only color matters, text can be anything here
+    renderInfos.emplace_back(ViewFormatter::GetPosOfUNOText('U'), 
+        Game::Card(Game::CardColor::RED, Game::CardText::ZERO));
+    renderInfos.emplace_back(ViewFormatter::GetPosOfUNOText('N'), 
+        Game::Card(Game::CardColor::YELLOW, Game::CardText::ZERO));
+    renderInfos.emplace_back(ViewFormatter::GetPosOfUNOText('O'), 
+        Game::Card(Game::CardColor::GREEN, Game::CardText::ZERO));
+    renderInfos.emplace_back(ViewFormatter::GetPosOfUNOText('!'), 
+        Game::Card(Game::CardColor::BLUE, Game::CardText::ZERO));
+    
+    std::sort(renderInfos.begin(), renderInfos.end());
+    return renderInfos;
 }
 
 void Outputter::ClearScreen() const
