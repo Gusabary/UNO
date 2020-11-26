@@ -1,7 +1,11 @@
-#include <termios.h>
-#include <unistd.h>
 #include <iostream>
+
+#if defined(__unix__)
 #include <poll.h>
+#elif defined(_WIN32)
+#include <conio.h>
+#include <windows.h>
+#endif
 
 #include "util.h"
 
@@ -29,6 +33,7 @@ int Util::GetIndexInSegment(int handcardIndex) { return handcardIndex % Common::
 
 char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
 {
+#if defined(__unix__)
     std::unique_ptr<Terminal> terminal;
     if (autoFlush) {
         terminal.reset(new Terminal());
@@ -45,6 +50,18 @@ char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
         char c = getchar();
         return c;
     }
+#elif defined(_WIN32)
+    auto ret = WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), milliseconds);
+
+    if (ret == WAIT_TIMEOUT) {
+        throw std::runtime_error("timeout");
+    }
+    else if (ret == WAIT_OBJECT_0) {
+        char c = _getch();
+        spdlog::info("getch: {}", c);
+        return c;
+    }
+#endif
     return 0;
 }
 }}

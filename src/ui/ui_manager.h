@@ -65,7 +65,7 @@ private:
 
     bool mLastCardCanBePlayed;
     bool mHasChanceToPlayAfterDraw;
-    bool mIsSpecifyingNextColor;
+    bool mIsSpecifyingNextColor{false};
 
     bool mTimerThreadShouldStop{false};
     // when printing view, it shouldn't be modified

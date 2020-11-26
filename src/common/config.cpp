@@ -104,7 +104,7 @@ void Config::ParseCmdlineOpts()
 
     // -n
     if (mCmdlineOpts->count("players")) {
-        mCommonConfigInfo->mPlayerNum = (*mCmdlineOpts)["playerNum"].as<int>();
+        mCommonConfigInfo->mPlayerNum = (*mCmdlineOpts)["players"].as<int>();
     }
 }
 

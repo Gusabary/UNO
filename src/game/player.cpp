@@ -159,6 +159,7 @@ void Player::HandleSelfDraw()
         indexOfNewlyDrawn = mHandCards->GetIndexOfNewlyDrawn(handcardsBeforeDraw);
     }
 
+    /// FIXME: use uninitialized variable indexOfNewlyDrawn
     UpdateStateAfterDraw(0, mGameStat->GetCardsNumToDraw(), indexOfNewlyDrawn);
     if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
         // draw penalty due to a +2 / +4, cannot play immediately

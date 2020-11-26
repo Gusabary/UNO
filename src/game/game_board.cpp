@@ -1,3 +1,5 @@
+#include <ctime>
+
 #include "game_board.h"
 
 namespace UNO { namespace Game {

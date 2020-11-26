@@ -2,6 +2,7 @@
 
 namespace UNO { namespace Common {
 
+#ifdef __unix__
 Terminal::Terminal()
 {
     /// XXX: what if throwing an exception
@@ -44,6 +45,7 @@ Terminal::~Terminal()
 {
     Recover();
 }
+#endif
 
 void Terminal::DisableInput()
 {

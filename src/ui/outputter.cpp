@@ -16,7 +16,7 @@ Outputter::Outputter(std::unique_ptr<GameStat> &gameStat,
 
 void Outputter::PrintRawView(const View &view) const
 {
-    // ClearScreen();
+    ClearScreen();
     auto [height, width] = ViewFormatter::GetBaseScaleOfView();
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
@@ -28,7 +28,7 @@ void Outputter::PrintRawView(const View &view) const
 
 void Outputter::PrintView(const View &view) const
 {
-    // ClearScreen();
+    ClearScreen();
     auto [baseHeight, width] = ViewFormatter::GetBaseScaleOfView();
     int height = baseHeight + view.GetExtraRowNum();
 
@@ -58,6 +58,7 @@ void Outputter::PrintView(const View &view) const
 void Outputter::PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlayed,
     bool hasChanceToPlayAfterDraw) const
 {
+    spdlog::info("is specifying: {}", isSpecifyingNextColor);
     if (isSpecifyingNextColor) {
         std::cout << "Specify the next color (" 
                   << ToColorEscape(CardColor::RED)    << "R" << ColorEscape::RESET << "/"

@@ -17,7 +17,11 @@ InputAction Inputter::GetAction(int timeout)
         switch (ch) {
             case ',':  return InputAction::CURSOR_MOVE_LEFT;
             case '.':  return InputAction::CURSOR_MOVE_RIGHT;
+#if defined(__unix__)
             case '\n': return InputAction::PLAY;
+#elif defined(_WIN32)
+            case '\r': return InputAction::PLAY;
+#endif
             case ' ':  return InputAction::PASS;
         }
     }
