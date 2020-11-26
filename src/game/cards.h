@@ -8,6 +8,7 @@
 #include <deque>
 #include <algorithm>
 #include <random>
+#include <spdlog/spdlog.h>
 
 #include "../common/common.h"
 

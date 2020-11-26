@@ -153,13 +153,12 @@ void Player::HandleSelfDraw()
     // wait for draw rsp msg
     auto info = Common::Util::Receive<DrawRspInfo>(mClient);
     auto handcardsBeforeDraw = *mHandCards;
-    int indexOfNewlyDrawn;
+    int indexOfNewlyDrawn = -1;
     mHandCards->Draw(info->mCards);
     if (info->mNumber == 1) {
         indexOfNewlyDrawn = mHandCards->GetIndexOfNewlyDrawn(handcardsBeforeDraw);
     }
 
-    /// FIXME: use uninitialized variable indexOfNewlyDrawn
     UpdateStateAfterDraw(0, mGameStat->GetCardsNumToDraw(), indexOfNewlyDrawn);
     if (!mPlayerStats[0].HasChanceToPlayAfterDraw()) {
         // draw penalty due to a +2 / +4, cannot play immediately
