@@ -125,6 +125,8 @@ void Player::GameLoop()
             }
         }
     }
+    // show one more frame after win
+    mUIManager->Render();
     GameEnds();
 }
 

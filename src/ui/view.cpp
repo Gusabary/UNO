@@ -167,8 +167,14 @@ void View::DrawTimeIndicator(int currentPlayer, int timeElapsed)
 
 void View::DrawHandCards(int row, int col, int width, const HandCards &handcards)
 {
-    for (int i = 0; i < Common::Util::GetSegmentNum(handcards.Number()); i++) {
-        AlignCenter(row + 3 + i, col, width, handcards.ToStringBySegment(i));
+    if (handcards.Number() > 0) {
+        for (int i = 0; i < Common::Util::GetSegmentNum(handcards.Number()); i++) {
+            AlignCenter(row + 3 + i, col, width, handcards.ToStringBySegment(i));
+        }
+    }
+    else {
+        // you have won
+        AlignCenter(row + 3, col, width, "You win!");
     }
 }
 
