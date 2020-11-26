@@ -45,6 +45,18 @@ void Outputter::PrintView(const View &view) const
                 charsLeftToReset = cardsToRender[curRenderIndex].Length();
                 curRenderIndex++;
             }
+            if (curRenderIndex == Common::Common::mPlayerNum &&
+                row == posesToRender[curRenderIndex - 1].first &&
+                col == posesToRender[curRenderIndex - 1].second + 4) {
+                    // render UNO! potentially
+                    std::cout << ToColorEscape(CardColor::RED) << view.At(row, col)
+                              << ToColorEscape(CardColor::YELLOW) << view.At(row, col + 1)
+                              << ToColorEscape(CardColor::GREEN) << view.At(row, col + 2)
+                              << ToColorEscape(CardColor::BLUE) << view.At(row, col + 3)
+                              << ColorEscape::RESET;
+                    col += 3;
+                    continue;
+            }
             std::cout << view.At(row, col);
             charsLeftToReset--;
             if (charsLeftToReset == 0) {

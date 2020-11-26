@@ -106,3 +106,5 @@
         ```
 
 + when using asio, invocation to `io_context::run()` will block if there is still some async work to complete. *[reference](https://think-async.com/Asio/asio-1.18.0/doc/asio/tutorial/tuttimer2.html)*
+
++ to install MinGw on Windows, take [this](https://www.tutorialspoint.com/How-to-Install-Cplusplus-Compiler-on-Windows) for a reference. after installation, some necessary binarys should already have been added to *PATH*, run `g++` to have a check. and then, we can use it like `cmake -G "MinGW Makefiles" ..`

@@ -5,6 +5,7 @@ namespace UNO { namespace UI {
 const std::string View::CARDS_REMAINED_STR = "cards remained: ";
 const std::string View::LAST_PLAYED_STR = "last played: ";
 const std::string View::HAND_CARDS_STR = "handcards: ";
+const std::string View::UNO_STR = "UNO!";
 
 View::View()
 {
@@ -91,7 +92,11 @@ void View::DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerS
     // }
 
     Copy(row + 3, col + 2, CARDS_REMAINED_STR);
-    Copy(row + 3, col + 2 + CARDS_REMAINED_STR.size(), std::to_string(playerStat.GetRemainingHandCardsNum()));
+    auto remainingHandCardsNum = playerStat.GetRemainingHandCardsNum();
+    Copy(row + 3, col + 2 + CARDS_REMAINED_STR.size(), std::to_string(remainingHandCardsNum));
+    if (remainingHandCardsNum == 1) {
+        DrawUNO();
+    }
 
     Copy(row + 4, col + 2, LAST_PLAYED_STR);
     if (playerStat.DoPlayInLastRound()) {
@@ -119,6 +124,9 @@ void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
     // int height = GetSelfBoxHeight();
     DrawBorderAndUsername(row, col, width, height - 2 + mExtraRowNum, playerStat.GetUsername());
     DrawHandCards(row, col, width, handcards);
+    if (handcards.Number() == 1) {
+        DrawUNO();
+    }
 
     if (gameStat.IsMyTurn()) {
         // mView[row + 1][col + width - 3] = '*';
@@ -132,6 +140,12 @@ void View::DrawLastPlayedCard(Card lastPlayedCard)
 {
     auto [row, col] = ViewFormatter::GetPosOfLastPlayedCard();
     Copy(row, col, lastPlayedCard.ToString());
+}
+
+void View::DrawUNO()
+{
+    auto [row, col] = ViewFormatter::GetPosOfLastPlayedCard();
+    Copy(row, col + 4, UNO_STR);
 }
 
 void View::DrawTimeIndicator(int currentPlayer, int timeElapsed)

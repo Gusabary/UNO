@@ -45,6 +45,8 @@ private:
 
     void DrawHandCards(int row, int col, int width, const HandCards &handcards);
 
+    void DrawUNO();
+
     int GetSelfBoxHeight();
 
     void Copy(int row, int col, const std::string &src);
@@ -57,6 +59,7 @@ private:
     const static std::string CARDS_REMAINED_STR;
     const static std::string LAST_PLAYED_STR;
     const static std::string HAND_CARDS_STR;
+    const static std::string UNO_STR;
 
     ViewT mView;
 
