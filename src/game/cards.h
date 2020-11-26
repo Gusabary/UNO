@@ -8,7 +8,9 @@
 #include <deque>
 #include <algorithm>
 #include <random>
+#ifdef ENABLE_LOG
 #include <spdlog/spdlog.h>
+#endif
 
 #include "../common/common.h"
 

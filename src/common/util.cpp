@@ -58,7 +58,6 @@ char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
     }
     else if (ret == WAIT_OBJECT_0) {
         char c = _getch();
-        spdlog::info("getch: {}", c);
         return c;
     }
 #endif

@@ -3,6 +3,8 @@
 #include <vector>
 #include <utility>
 #include <thread>
+#include <functional>
+#include <mutex>
 
 #include "view.h"
 #include "inputter.h"

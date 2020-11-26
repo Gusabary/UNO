@@ -59,7 +59,6 @@ void Outputter::PrintView(const View &view) const
 void Outputter::PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlayed,
     bool hasChanceToPlayAfterDraw) const
 {
-    spdlog::info("is specifying: {}", isSpecifyingNextColor);
     if (isSpecifyingNextColor) {
         std::cout << "Specify the next color (" 
                   << ToColorEscape(CardColor::RED)    << "R" << ColorEscape::RESET << "/"

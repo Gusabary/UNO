@@ -55,6 +55,12 @@ elseif(WIN32)
 endif()
 
 add_subdirectory(cxxopts)
-add_subdirectory(googletest)
 add_subdirectory(yaml-cpp)
-add_subdirectory(spdlog)
+
+if(BUILD_TEST)
+  add_subdirectory(googletest)
+endif()
+
+if(ENABLE_LOG)
+  add_subdirectory(spdlog)
+endif()

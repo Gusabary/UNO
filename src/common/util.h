@@ -2,7 +2,9 @@
 
 #include <memory>
 #include <cassert>
+#ifdef ENABLE_LOG
 #include <spdlog/spdlog.h>
+#endif
 
 #include "common.h"
 #include "terminal.h"

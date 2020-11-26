@@ -8,4 +8,7 @@ add_executable(uno ${APP_DIR})
 target_link_libraries(uno PRIVATE asio)
 target_link_libraries(uno PRIVATE cxxopts)
 target_link_libraries(uno PRIVATE yaml-cpp)
-target_link_libraries(uno PRIVATE spdlog::spdlog)
+
+if(ENABLE_LOG)
+    target_link_libraries(uno PRIVATE spdlog::spdlog)
+endif()

@@ -12,4 +12,7 @@ target_link_libraries(uno_test PRIVATE cxxopts)
 target_link_libraries(uno_test PRIVATE gtest)
 target_link_libraries(uno_test PRIVATE gmock)
 target_link_libraries(uno_test PRIVATE yaml-cpp)
-target_link_libraries(uno_test PRIVATE spdlog::spdlog)
+
+if(ENABLE_LOG)
+    target_link_libraries(uno_test PRIVATE spdlog::spdlog)
+endif()

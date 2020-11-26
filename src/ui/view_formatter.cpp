@@ -147,7 +147,6 @@ ViewFormatter::PosT ViewFormatter::GetPosOfHandCard(int handcardIndex,
 
 ViewFormatter::ScaleT ViewFormatter::GetBaseScaleOfView()
 {
-    spdlog::info("player num: {}", Common::Common::mPlayerNum);
     return mBaseScaleOfView[Common::Common::mPlayerNum];
 }
 
