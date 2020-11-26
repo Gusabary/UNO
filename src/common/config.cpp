@@ -7,25 +7,48 @@ int Common::Common::mPlayerNum;
 int Common::Common::mTimeoutPerTurn;
 int Common::Common::mHandCardsNumPerRow;
 
+const std::string Config::CMD_OPT_SHORT_LISTEN = "l";
+const std::string Config::CMD_OPT_LONG_LISTEN = "listen";
+const std::string Config::CMD_OPT_BOTH_LISTEN = CMD_OPT_SHORT_LISTEN + ", " + CMD_OPT_LONG_LISTEN;
+const std::string Config::CMD_OPT_SHORT_CONNECT = "c";
+const std::string Config::CMD_OPT_LONG_CONNECT = "connect";
+const std::string Config::CMD_OPT_BOTH_CONNECT = CMD_OPT_SHORT_CONNECT + ", " + CMD_OPT_LONG_CONNECT;
+const std::string Config::CMD_OPT_SHORT_USERNAME = "u";
+const std::string Config::CMD_OPT_LONG_USERNAME = "username";
+const std::string Config::CMD_OPT_BOTH_USERNAME = CMD_OPT_SHORT_USERNAME + ", " + CMD_OPT_LONG_USERNAME;
+const std::string Config::CMD_OPT_SHORT_PLAYERS = "n";
+const std::string Config::CMD_OPT_LONG_PLAYERS = "players";
+const std::string Config::CMD_OPT_BOTH_PLAYERS = CMD_OPT_SHORT_PLAYERS + ", " + CMD_OPT_LONG_PLAYERS;
+const std::string Config::CMD_OPT_SHORT_CFGFILE = "f";
+const std::string Config::CMD_OPT_LONG_CFGFILE = "file";
+const std::string Config::CMD_OPT_BOTH_CFGFILE = CMD_OPT_SHORT_CFGFILE + ", " + CMD_OPT_LONG_CFGFILE;
+const std::string Config::FILE_OPT_SERVER = "server";
+const std::string Config::FILE_OPT_CLIENT = "client";
+const std::string Config::FILE_OPT_LISTEN = "listenOn";
+const std::string Config::FILE_OPT_CONNECT = "connectTo";
+const std::string Config::FILE_OPT_USERNAME = "username";
+const std::string Config::FILE_OPT_PLAYERS = "playerNum";
+
 Config::Config(int argc, const char **argv)
 {
     mOptions = std::make_unique<cxxopts::Options>("uno", "UNO - uno card game");
     mOptions->add_options()
-        ("l, listen", "the port number that server will listen on", cxxopts::value<std::string>())
-        ("c, connect", "the endpoint that client (player) will connect to", cxxopts::value<std::string>())
-        ("u, username", "the username of the player", cxxopts::value<std::string>())
-        ("n, players", "the number of players", cxxopts::value<int>())
-        ("f, file", "the path of config file", cxxopts::value<std::string>());
+        (CMD_OPT_BOTH_LISTEN, "the port number that server will listen on", cxxopts::value<std::string>())
+        (CMD_OPT_BOTH_CONNECT, "the endpoint that client (player) will connect to", cxxopts::value<std::string>())
+        (CMD_OPT_BOTH_USERNAME, "the username of the player", cxxopts::value<std::string>())
+        (CMD_OPT_BOTH_PLAYERS, "the number of players", cxxopts::value<int>())
+        (CMD_OPT_BOTH_CFGFILE, "the path of config file", cxxopts::value<std::string>());
     
     mCmdlineOpts = std::make_unique<cxxopts::ParseResult>(mOptions->parse(argc, argv));
-    if (mCmdlineOpts->count("file")) {
-        auto configFile = (*mCmdlineOpts)["file"].as<std::string>();
+    std::string configFile;
+    if (mCmdlineOpts->count(CMD_OPT_LONG_CFGFILE)) {
+        auto configFile = (*mCmdlineOpts)[CMD_OPT_LONG_CFGFILE].as<std::string>();
         auto rootNode = YAML::LoadFile(configFile);
-        if (rootNode["server"].IsDefined()) {
-            mServerNode = std::make_unique<YAML::Node>(rootNode["server"]);
+        if (rootNode[FILE_OPT_SERVER].IsDefined()) {
+            mServerNode = std::make_unique<YAML::Node>(rootNode[FILE_OPT_SERVER]);
         }
-        if (rootNode["client"].IsDefined()) {
-            mClientNode = std::make_unique<YAML::Node>(rootNode["client"]);
+        if (rootNode[FILE_OPT_CLIENT].IsDefined()) {
+            mClientNode = std::make_unique<YAML::Node>(rootNode[FILE_OPT_CLIENT]);
         }
     }
 }
@@ -53,58 +76,70 @@ std::unique_ptr<GameConfigInfo> Config::Parse()
 void Config::ParseFileOpts()
 {
     // parse server node
-    if (mServerNode && mCmdlineOpts->count("listen")) {
-        if ((*mServerNode)["playerNum"].IsDefined()) {
-            mCommonConfigInfo->mPlayerNum = (*mServerNode)["playerNum"].as<int>();
+    if (mServerNode && mCmdlineOpts->count(CMD_OPT_LONG_LISTEN)) {
+        // if ((*mServerNode)[FILE_OPT_LISTEN].IsDefined()) {
+        //     mGameConfigInfo->mPort = (*mServerNode)[FILE_OPT_LISTEN].as<std::string>();
+        // }
+        if ((*mServerNode)[FILE_OPT_PLAYERS].IsDefined()) {
+            mCommonConfigInfo->mPlayerNum = (*mServerNode)[FILE_OPT_PLAYERS].as<int>();
         }
     }
 
     // parse client node
-    if (mClientNode && mCmdlineOpts->count("connect")) {
-
+    if (mClientNode && mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
+        // if ((*mClientNode)[FILE_OPT_CONNECT].IsDefined()) {
+        //     std::string endpoint = (*mClientNode)[FILE_OPT_CONNECT].as<std::string>();
+        //     int pos = endpoint.find(":");
+        //     mGameConfigInfo->mHost = endpoint.substr(0, pos);
+        //     mGameConfigInfo->mPort = endpoint.substr(pos + 1);
+        // }
+        if ((*mClientNode)[FILE_OPT_USERNAME].IsDefined()) {
+            mGameConfigInfo->mUsername = (*mClientNode)[FILE_OPT_USERNAME].as<std::string>();
+        }
     }
 }
 
 void Config::ParseCmdlineOpts()
 {
     // check options
-    if (mCmdlineOpts->count("listen") && mCmdlineOpts->count("connect")) {
+    if (mCmdlineOpts->count(CMD_OPT_LONG_LISTEN) && mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
         throw std::runtime_error("cannot specify both -l and -c options at the same time");
     }
-    if (!mCmdlineOpts->count("listen") && !mCmdlineOpts->count("connect")) {
+    if (!mCmdlineOpts->count(CMD_OPT_LONG_LISTEN) && !mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
         throw std::runtime_error("must specify either -l or -c option");
     }
-    if (mCmdlineOpts->count("connect") && !mCmdlineOpts->count("username")) {
+    if (mCmdlineOpts->count(CMD_OPT_LONG_CONNECT) && !mCmdlineOpts->count(CMD_OPT_LONG_USERNAME)
+        && !(*mClientNode)[FILE_OPT_USERNAME].IsDefined()) {
         throw std::runtime_error("must specify -u option if -c option is specified");
     }
-    if (mCmdlineOpts->count("connect") && mCmdlineOpts->count("players")) {
+    if (mCmdlineOpts->count(CMD_OPT_LONG_CONNECT) && mCmdlineOpts->count(CMD_OPT_LONG_PLAYERS)) {
         throw std::runtime_error("only server side can specify -n option");
     }
 
     // -l
-    if (mCmdlineOpts->count("listen")) {
+    if (mCmdlineOpts->count(CMD_OPT_LONG_LISTEN)) {
         mGameConfigInfo->mIsServer = true;
         // mGameConfigInfo->mHost = "localhost";
-        mGameConfigInfo->mPort = (*mCmdlineOpts)["listen"].as<std::string>();
+        mGameConfigInfo->mPort = (*mCmdlineOpts)[CMD_OPT_LONG_LISTEN].as<std::string>();
     }
 
     // -c
-    if (mCmdlineOpts->count("connect")) {
+    if (mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
         mGameConfigInfo->mIsServer = false;
-        std::string endpoint = (*mCmdlineOpts)["connect"].as<std::string>();
+        std::string endpoint = (*mCmdlineOpts)[CMD_OPT_LONG_CONNECT].as<std::string>();
         int pos = endpoint.find(":");
         mGameConfigInfo->mHost = endpoint.substr(0, pos);
         mGameConfigInfo->mPort = endpoint.substr(pos + 1);
     }
 
     // -u
-    if (mCmdlineOpts->count("username")) {
-        mGameConfigInfo->mUsername = (*mCmdlineOpts)["username"].as<std::string>();
+    if (mCmdlineOpts->count(CMD_OPT_LONG_USERNAME)) {
+        mGameConfigInfo->mUsername = (*mCmdlineOpts)[CMD_OPT_LONG_USERNAME].as<std::string>();
     }
 
     // -n
-    if (mCmdlineOpts->count("players")) {
-        mCommonConfigInfo->mPlayerNum = (*mCmdlineOpts)["players"].as<int>();
+    if (mCmdlineOpts->count(CMD_OPT_LONG_PLAYERS)) {
+        mCommonConfigInfo->mPlayerNum = (*mCmdlineOpts)[CMD_OPT_LONG_PLAYERS].as<int>();
     }
 }
 
