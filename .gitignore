@@ -36,3 +36,9 @@ build
 
 # vscode
 .vscode
+
+# python
+__pycache__
+
+# log
+logs

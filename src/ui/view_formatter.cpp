@@ -98,7 +98,7 @@ void ViewFormatter::Init()
         PosT{15, 10}, PosT{7, 0}, PosT{0, 20}, PosT{7, 40}
     });
     mPosOfLastPlayedCard.emplace_back(PosT{10, 30});
-    mBaseScaleOfView.emplace_back(ScaleT{20, 62});
+    mBaseScaleOfView.emplace_back(ScaleT{21, 62});
     mPosOfUNOText.emplace_back(PosT{11, 29});
 }
 

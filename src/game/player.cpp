@@ -23,7 +23,7 @@ void Player::ResetGame()
 
 void Player::JoinGame()
 {
-    std::cout << "connect success, sending username to server" << std::endl;
+    // std::cout << "connect success, sending username to server" << std::endl;
     Common::Util::Deliver<JoinGameInfo>(mClient, mUsername);
 
     auto joinRsp = Common::Util::Receive<JoinGameRspInfo>(mClient);
