@@ -47,6 +47,7 @@ private:
 
 private:
     const std::string mUsername;
+    std::string mWinner;
     std::shared_ptr<Network::IClient> mClient;
 
     std::unique_ptr<UIManager> mUIManager;

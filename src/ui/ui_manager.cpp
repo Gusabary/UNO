@@ -142,6 +142,26 @@ CardColor UIManager::SpecifyNextColor()
     return nextColor;
 }
 
+bool UIManager::WantToPlayAgain(const std::string &winner)
+{
+    std::cout << winner << " won. Want to play again? (Y/n) " << std::endl;
+    while (true) {
+        char ch;
+        try {
+            ch = Common::Util::GetCharWithTimeout(30000, true);
+        }
+        catch (const std::exception &e) {
+            // timeout, regard it as 'N'
+            ch = 'N';
+        }
+
+        switch (ch) {
+            case 'y': case 'Y': return true;
+            case 'n': case 'N': return false;
+        }
+    }
+}
+
 void UIManager::ExecuteWithTimePassing(const std::function<void()> &func)
 {
     auto startTime = std::chrono::system_clock::now();

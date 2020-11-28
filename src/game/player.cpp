@@ -43,7 +43,7 @@ void Player::JoinGame()
 
     // wait for game start
     auto info = Common::Util::Receive<GameStartInfo>(mClient);
-    std::cout << *info << std::endl;
+    // std::cout << *info << std::endl;
 
     mHandCards.reset(new HandCards(info->mInitHandCards));
     mGameStat.reset(new GameStat(*info));
@@ -105,19 +105,19 @@ void Player::GameLoop()
             switch (info->mActionType) {
                 case ActionType::DRAW: {
                     auto drawInfo = Common::Util::DynamicCast<DrawInfo>(info);
-                    std::cout << *drawInfo << std::endl;
+                    // std::cout << *drawInfo << std::endl;
                     UpdateStateAfterDraw(drawInfo->mPlayerIndex, drawInfo->mNumber);
                     break;
                 }
                 case ActionType::SKIP: {
                     auto skipInfo = Common::Util::DynamicCast<SkipInfo>(info);
-                    std::cout << *skipInfo << std::endl;
+                    // std::cout << *skipInfo << std::endl;
                     UpdateStateAfterSkip(skipInfo->mPlayerIndex);
                     break;
                 }
                 case ActionType::PLAY: {
                     auto playInfo = Common::Util::DynamicCast<PlayInfo>(info);
-                    std::cout << *playInfo << std::endl;
+                    // std::cout << *playInfo << std::endl;
                     UpdateStateAfterPlay(playInfo->mPlayerIndex, playInfo->mCard);
                     break;
                 }
@@ -135,17 +135,8 @@ void Player::GameEnds()
 {
     // let the server resets game first
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    while (true) {
-        std::cout << "want to play again? (Y/n) ";
-        char ch;
-        std::cin.get(ch);
-        if (ch == 'y' || ch == 'Y') {
-            break;
-        }
-        else if (ch == 'n' || ch == 'N') {
-            std::exit(0);
-        }
-        std::cin.get(ch);  // consume the \n
+    if (!mUIManager->WantToPlayAgain(mWinner)) {
+        std::exit(0);
     }
     ResetGame();
 }
@@ -226,13 +217,7 @@ void Player::Win(int playerIndex)
 {
     mUIManager->StopTimerThread();
     mGameStat->GameEnds();
-    if (playerIndex == 0) {
-        std::cout << "You win!" << std::endl;
-    }
-    else {
-        std::string winner = mPlayerStats[playerIndex].GetUsername();
-        std::cout << winner << " wins!" << std::endl;
-    }
+    mWinner = (playerIndex == 0) ? "You" : mPlayerStats[playerIndex].GetUsername();
 }
 
 void Player::PrintLocalState()

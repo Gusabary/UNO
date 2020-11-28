@@ -20,7 +20,7 @@ public:
               std::vector<PlayerStat> &playerStats,
               std::unique_ptr<HandCards> &handCards);
 
-    ~UIManager() { mTimerThread->join(); }
+    // ~UIManager() { mTimerThread->join(); }
 
     void RunTimerThread();
 
@@ -34,6 +34,8 @@ public:
         bool hasChanceToPlayAfterDraw);
 
     CardColor SpecifyNextColor();
+
+    bool WantToPlayAgain(const std::string &winner);
 
     void NextTurn();
 

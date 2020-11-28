@@ -62,7 +62,10 @@ void GameStat::UpdateAfterPlay(Card card)
     if (card.mText == CardText::DRAW_FOUR) {
         mCardsNumToDraw = (mCardsNumToDraw == 1) ? 4 : (mCardsNumToDraw + 4);
     }
-    NextPlayer();
+
+    if (!mGameEnds) {
+        NextPlayer();
+    }
 }
 
 void GameStat::Tick()

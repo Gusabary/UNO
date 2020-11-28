@@ -41,7 +41,7 @@ public:
 
     int GetCardsNumToDraw() const { return mCardsNumToDraw; }
 
-    void GameEnds() { mGameEnds = true; }
+    void GameEnds() { mGameEnds = true; mCurrentPlayer = -1; }
 
     void Reverse() { mIsInClockwise = !mIsInClockwise; }
 

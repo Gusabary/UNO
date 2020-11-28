@@ -133,6 +133,10 @@ void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
         // show cursor only in the turn of player himself
         auto [cardRow, cardCol] = ViewFormatter::GetPosOfHandCard(cursorIndex, handcards);
         mView[cardRow][cardCol - 1] = '>';
+        if (mView[row + 5 + mExtraRowNum][col] != '[') {
+            // make sure there exists a time indicator under self box when it's my turn
+            DrawTimeIndicator(0, 0);
+        }
     }
 }
 
