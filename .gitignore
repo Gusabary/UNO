@@ -39,6 +39,7 @@ build
 
 # python
 __pycache__
+playground.py
 
 # log
 logs
