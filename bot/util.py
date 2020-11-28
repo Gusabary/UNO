@@ -14,19 +14,31 @@ def remove_escape(s):
             .replace("\x1b[34m", "") \
             .replace("\x1b[0m", "") 
 
-def can_be_played_after(card_to_play, last_played_card):
+def is_special_card(card):
+    if card in ['W', '+4']:
+        return True
+    if card[1:] in ['S', 'R', '+2']:
+        return True
+    return False
+
+def can_be_played_after(card_to_play, last_played_card, handcards_num):
     _card_to_play = remove_escape(card_to_play)
     _last_played_card = remove_escape(last_played_card)
-
+    _last_color = _last_played_card[0]
+    _last_text = _last_played_card[1:]
     # print("A:", _card_to_play, "\tB,", _last_played_card)
-    if _card_to_play == 'W' or _card_to_play == '+4':
+
+    if handcards_num == 1 and is_special_card(_card_to_play):
         return False
-    if _last_played_card[1:] == 'S' or _last_played_card[1:] == '+2' or _last_played_card[1:] == '+4':
-        return False
-    if _card_to_play[0] == _last_played_card[0]:
+    if _last_text == 'S':
+        return _card_to_play[1:] == 'S'
+    if _last_text == '+2':
+        return _card_to_play[1:] in ['+2', '+4']
+    if _last_text == '+4':
+        return _card_to_play[1:] == '+4'
+    if _card_to_play in ['W', '+4']:
         return True
-    if len(_last_played_card) > 1 and _card_to_play[1] == _last_played_card[1]:
-        return True
+    return _card_to_play[0] == _last_color or _card_to_play[1:] == _last_text
 
 def update_handcards(handcards, line):
     cursor_index = -1
@@ -42,7 +54,6 @@ def update_handcards(handcards, line):
 def next_frame(game, player_num):
     cur_line_num = 0
     is_updating_handcards = False
-    is_my_turn = False
     stat = 0
     lines_left_num = -1
 
@@ -56,8 +67,8 @@ def next_frame(game, player_num):
 
     while True:
         line = game.stdout.readline().decode("UTF-8").replace("\n", "") 
-        line = remove_escape(line)
         print(cur_line_num, "\t", line)
+        line = remove_escape(line)
 
         if cur_line_num == 0 and re.match(".*Want to play again", line):
             stat = 4

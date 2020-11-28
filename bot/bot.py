@@ -1,5 +1,5 @@
 from subprocess import Popen, PIPE
-import os
+import os, sys
 import re
 import util
 
@@ -55,19 +55,22 @@ class Bot:
                     if hint_stat == 1:
                         self.try_play_card()
                     elif hint_stat == 2:
-                        self.press_keyboard(' ')
+                        self.try_play_card_immediately()
                     elif hint_stat == 3:
-                        self.press_keyboard('r')
+                        self.specify_next_color()
                     else:
                         assert False
                 else:
                     time_to_think -= 1
+            else:
+                # not my turn
+                last_hint_stat = -1
 
     def try_play_card(self):
         # press keyboard only once for each frame
         index_of_card_to_play = -1
         for i in range(len(self.handcards)):
-            if util.can_be_played_after(self.handcards[i], self.last_played_card):
+            if util.can_be_played_after(self.handcards[i], self.last_played_card, len(self.handcards)):
                 index_of_card_to_play = i
                 break
         print("index of card to play:", index_of_card_to_play, "\tcursor index:", self.cursor_index)
@@ -82,6 +85,21 @@ class Bot:
                 self.press_keyboard('.')
             else:
                 self.press_keyboard('\n')
+    
+    def try_play_card_immediately(self):
+        card_to_play = self.handcards[self.cursor_index]
+        if util.can_be_played_after(card_to_play, self.last_played_card, len(self.handcards)):
+            self.press_keyboard('\n')
+        else:
+            self.press_keyboard(' ')
         
+    def specify_next_color(self):
+        first_handcard = self.handcards[0]
+        if first_handcard in ['W', '+4']:
+            self.press_keyboard('r')
+        else:
+            self.press_keyboard(first_handcard[0])
 
-bot = Bot("localhost:9091", player_num=3)
+if __name__ == "__main__":
+    player_num = int(sys.argv[1])
+    bot = Bot("localhost:9091", player_num=player_num)
