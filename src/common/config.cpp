@@ -6,6 +6,22 @@ namespace UNO { namespace Common {
 int Common::Common::mPlayerNum;
 int Common::Common::mTimeoutPerTurn;
 int Common::Common::mHandCardsNumPerRow;
+std::string Common::Common::mRedEscape;
+std::string Common::Common::mYellowEscape;
+std::string Common::Common::mGreenEscape;
+std::string Common::Common::mBlueEscape;
+const std::map<std::string, std::string> Common::Common::mEscapeMap = {
+    {"red",          "\033[31m"},
+    {"yellow",       "\033[33m"},
+    {"green",        "\033[32m"},
+    {"blue",         "\033[34m"},
+    {"cyan",         "\033[36m"},
+    {"brightRed",    "\033[91m"},
+    {"brightYellow", "\033[93m"},
+    {"brightGreen",  "\033[92m"},
+    {"brightBlue",   "\033[94m"},
+    {"brightCyan",   "\033[96m"}
+};
 
 const std::string Config::CMD_OPT_SHORT_LISTEN = "l";
 const std::string Config::CMD_OPT_LONG_LISTEN = "listen";
@@ -28,6 +44,10 @@ const std::string Config::FILE_OPT_LISTEN = "listenOn";
 const std::string Config::FILE_OPT_CONNECT = "connectTo";
 const std::string Config::FILE_OPT_USERNAME = "username";
 const std::string Config::FILE_OPT_PLAYERS = "playerNum";
+const std::string Config::FILE_OPT_RED = "red";
+const std::string Config::FILE_OPT_YELLOW = "yellow";
+const std::string Config::FILE_OPT_GREEN = "green";
+const std::string Config::FILE_OPT_BLUE = "blue";
 
 Config::Config(int argc, const char **argv)
 {
@@ -96,6 +116,18 @@ void Config::ParseFileOpts()
         if ((*mClientNode)[FILE_OPT_USERNAME].IsDefined()) {
             mGameConfigInfo->mUsername = (*mClientNode)[FILE_OPT_USERNAME].as<std::string>();
         }
+        if ((*mClientNode)[FILE_OPT_RED].IsDefined()) {
+            mCommonConfigInfo->mRedEscape = (*mClientNode)[FILE_OPT_RED].as<std::string>();
+        }
+        if ((*mClientNode)[FILE_OPT_YELLOW].IsDefined()) {
+            mCommonConfigInfo->mYellowEscape = (*mClientNode)[FILE_OPT_YELLOW].as<std::string>();
+        }
+        if ((*mClientNode)[FILE_OPT_GREEN].IsDefined()) {
+            mCommonConfigInfo->mGreenEscape = (*mClientNode)[FILE_OPT_GREEN].as<std::string>();
+        }
+        if ((*mClientNode)[FILE_OPT_BLUE].IsDefined()) {
+            mCommonConfigInfo->mBlueEscape = (*mClientNode)[FILE_OPT_BLUE].as<std::string>();
+        }
     }
 }
 
@@ -148,5 +180,37 @@ void Config::SetUpCommonConfig()
     Common::Common::mPlayerNum = mCommonConfigInfo->mPlayerNum.value_or(3);
     Common::Common::mTimeoutPerTurn = 15;
     Common::Common::mHandCardsNumPerRow = 8;
+    
+    auto redIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mRedEscape.value_or("red"));
+    if (redIter == Common::Common::mEscapeMap.end()) {
+        Common::Common::mRedEscape = Common::Common::mEscapeMap.at("red");
+    }
+    else {
+        Common::Common::mRedEscape = redIter->second;
+    }
+
+    auto yellowIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mYellowEscape.value_or("yellow"));
+    if (yellowIter == Common::Common::mEscapeMap.end()) {
+        Common::Common::mYellowEscape = Common::Common::mEscapeMap.at("yellow");
+    }
+    else {
+        Common::Common::mYellowEscape = yellowIter->second;
+    }
+
+    auto greenIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mGreenEscape.value_or("green"));
+    if (greenIter == Common::Common::mEscapeMap.end()) {
+        Common::Common::mGreenEscape = Common::Common::mEscapeMap.at("green");
+    }
+    else {
+        Common::Common::mGreenEscape = greenIter->second;
+    }
+
+    auto blueIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mBlueEscape.value_or("blue"));
+    if (blueIter == Common::Common::mEscapeMap.end()) {
+        Common::Common::mBlueEscape = Common::Common::mEscapeMap.at("blue");
+    }
+    else {
+        Common::Common::mBlueEscape = blueIter->second;
+    }
 }
 }}

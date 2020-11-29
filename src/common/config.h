@@ -17,6 +17,10 @@ struct GameConfigInfo {
 
 struct CommonConfigInfo {
     std::optional<int> mPlayerNum;
+    std::optional<std::string> mRedEscape;
+    std::optional<std::string> mYellowEscape;
+    std::optional<std::string> mGreenEscape;
+    std::optional<std::string> mBlueEscape;
 };
 
 class Config {
@@ -64,5 +68,9 @@ private:
     const static std::string FILE_OPT_CONNECT;
     const static std::string FILE_OPT_USERNAME;
     const static std::string FILE_OPT_PLAYERS;
+    const static std::string FILE_OPT_RED;
+    const static std::string FILE_OPT_YELLOW;
+    const static std::string FILE_OPT_GREEN;
+    const static std::string FILE_OPT_BLUE;
 };
 }}

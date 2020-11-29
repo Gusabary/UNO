@@ -9,11 +9,11 @@ namespace UNO { namespace UI {
 using namespace Game;
 
 struct ColorEscape {
-    const static std::string RESET;
-    const static std::string RED;
-    const static std::string YELLOW;
-    const static std::string GREEN;
-    const static std::string BLUE;
+    static std::string RESET;
+    static std::string RED;
+    static std::string YELLOW;
+    static std::string GREEN;
+    static std::string BLUE;
     // const static std::string BLACK;
 };
 

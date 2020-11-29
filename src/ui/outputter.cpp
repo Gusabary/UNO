@@ -2,17 +2,23 @@
 
 namespace UNO { namespace UI {
 
-const std::string ColorEscape::RESET  = "\033[0m";
-const std::string ColorEscape::RED    = "\033[31m";
-const std::string ColorEscape::YELLOW = "\033[33m";
-const std::string ColorEscape::GREEN  = "\033[32m";
-const std::string ColorEscape::BLUE   = "\033[34m";
+std::string ColorEscape::RESET;
+std::string ColorEscape::RED;
+std::string ColorEscape::YELLOW;
+std::string ColorEscape::GREEN;
+std::string ColorEscape::BLUE;
 // const std::string ColorEscape::BLACK  = "\033[30m";
 
 Outputter::Outputter(std::unique_ptr<GameStat> &gameStat, 
     std::vector<PlayerStat> &playerStats, std::unique_ptr<HandCards> &handCards) 
     : mGameStat(gameStat), mPlayerStats(playerStats), mHandCards(handCards) 
-{}
+{
+    ColorEscape::RESET  = "\033[0m";
+    ColorEscape::RED    = Common::Common::mRedEscape;
+    ColorEscape::YELLOW = Common::Common::mYellowEscape;
+    ColorEscape::GREEN  = Common::Common::mGreenEscape;
+    ColorEscape::BLUE   = Common::Common::mBlueEscape;
+}
 
 void Outputter::PrintRawView(const View &view) const
 {
