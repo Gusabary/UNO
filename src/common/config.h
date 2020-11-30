@@ -8,6 +8,10 @@
 
 namespace UNO { namespace Common {
 
+/**
+ * config info that is used by \c GameBoard and \c Player, 
+ * which is outside the \c Config class
+ */
 struct GameConfigInfo {
     bool mIsServer;
     std::string mHost;
@@ -15,6 +19,10 @@ struct GameConfigInfo {
     std::string mUsername;
 };
 
+/**
+ * config info that is used by Config::SetUpCommonConfig,
+ * which is inside the \c Config class
+ */
 struct CommonConfigInfo {
     std::optional<int> mPlayerNum;
     std::optional<std::string> mRedEscape;
@@ -27,13 +35,27 @@ class Config {
 public:
     Config(int argc, const char **argv);
 
+    /**
+     * Parse the config info from both yaml file and command line.
+     *   \return config info that will be used outside the class
+     */
     std::unique_ptr<GameConfigInfo> Parse();
 
 private:
+    /**
+     * Parse the config info from yaml file.
+     */
     void ParseFileOpts();
 
+    /**
+     * Parse the config info from command line.
+     */
     void ParseCmdlineOpts();
 
+    /**
+     * Initialize variables in \c Common::Common with config info just parsed
+     * and those variables are what will be actually used in the game. 
+     */
     void SetUpCommonConfig();
 
 private:

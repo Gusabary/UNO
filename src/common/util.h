@@ -27,21 +27,40 @@ public:
 
     static int WrapWithPlayerNum(int numToWrap);
 
-    static char GetCharImmediately();
-
+    /**
+     * Consume a char with a timeout, if it's exceeded, an exception will be thrown
+     *   \param milliseconds: timeout in milliseconds
+     *   \param autoFlush: if true, the inputted char will get consumed regardless of '\n'
+     *   \return the consumed char
+     */
     static char GetCharWithTimeout(int milliseconds, bool autoFlush);
 
+    /**
+     * Get the number of segment, given the number of cards in hand.
+     */
     static int GetSegmentNum(int handcardNum);
 
+    /**
+     * Get the index of segment that a card in hand belongs to.
+     */
     static int GetSegmentIndex(int handcardIndex);
 
+    /**
+     * Get the index in a segment, given the index of the card in hand.
+     */
     static int GetIndexInSegment(int handcardIndex);
 
+    /**
+     * Dynamically cast a unique_ptr to one with another type.
+     */
     template<typename DstInfoT, typename SrcInfoUp>
     static std::unique_ptr<DstInfoT> DynamicCast(SrcInfoUp &&srcInfo) {
         return std::unique_ptr<DstInfoT>(dynamic_cast<DstInfoT *>(srcInfo.release()));
     }
 
+    /**
+     * Helper of ReceiveInfo for brief code.
+     */
     template<typename InfoT, typename Peer, typename... Args>
     static std::unique_ptr<InfoT> Receive(std::shared_ptr<Peer> peer, Args... args) {
         if constexpr (std::is_same_v<Peer, Network::IServer>) {
@@ -57,6 +76,9 @@ public:
         }
     }
 
+    /**
+     * Helper of DelieveInfo for brief code.
+     */
     template<typename InfoT, typename Peer, typename... Args>
     static void Deliver(std::shared_ptr<Peer> peer, Args... args) {
         if constexpr (std::is_same_v<Peer, Network::IServer>) {

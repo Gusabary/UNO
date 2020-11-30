@@ -22,23 +22,50 @@ public:
 
     // ~UIManager() { mTimerThread->join(); }
 
+    /**
+     * Start the timer thread.
+     */
     void RunTimerThread();
 
+    /**
+     * Stop the timer thread and wait for joining.
+     */
     void StopTimerThread();
 
+    /**
+     * Render view when waiting for other players to join.
+     */
     void RenderWhenInitWaiting(const std::vector<std::string> &usernames, bool isFirstTime);
 
+    /**
+     * Render view in the main game loop.
+     */
     void Render();
 
+    /**
+     * Get the player's action.
+     */
     std::pair<InputAction, int> GetAction(bool lastCardCanBePlayed, 
         bool hasChanceToPlayAfterDraw);
 
+    /**
+     * Get the specified next color when a 'W' or '+4' is played.
+     */
     CardColor SpecifyNextColor();
 
+    /**
+     * Ask player whether want to play again.
+     */
     bool WantToPlayAgain(const std::string &winner);
 
+    /**
+     * Hook invoked when the game enters next turn.
+     */
     void NextTurn();
 
+    /**
+     * Move the cursor in handcard to the position indicated by \param index.
+     */
     void MoveCursorTo(int index) { mCursorIndex = index; }
 
 private:

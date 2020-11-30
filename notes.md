@@ -110,3 +110,5 @@
 + to install MinGw on Windows, take [this](https://www.tutorialspoint.com/How-to-Install-Cplusplus-Compiler-on-Windows) for a reference. after installation, some necessary binarys should already have been added to *PATH*, run `g++` to have a check. and then, we can use it like `cmake -G "MinGW Makefiles" ..`
 
 + using Python to run an executable and provide input interactively, take [this](https://stackoverflow.com/questions/32570029/input-to-c-executable-python-subprocess) for a reference.
+
++ use `firewall-cmd` commands to query and manipulate configuration about firewall to expose service. *[reference](https://www.tecmint.com/fix-no-route-to-host-ssh-error-in-linux/)*

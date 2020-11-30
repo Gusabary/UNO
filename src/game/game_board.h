@@ -18,25 +18,52 @@ public:
 
     static std::shared_ptr<Network::IServer> CreateServer(const std::string &port);
 
-    static std::pair<std::unique_ptr<DiscardPile>, std::unique_ptr<Deck>> CreateCardPile();
-
 // private:
+    /**
+     * Callback of receiving a \c JoinGameInfo from a player.
+     *   \param index: the index of the player
+     *   \param username: the player's username
+     */
     void ReceiveUsername(int index, const std::string &username);
 
+    /**
+     * Have received all players' info, start game.
+     */
     void StartGame();
 
+    /**
+     * Main game loop, wait for \c ActionInfo from players and act accordingly.
+     */
     void GameLoop();
     
+    /**
+     * Handle a \c DrawInfo from player.
+     */
     void HandleDraw(const std::unique_ptr<DrawInfo> &info);
     
+    /**
+     * Handle a \c SkipInfo from player.
+     */
     void HandleSkip(const std::unique_ptr<SkipInfo> &info);
     
+    /**
+     * Handle a \c PlayInfo from player.
+     */
     void HandlePlay(const std::unique_ptr<PlayInfo> &info);
 
+    /**
+     * Someone has won, end game.
+     */
     void Win();
 
+    /**
+     * Reset the game state and prepare for restart.
+     */
     void ResetGame();
 
+    /**
+     * Broadcast info to players other than the current one.
+     */
     template <typename ActionInfoT>
     void Broadcast(ActionInfoT &info) {
         int currentPlayer = mGameStat->GetCurrentPlayer();

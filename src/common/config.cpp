@@ -97,9 +97,6 @@ void Config::ParseFileOpts()
 {
     // parse server node
     if (mServerNode && mCmdlineOpts->count(CMD_OPT_LONG_LISTEN)) {
-        // if ((*mServerNode)[FILE_OPT_LISTEN].IsDefined()) {
-        //     mGameConfigInfo->mPort = (*mServerNode)[FILE_OPT_LISTEN].as<std::string>();
-        // }
         if ((*mServerNode)[FILE_OPT_PLAYERS].IsDefined()) {
             mCommonConfigInfo->mPlayerNum = (*mServerNode)[FILE_OPT_PLAYERS].as<int>();
         }
@@ -107,12 +104,6 @@ void Config::ParseFileOpts()
 
     // parse client node
     if (mClientNode && mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
-        // if ((*mClientNode)[FILE_OPT_CONNECT].IsDefined()) {
-        //     std::string endpoint = (*mClientNode)[FILE_OPT_CONNECT].as<std::string>();
-        //     int pos = endpoint.find(":");
-        //     mGameConfigInfo->mHost = endpoint.substr(0, pos);
-        //     mGameConfigInfo->mPort = endpoint.substr(pos + 1);
-        // }
         if ((*mClientNode)[FILE_OPT_USERNAME].IsDefined()) {
             mGameConfigInfo->mUsername = (*mClientNode)[FILE_OPT_USERNAME].as<std::string>();
         }
@@ -151,7 +142,6 @@ void Config::ParseCmdlineOpts()
     // -l
     if (mCmdlineOpts->count(CMD_OPT_LONG_LISTEN)) {
         mGameConfigInfo->mIsServer = true;
-        // mGameConfigInfo->mHost = "localhost";
         mGameConfigInfo->mPort = (*mCmdlineOpts)[CMD_OPT_LONG_LISTEN].as<std::string>();
     }
 

@@ -23,10 +23,20 @@ public:
               std::vector<PlayerStat> &playerStats,
               std::unique_ptr<HandCards> &handCards);
 
+    /**
+     * Print view without color rendering. 
+     * Used when waiting for other playes to join.
+     */
     void PrintRawView(const View &view) const;
 
+    /**
+     * Print view with color rendering.
+     */
     void PrintView(const View &view) const;
 
+    /**
+     * Print the hint text shown below the view. Only appear in player's turn.
+     */
     void PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlayed,
         bool hasChanceToPlayAfterDraw) const;
 

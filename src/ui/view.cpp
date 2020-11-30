@@ -136,8 +136,6 @@ void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
     }
 }
 
-// make sure that if it's my turn, there must be a self time indicator
-// i.e. self time indicator and hint text should always appear at the same time
 void View::DrawSelfTimeIndicatorIfNot()
 {
     auto [row, col] = ViewFormatter::GetPosOfPlayerBox(0);

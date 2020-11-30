@@ -19,8 +19,14 @@ class Inputter {
 public:
     Inputter() {}
 
+    /**
+     * Wait for player to input an action with a time limit \param timeout.
+     */
     InputAction GetAction(int timeout);
 
+    /**
+     * After the player plays a 'W' or '+4', he needs to specify the next color to turn to.
+     */
     Game::CardColor SpecifyNextColor(int timeout);
 
 private:

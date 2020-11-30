@@ -39,11 +39,6 @@ void HandCards::Erase(int index)
     mCards.erase(std::next(mCards.begin(), index));
 }
 
-/**
- * get the index of a given card in the handcards. Noth that:
- *   1) the given card has to exist in the handcards (guaranteed by the caller)
- *   2) if the given card is duplicated in the handcards, return the index of the first one
- */
 int HandCards::GetIndex(Card card) const
 {
     auto it = mCards.find(card);
