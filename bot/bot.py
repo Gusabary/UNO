@@ -6,7 +6,12 @@ import util
 class Bot:
     def __init__(self, endpoint, username="bot", player_num=2, debug=False):
         project_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        uno_path = project_path + "/build/src/uno"
+        if os.name == 'nt':
+            # windows
+            uno_path = project_path + "\\build\\src\\Debug\\uno.exe"
+        else:
+            # unix
+            uno_path = project_path + "/build/src/uno"
         args = [uno_path, "-c", endpoint, "-u", username]
         
         self.game = Popen(args, stdin=PIPE, stdout=PIPE)
@@ -117,5 +122,5 @@ if __name__ == "__main__":
         username = sys.argv[3]
     else:
         username = "bot"
-    bot = Bot(endpoint, player_num=player_num, username=username)
+    bot = Bot(endpoint, player_num=player_num, username=username, debug=True)
     bot.game_loop()

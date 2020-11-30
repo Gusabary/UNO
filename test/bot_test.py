@@ -11,7 +11,14 @@ if len(sys.argv) > 1:
 
 start_time = time.time()
 
-server = Popen([proj_dir + "/build/src/uno", "-l", "9091", "-n", str(player_num)], stdout=PIPE)
+if os.name == 'nt':
+    # windows
+    uno_path = proj_dir + "\\build\\src\\Debug\\uno.exe"
+else:
+    # unix
+    uno_path = proj_dir + "/build/src/uno"
+
+server = Popen([uno_path, "-l", "9091", "-n", str(player_num)], stdout=PIPE)
 time.sleep(0.2)
 
 bots = []

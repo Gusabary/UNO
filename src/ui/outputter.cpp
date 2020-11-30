@@ -43,14 +43,15 @@ void Outputter::PrintView(const View &view) const
     int charsLeftToReset = 0;
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
-            auto curRenderInfo = renderInfos[curRenderIndex];
-            if (curRenderIndex < renderInfos.size() &&
-                row == curRenderInfo.mPos.first &&
-                col == curRenderInfo.mPos.second)
-            {
-                std::cout << ToColorEscape(curRenderInfo.mCard.mColor);
-                charsLeftToReset = curRenderInfo.mCard.Length();
-                curRenderIndex++;
+            if (curRenderIndex < renderInfos.size()) {
+                auto curRenderInfo = renderInfos[curRenderIndex];
+                if (row == curRenderInfo.mPos.first &&
+                    col == curRenderInfo.mPos.second)
+                {
+                    std::cout << ToColorEscape(curRenderInfo.mCard.mColor);
+                    charsLeftToReset = curRenderInfo.mCard.Length();
+                    curRenderIndex++;
+                }
             }
             std::cout << view.At(row, col);
             charsLeftToReset--;

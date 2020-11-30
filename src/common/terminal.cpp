@@ -1,3 +1,5 @@
+#include <conio.h>
+
 #include "terminal.h"
 
 namespace UNO { namespace Common {
@@ -54,7 +56,7 @@ void Terminal::ClearStdInBuffer()
     while (true) {
         auto ret = _kbhit();
         if (ret != 0) {
-            ch = _getch();
+            _getch();
         }
         else {
             break;
