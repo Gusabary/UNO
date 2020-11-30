@@ -79,9 +79,14 @@ void UIManager::NextTurn()
 
 void UIManager::Print() const
 {
+    // get value only once, for atomicity
+    auto isMyTurn = mGameStat->IsMyTurn();
+    if (isMyTurn) {
+        mView->DrawSelfTimeIndicatorIfNot();
+    }
     mOutputter->PrintView(*mView);
 
-    if (mGameStat->IsMyTurn()) {
+    if (isMyTurn) {
         mOutputter->PrintHintText(mIsSpecifyingNextColor, mLastCardCanBePlayed, 
             mHasChanceToPlayAfterDraw);
     }

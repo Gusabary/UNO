@@ -27,7 +27,9 @@ public:
     void DrawLastPlayedCard(Card lastPlayedCard);
 
     void DrawTimeIndicator(int currentPlayer, int timeElapsed);
-    
+
+    void DrawSelfTimeIndicatorIfNot();
+
     int GetExtraRowNum() const { return mExtraRowNum; }
 
     char At(int row, int col) const { return mView[row][col]; }

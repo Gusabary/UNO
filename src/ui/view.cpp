@@ -133,10 +133,16 @@ void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat,
         // show cursor only in the turn of player himself
         auto [cardRow, cardCol] = ViewFormatter::GetPosOfHandCard(cursorIndex, handcards);
         mView[cardRow][cardCol - 1] = '>';
-        if (mView[row + 5 + mExtraRowNum][col] != '[') {
-            // make sure there exists a time indicator under self box when it's my turn
-            DrawTimeIndicator(0, 0);
-        }
+    }
+}
+
+// make sure that if it's my turn, there must be a self time indicator
+// i.e. self time indicator and hint text should always appear at the same time
+void View::DrawSelfTimeIndicatorIfNot()
+{
+    auto [row, col] = ViewFormatter::GetPosOfPlayerBox(0);
+    if (mView[row + 5 + mExtraRowNum][col] != '[') {
+        DrawTimeIndicator(0, 0);
     }
 }
 
