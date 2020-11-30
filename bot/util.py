@@ -26,7 +26,6 @@ def can_be_played_after(card_to_play, last_played_card, handcards_num):
     _last_played_card = remove_escape(last_played_card)
     _last_color = _last_played_card[0]
     _last_text = _last_played_card[1:]
-    # print("A:", _card_to_play, "\tB,", _last_played_card)
 
     if handcards_num == 1 and is_special_card(_card_to_play):
         return False
@@ -51,7 +50,7 @@ def update_handcards(handcards, line):
 
     return handcards + _line, cursor_index
 
-def next_frame(game, player_num):
+def next_frame(game, player_num, debug=False):
     cur_line_num = 0
     is_updating_handcards = False
     stat = 0
@@ -67,7 +66,10 @@ def next_frame(game, player_num):
 
     while True:
         line = game.stdout.readline().decode("UTF-8").replace("\n", "") 
-        print(cur_line_num, "\t", line)
+        if debug:
+            print(cur_line_num, "\t", line)
+        else:
+            print(line)
         line = remove_escape(line)
 
         if cur_line_num == 0 and re.match(".*Want to play again", line):
@@ -89,12 +91,13 @@ def next_frame(game, player_num):
             else:
                 handcards, _cursor_index = update_handcards(handcards, line)
                 if _cursor_index > -1:
-                    cursor_index = _cursor_index
+                    cursor_index = _cursor_index + 8 * (cur_line_num - _pos_of_my_box[0] - 3)
 
         if cur_line_num == get_ui_line_nums(player_num, len(handcards)) - 1:
             if line[_pos_of_my_box[1]] != '[':
                 # it's not my turn
-                return False
+                stat = 0
+                return stat, last_played_card, handcards, cursor_index
 
         if cur_line_num == get_ui_line_nums(player_num, len(handcards)):
             if re.match("Now it's your turn", line):
