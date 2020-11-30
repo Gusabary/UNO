@@ -21,9 +21,7 @@ public:
     void Recover();
 #endif
 
-    static void DisableInput();
-    
-    static void EnableInput();
+    static void ClearStdInBuffer();
 
 #ifdef __unix__
 private:

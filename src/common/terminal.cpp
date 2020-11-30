@@ -6,7 +6,6 @@ namespace UNO { namespace Common {
 Terminal::Terminal()
 {
     /// XXX: what if throwing an exception
-    /// XXX: how to apply to windows
     // save the old attr
     tcgetattr(STDIN_FILENO, &mOldAttr);
 }
@@ -47,14 +46,21 @@ Terminal::~Terminal()
 }
 #endif
 
-void Terminal::DisableInput()
+void Terminal::ClearStdInBuffer()
 {
-    /// TODO: how to disable keyboard input
-}
-
-void Terminal::EnableInput()
-{
-    /// TODO: how to enable keyboard input
+#if defined(__unix__)
+    tcflush(STDIN_FILENO, TCIFLUSH);
+#elif defined(_WIN32)
+    while (true) {
+        auto ret = _kbhit();
+        if (ret != 0) {
+            ch = _getch();
+        }
+        else {
+            break;
+        }
+    }
+#endif
 }
 
 }}

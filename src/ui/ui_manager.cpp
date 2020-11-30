@@ -67,10 +67,7 @@ void UIManager::NextTurn()
     if (mGameStat->IsMyTurn()) {
         ResetCursor();
         ResetTimeLeft();
-        Common::Terminal::EnableInput();
-    }
-    else {
-        Common::Terminal::DisableInput();
+        Common::Terminal::ClearStdInBuffer();
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
