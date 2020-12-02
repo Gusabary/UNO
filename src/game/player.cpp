@@ -26,6 +26,8 @@ void Player::JoinGame()
     // std::cout << "connect success, sending username to server" << std::endl;
     Common::Util::Deliver<JoinGameInfo>(mClient, mUsername);
 
+    /// TODO: If the room is full and another player wants to join in, he will block here
+    /// maybe use a clock to detect if the room is full.
     auto joinRsp = Common::Util::Receive<JoinGameRspInfo>(mClient);
     // std::cout << *joinRsp << std::endl;
     auto initUsernames = joinRsp->mUsernames;

@@ -41,7 +41,19 @@ list_ports()
     done < $conf_path
 }
 
-# mode can be [start, get, list]
+stop_target()
+{
+    if [[ $1 == "daemon" ]];
+    then
+        kill $(ps aux | grep daemon.sh | grep -v grep | awk '{print $2}')
+        echo "daemon stopped."
+    else
+        kill $(ps aux | grep -e "-l $1" | grep -v grep | awk '{print $2}')
+        echo "server-$1 stopped."
+    fi
+}
+
+# mode can be [start, get, list, stop]
 mode=$1
 
 # target can be [daemon, $port]
@@ -53,4 +65,6 @@ elif [[ $mode == "get" ]]; then
     get_target $target
 elif [[ $mode == "list" ]]; then
     list_ports
+elif [[ $mode == "stop" ]]; then
+    stop_target $target
 fi

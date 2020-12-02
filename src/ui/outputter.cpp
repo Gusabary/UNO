@@ -22,7 +22,7 @@ Outputter::Outputter(std::unique_ptr<GameStat> &gameStat,
 
 void Outputter::PrintRawView(const View &view) const
 {
-    // ClearScreen();
+    ClearScreen();
     auto [height, width] = ViewFormatter::GetBaseScaleOfView();
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
@@ -34,7 +34,7 @@ void Outputter::PrintRawView(const View &view) const
 
 void Outputter::PrintView(const View &view) const
 {
-    // ClearScreen();
+    ClearScreen();
     auto [baseHeight, width] = ViewFormatter::GetBaseScaleOfView();
     int height = baseHeight + view.GetExtraRowNum();
 
