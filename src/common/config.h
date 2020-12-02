@@ -17,6 +17,7 @@ struct GameConfigInfo {
     std::string mHost;
     std::string mPort;
     std::string mUsername;
+    std::string mLogPath;
 };
 
 /**
@@ -83,6 +84,7 @@ private:
     const static std::string CMD_OPT_SHORT_CFGFILE;
     const static std::string CMD_OPT_LONG_CFGFILE;
     const static std::string CMD_OPT_BOTH_CFGFILE;
+    const static std::string CMD_OPT_LONG_LOGFILE;
 
     const static std::string FILE_OPT_SERVER;
     const static std::string FILE_OPT_CLIENT;

@@ -2,6 +2,7 @@
 
 script_dir=$(cd "$(dirname "$0")" >/dev/null 2>&1; pwd -P)
 proj_dir=$(dirname $script_dir)
+log_dir=$proj_dir"/logs"
 
 server_path=$proj_dir"/build/src/uno"
 bot_path=$proj_dir"/bot/bot.py"
@@ -20,8 +21,9 @@ prepare_room()
     port=$1
     totol_player_num=$2
     bot_num=$3
+    log_path=$log_dir"/server-$port.log"
     print_log "starting server... [port: $port, player_num: $totol_player_num, bot_num: $bot_num]"
-    $server_path -l $port -n $totol_player_num >/dev/null 2>&1 &
+    $server_path -l $port -n $totol_player_num --log $log_path >/dev/null 2>&1 &
     sleep 0.2
     print_log "server started."
     for ((i = 0; i < $bot_num; i++)) 

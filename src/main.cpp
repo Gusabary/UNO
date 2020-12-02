@@ -17,14 +17,14 @@ using namespace UNO;
 
 int main(int argc, char **argv)
 {
+    auto configInfo = Common::Config(argc, const_cast<const char **>(argv)).Parse();
+
 #ifdef ENABLE_LOG
     spdlog::set_level(spdlog::level::info);
-    spdlog::set_default_logger(spdlog::basic_logger_mt("UNO", "logs/log.txt"));
+    spdlog::set_default_logger(spdlog::basic_logger_mt("UNO", configInfo->mLogPath));
     spdlog::default_logger()->flush_on(spdlog::level::info);
     spdlog::info("hello, spdlog");
 #endif
-
-    auto configInfo = Common::Config(argc, const_cast<const char **>(argv)).Parse();
 
     if (configInfo->mIsServer) {
         auto serverSp = Game::GameBoard::CreateServer(configInfo->mPort);
