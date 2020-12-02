@@ -43,3 +43,7 @@ playground.py
 
 # log
 logs
+*.log
+
+# script
+playground.sh

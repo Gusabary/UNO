@@ -66,18 +66,6 @@ void View::DrawWhenInitWaiting(const std::vector<std::string> &usernames, bool i
     }
 }
 
-/**
- * draw a box of other player (instead of the player himself), whose top left corner is
- * located by \p row and \p col, and contains the information of \p gameStat and \p playerStat.
- * if \p isCurrentPlayer is true, a star will be marked on the top right corner of the box.
- * the other box looks like:
- *      +--------------------+
- *      | Gusabary         * |
- *      +--------------------+
- *      | cards remained: 7  |
- *      | last played: YR    |
- *      +--------------------+
- */
 void View::DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerStat &playerStat)
 {
     bool isCurrentPlayer = false;
@@ -104,16 +92,6 @@ void View::DrawOtherBox(int playerIndex, const GameStat &gameStat, const PlayerS
     }
 }
 
-/**
- * draw a box of the player himself, whose top left corner is located by \p row and \p col,
- * and contains the information of \p gameStat, \p playerStat and \p handcards.
- * the self box looks like:
- *      +----------------------------+
- *      | Gusabary                 * |
- *      +----------------------------+
- *      | R1  R2  Y3  R4  W >B+2  +4 |
- *      +----------------------------+
- */
 void View::DrawSelfBox(const GameStat &gameStat, const PlayerStat &playerStat, 
     const HandCards &handcards, int cursorIndex)
 {
