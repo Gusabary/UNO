@@ -13,6 +13,7 @@ namespace UNO { namespace Common {
  * which is outside the \c Config class
  */
 struct GameConfigInfo {
+    bool mDoShowVersion{false};
     bool mIsServer;
     std::string mHost;
     std::string mPort;
@@ -85,6 +86,9 @@ private:
     const static std::string CMD_OPT_LONG_CFGFILE;
     const static std::string CMD_OPT_BOTH_CFGFILE;
     const static std::string CMD_OPT_LONG_LOGFILE;
+    const static std::string CMD_OPT_SHORT_VERSION;
+    const static std::string CMD_OPT_LONG_VERSION;
+    const static std::string CMD_OPT_BOTH_VERSION;
 
     const static std::string FILE_OPT_SERVER;
     const static std::string FILE_OPT_CLIENT;

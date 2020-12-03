@@ -39,6 +39,9 @@ const std::string Config::CMD_OPT_SHORT_CFGFILE = "f";
 const std::string Config::CMD_OPT_LONG_CFGFILE = "file";
 const std::string Config::CMD_OPT_BOTH_CFGFILE = CMD_OPT_SHORT_CFGFILE + ", " + CMD_OPT_LONG_CFGFILE;
 const std::string Config::CMD_OPT_LONG_LOGFILE = "log";
+const std::string Config::CMD_OPT_SHORT_VERSION = "v";
+const std::string Config::CMD_OPT_LONG_VERSION = "version";
+const std::string Config::CMD_OPT_BOTH_VERSION = CMD_OPT_SHORT_VERSION + ", " + CMD_OPT_LONG_VERSION;
 const std::string Config::FILE_OPT_SERVER = "server";
 const std::string Config::FILE_OPT_CLIENT = "client";
 const std::string Config::FILE_OPT_LISTEN = "listenOn";
@@ -59,7 +62,8 @@ Config::Config(int argc, const char **argv)
         (CMD_OPT_BOTH_USERNAME, "the username of the player", cxxopts::value<std::string>())
         (CMD_OPT_BOTH_PLAYERS, "the number of players", cxxopts::value<int>())
         (CMD_OPT_BOTH_CFGFILE, "the path of config file", cxxopts::value<std::string>())
-        (CMD_OPT_LONG_LOGFILE, "the path of log file", cxxopts::value<std::string>());
+        (CMD_OPT_LONG_LOGFILE, "the path of log file", cxxopts::value<std::string>())
+        (CMD_OPT_BOTH_VERSION, "the version of application", cxxopts::value<bool>());
     
     mCmdlineOpts = std::make_unique<cxxopts::ParseResult>(mOptions->parse(argc, argv));
     std::string configFile;
@@ -126,6 +130,12 @@ void Config::ParseFileOpts()
 
 void Config::ParseCmdlineOpts()
 {
+    // -v
+    if (mCmdlineOpts->count(CMD_OPT_LONG_VERSION)) {
+        mGameConfigInfo->mDoShowVersion = true;
+        return;
+    }
+    
     // check options
     if (mCmdlineOpts->count(CMD_OPT_LONG_LISTEN) && mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
         throw std::runtime_error("cannot specify both -l and -c options at the same time");

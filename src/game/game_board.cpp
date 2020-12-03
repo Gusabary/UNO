@@ -48,7 +48,9 @@ void GameBoard::ReceiveUsername(int index, const std::string &username)
 
 void GameBoard::StartGame()
 {
+#ifdef ENABLE_LOG
     spdlog::info("Game Starts.");
+#endif
     mDeck->Init();
     std::vector<std::array<Card, 7>> initHandCards = 
         mDeck->DealInitHandCards(Common::Common::mPlayerNum);
@@ -175,7 +177,9 @@ void GameBoard::HandlePlay(const std::unique_ptr<PlayInfo> &info)
 void GameBoard::Win()
 {
     mGameStat->GameEnds();
+#ifdef ENABLE_LOG
     spdlog::info("Game Ends.");
+#endif
 }
 
 }}
