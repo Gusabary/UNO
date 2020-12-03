@@ -44,7 +44,7 @@ uno-mac.zip
 
 ```bash
 git clone git@github.com:Gusabary/UNO.git
-cd UNO
+cd UNO/script
 
 # for linux and mac
 chmod +x ./build.sh
