@@ -52,7 +52,12 @@ void UIManager::Render()
 {
     std::lock_guard<std::mutex> lock(mMutex);
     // before render, mView should be cleared first
-    mView->Clear(false, mGameStat->GetCurrentPlayer());
+    if (mGameStat->DoesGameEnd()) {
+        mView->Clear(true);
+    }
+    else {
+        mView->Clear(false, mGameStat->GetCurrentPlayer());
+    }
     mView->DrawSelfBox(*mGameStat, mPlayerStats[0], *mHandCards, mCursorIndex);
     for (int i = 1; i < mPlayerStats.size(); i++) {
         mView->DrawOtherBox(i, *mGameStat, mPlayerStats[i]);
