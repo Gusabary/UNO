@@ -6,7 +6,10 @@ Player::Player(std::string username, std::shared_ptr<Network::IClient> clientSp)
     : mUsername(username), mClient(clientSp)
 {
     mClient->RegisterConnectCallback([this] { JoinGame(); });
+}
 
+void Player::Start()
+{
     mClient->Connect();
 }
 

@@ -17,6 +17,8 @@ class Player {
 public:
     explicit Player(std::string username, std::shared_ptr<Network::IClient> clientSp);
 
+    void Start();
+
     static std::shared_ptr<Network::IClient> CreateClient(const std::string &host, 
         const std::string &port);
 

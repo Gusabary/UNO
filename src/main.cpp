@@ -34,10 +34,12 @@ int main(int argc, char **argv)
     if (configInfo->mIsServer) {
         auto serverSp = Game::GameBoard::CreateServer(configInfo->mPort);
         Game::GameBoard gameBoard(serverSp);
+        gameBoard.Start();
     }
     else {
         auto clientSp = Game::Player::CreateClient(configInfo->mHost, configInfo->mPort);
         Game::Player player(configInfo->mUsername, clientSp);
+        player.Start();
     }
 
     return 0;

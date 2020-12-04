@@ -16,6 +16,8 @@ class GameBoard {
 public:
     explicit GameBoard(std::shared_ptr<Network::IServer> serverSp);
 
+    void Start();
+
     static std::shared_ptr<Network::IServer> CreateServer(const std::string &port);
 
 // private:

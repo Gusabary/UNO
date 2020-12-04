@@ -15,7 +15,10 @@ GameBoard::GameBoard(std::shared_ptr<Network::IServer> serverSp)
         }
     );
     mServer->RegisterAllPlayersJoinedCallback([this] { StartGame(); });
+}
 
+void GameBoard::Start()
+{
     mServer->Run();
 }
 
