@@ -5,7 +5,7 @@
 
 namespace UNO { namespace Common {
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 Terminal::Terminal()
 {
     /// XXX: what if throwing an exception
@@ -51,7 +51,7 @@ Terminal::~Terminal()
 
 void Terminal::ClearStdInBuffer()
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     tcflush(STDIN_FILENO, TCIFLUSH);
 #elif defined(_WIN32)
     while (true) {

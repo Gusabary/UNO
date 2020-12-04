@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 #include <termios.h>
 #include <unistd.h>
 #endif
@@ -9,7 +9,7 @@ namespace UNO { namespace Common {
 
 class Terminal {
 public:
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
     /**
      * Save the old terminal mode.
      */
@@ -42,7 +42,7 @@ public:
      */
     static void ClearStdInBuffer();
 
-#ifdef __unix__
+#if defined(__unix__) || defined(__APPLE__)
 private:
     void GetNewAttr();
 

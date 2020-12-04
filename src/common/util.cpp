@@ -1,6 +1,6 @@
 #include <iostream>
 
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
 #include <poll.h>
 #elif defined(_WIN32)
 #include <conio.h>
@@ -33,7 +33,7 @@ int Util::GetIndexInSegment(int handcardIndex) { return handcardIndex % Common::
 
 char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
 {
-#if defined(__unix__)
+#if defined(__unix__) || defined(__APPLE__)
     std::unique_ptr<Terminal> terminal;
     if (autoFlush) {
         terminal.reset(new Terminal());
