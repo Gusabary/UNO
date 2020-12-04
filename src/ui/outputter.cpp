@@ -72,8 +72,6 @@ void Outputter::PrintHintText(bool isSpecifyingNextColor, bool lastCardCanBePlay
                   << ToColorEscape(CardColor::YELLOW) << "Y" << ColorEscape::RESET << "/"
                   << ToColorEscape(CardColor::GREEN)  << "G" << ColorEscape::RESET << "/"
                   << ToColorEscape(CardColor::BLUE)   << "B" << ColorEscape::RESET << ")." << std::endl;
-        // // without std::endl, so a flush is needed
-        // std::cout.flush();
     }
     else if (!lastCardCanBePlayed) {
         auto lastPlayedCard = mGameStat->GetLastPlayedCard();

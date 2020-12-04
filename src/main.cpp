@@ -36,8 +36,8 @@ int main(int argc, char **argv)
         Game::GameBoard gameBoard(serverSp);
     }
     else {
-        auto clientUp = Game::Player::CreateClient(configInfo->mHost, configInfo->mPort);
-        Game::Player player(configInfo->mUsername, clientUp);
+        auto clientSp = Game::Player::CreateClient(configInfo->mHost, configInfo->mPort);
+        Game::Player player(configInfo->mUsername, clientSp);
     }
 
     return 0;

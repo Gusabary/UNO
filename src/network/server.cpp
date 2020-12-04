@@ -69,11 +69,9 @@ std::unique_ptr<Info> Server::ReceiveInfo(const std::type_info *infoType, int in
         {&typeid(SkipInfo),        [this](int index) { return ReceiveInfoImpl<SkipInfo>(index); }},
         {&typeid(PlayInfo),        [this](int index) { return ReceiveInfoImpl<PlayInfo>(index); }},
         {&typeid(DrawRspInfo),     [this](int index) { return ReceiveInfoImpl<DrawRspInfo>(index); }}
-        // {&typeid(GameEndInfo),   [this, index] { return ReceiveInfoImpl<GameEndInfo>(index); }}
     };
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    // std::cout << "[RECEIVE INFO from " << index << "] " << infoType->name() << std::endl;
     return it->second(index);
 }
 
@@ -105,13 +103,9 @@ void Server::DeliverInfo(const std::type_info *infoType, int index, const Info &
         {&typeid(DrawRspInfo),     [this](int index, const Info &info) { 
             DeliverInfoImpl<DrawRspInfo>(index, dynamic_cast<const DrawRspInfo &>(info)); 
         }}
-        // {&typeid(GameEndInfo),   [this, index, &info]() { 
-        //     DeliverInfoImpl<GameEndInfo>(index, dynamic_cast<const GameEndInfo &>(info));
-        // }}
     };
     auto it = mapping.find(infoType);
     assert(it != mapping.end());
-    // std::cout << "[DELIVER INFO to   " << index << "] " << infoType->name() << std::endl;
     return it->second(index, info);
 }
 

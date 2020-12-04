@@ -3,14 +3,14 @@
 namespace UNO { namespace Common {
 
 // define static common variables here
-int Common::Common::mPlayerNum;
-int Common::Common::mTimeoutPerTurn;
-int Common::Common::mHandCardsNumPerRow;
-std::string Common::Common::mRedEscape;
-std::string Common::Common::mYellowEscape;
-std::string Common::Common::mGreenEscape;
-std::string Common::Common::mBlueEscape;
-const std::map<std::string, std::string> Common::Common::mEscapeMap = {
+int Common::mPlayerNum;
+int Common::mTimeoutPerTurn;
+int Common::mHandCardsNumPerRow;
+std::string Common::mRedEscape;
+std::string Common::mYellowEscape;
+std::string Common::mGreenEscape;
+std::string Common::mBlueEscape;
+const std::map<std::string, std::string> Common::mEscapeMap = {
     {"red",          "\033[31m"},
     {"yellow",       "\033[33m"},
     {"green",        "\033[32m"},
@@ -185,40 +185,40 @@ void Config::ParseCmdlineOpts()
 
 void Config::SetUpCommonConfig()
 {
-    Common::Common::mPlayerNum = mCommonConfigInfo->mPlayerNum.value_or(3);
-    Common::Common::mTimeoutPerTurn = 15;
-    Common::Common::mHandCardsNumPerRow = 8;
+    Common::mPlayerNum = mCommonConfigInfo->mPlayerNum.value_or(3);
+    Common::mTimeoutPerTurn = 15;
+    Common::mHandCardsNumPerRow = 8;
     
-    auto redIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mRedEscape.value_or("red"));
-    if (redIter == Common::Common::mEscapeMap.end()) {
-        Common::Common::mRedEscape = Common::Common::mEscapeMap.at("red");
+    auto redIter = Common::mEscapeMap.find(mCommonConfigInfo->mRedEscape.value_or("red"));
+    if (redIter == Common::mEscapeMap.end()) {
+        Common::mRedEscape = Common::mEscapeMap.at("red");
     }
     else {
-        Common::Common::mRedEscape = redIter->second;
+        Common::mRedEscape = redIter->second;
     }
 
-    auto yellowIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mYellowEscape.value_or("yellow"));
-    if (yellowIter == Common::Common::mEscapeMap.end()) {
-        Common::Common::mYellowEscape = Common::Common::mEscapeMap.at("yellow");
+    auto yellowIter = Common::mEscapeMap.find(mCommonConfigInfo->mYellowEscape.value_or("yellow"));
+    if (yellowIter == Common::mEscapeMap.end()) {
+        Common::mYellowEscape = Common::mEscapeMap.at("yellow");
     }
     else {
-        Common::Common::mYellowEscape = yellowIter->second;
+        Common::mYellowEscape = yellowIter->second;
     }
 
-    auto greenIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mGreenEscape.value_or("green"));
-    if (greenIter == Common::Common::mEscapeMap.end()) {
-        Common::Common::mGreenEscape = Common::Common::mEscapeMap.at("green");
+    auto greenIter = Common::mEscapeMap.find(mCommonConfigInfo->mGreenEscape.value_or("green"));
+    if (greenIter == Common::mEscapeMap.end()) {
+        Common::mGreenEscape = Common::mEscapeMap.at("green");
     }
     else {
-        Common::Common::mGreenEscape = greenIter->second;
+        Common::mGreenEscape = greenIter->second;
     }
 
-    auto blueIter = Common::Common::mEscapeMap.find(mCommonConfigInfo->mBlueEscape.value_or("blue"));
-    if (blueIter == Common::Common::mEscapeMap.end()) {
-        Common::Common::mBlueEscape = Common::Common::mEscapeMap.at("blue");
+    auto blueIter = Common::mEscapeMap.find(mCommonConfigInfo->mBlueEscape.value_or("blue"));
+    if (blueIter == Common::mEscapeMap.end()) {
+        Common::mBlueEscape = Common::mEscapeMap.at("blue");
     }
     else {
-        Common::Common::mBlueEscape = blueIter->second;
+        Common::mBlueEscape = blueIter->second;
     }
 }
 }}

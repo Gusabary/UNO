@@ -37,7 +37,7 @@ enum class CardText : uint8_t {
 };
 
 /**
- * Some special set of \c CardColor or \c CardText.
+ * Some special sets of \c CardColor or \c CardText.
  */
 struct CardSet {
     const static std::set<CardColor> NonWildColors;
