@@ -1,4 +1,4 @@
-简体中文 | [English](./README-en.md)
+简体中文 | [English](./README.en.md)
 
 # UNO
 
@@ -16,15 +16,11 @@
 
 ### 下载可执行文件
 
-（链接）
-
-uno-linux.zip
-
-uno-windows.zip
-
-uno-mac.zip
+前往 [Releases](https://github.com/Gusabary/UNO/releases) 页面以下载构建好的可执行文件。
 
 ### 从源码构建
+
+当然您也可以从源码构建。
 
 #### 准备工作
 
@@ -32,11 +28,11 @@ uno-mac.zip
 
 + 确保编译器支持 C++17
 
-  | 平台    | 编译器                                                       |
+  | 平台    | 构建                                                         |
   | ------- | ------------------------------------------------------------ |
-  | Linux   | gcc 8.4.0  ![](https://img.shields.io/badge/build-passing-brightgreen) |
+  | Linux   | GCC 8.4.0  ![](https://img.shields.io/badge/build-passing-brightgreen) |
   | Windows | MSVC 19.28 (Visual Studio 16 2019)  ![](https://img.shields.io/badge/build-passing-brightgreen) |
-  | MacOS   |                                                              |
+  | MacOS   | AppleClang 10.0.1  ![](https://img.shields.io/badge/build-passing-brightgreen) |
 
 #### 开始构建
 
@@ -68,16 +64,18 @@ make install
 
 ## 快速开始
 
+推荐使用 VSCode 的终端，其他大部分终端都会有类似闪烁的现象，比较影响游戏体验。
+
 ### 开始第一场对局
 
 ```shell
 cd build/src
-./uno -c 207.148.67.183:20021 -u username
+./uno -c 8.133.165.59:20020 -u username
 ```
 
 其中，`-c` 参数为游戏的服务器地址，`-u` 参数为玩家的用户名。
 
-`207.148.67.183:20020` 为预启动的一个游戏服务，该服务配置为两人对局并有一个电脑，即人机对战。如果该服务已被占用，玩家可以尝试连接 20021 ~ 20024 中的任意端口。
+`8.133.165.59:20020` 为预启动的一个游戏服务，该服务配置为两人对局并有一个电脑，即人机对战。如果该服务已被占用，玩家可以尝试连接 20021 ~ 20024 中的任意端口。
 
 浏览 Wiki 以查看更多关于[启动参数配置](https://github.com/Gusabary/UNO/wiki/%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF)和[预启动游戏服务](https://github.com/Gusabary/UNO/wiki/%E9%A2%84%E5%90%AF%E5%8A%A8%E7%9A%84%E6%B8%B8%E6%88%8F%E6%9C%8D%E5%8A%A1)的信息。
 
