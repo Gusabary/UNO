@@ -43,10 +43,14 @@ list_ports()
 
 stop_target()
 {
-    if [[ $1 == "daemon" ]];
-    then
+    if [[ $1 == "daemon" ]]; then
         kill $(ps aux | grep daemon.sh | grep -v grep | awk '{print $2}')
         echo "daemon stopped."
+    elif [[ $1 == "all" ]]; then
+        while read port player_num bot_num
+        do
+            stop_target $port
+        done < $conf_path
     else
         kill $(ps aux | grep -e "-l $1" | grep -v grep | awk '{print $2}')
         echo "server-$1 stopped."
@@ -67,4 +71,6 @@ elif [[ $mode == "list" ]]; then
     list_ports
 elif [[ $mode == "stop" ]]; then
     stop_target $target
+elif [[ $mode == "-v" ]]; then
+    echo "uno_server_ctl version 1.0"
 fi
