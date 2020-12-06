@@ -25,7 +25,6 @@ Of course you can also build from source code.
 #### Prerequisite
 
 + Make sure your CMake version is >= 3.14
-
 + Make sure your C++ compiler has C++17 support
 
   | Platform | Build                                                        |
