@@ -177,7 +177,6 @@ void Config::ParseCmdlineOpts()
     }
 
     // --log
-    mGameConfigInfo->mLogPath = "logs/uno.log";
     if (mCmdlineOpts->count(CMD_OPT_LONG_LOGFILE)) {
         mGameConfigInfo->mLogPath = (*mCmdlineOpts)[CMD_OPT_LONG_LOGFILE].as<std::string>();
     }

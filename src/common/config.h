@@ -18,7 +18,7 @@ struct GameConfigInfo {
     std::string mHost;
     std::string mPort;
     std::string mUsername;
-    std::string mLogPath;
+    std::string mLogPath{"logs/uno.log"};
 };
 
 /**
