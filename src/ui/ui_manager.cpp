@@ -145,7 +145,10 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
 CardColor UIManager::SpecifyNextColor()
 {
     mIsSpecifyingNextColor = true;
-    Print();
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        Print();
+    }
 
     CardColor nextColor;
     ExecuteWithTimePassing([this, &nextColor] {
