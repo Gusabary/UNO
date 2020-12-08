@@ -12,7 +12,8 @@ enum class InputAction : uint8_t {
     CURSOR_MOVE_LEFT,
     CURSOR_MOVE_RIGHT,
     PLAY,
-    PASS  // skip or draw
+    PASS,  // skip or draw
+    QUIT
 };
 
 class Inputter {

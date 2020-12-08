@@ -23,6 +23,7 @@ InputAction Inputter::GetAction(int timeout)
             case '\r': return InputAction::PLAY;
 #endif
             case ' ':  return InputAction::PASS;
+            case 'q': case 'Q': return InputAction::QUIT;
         }
     }
 }

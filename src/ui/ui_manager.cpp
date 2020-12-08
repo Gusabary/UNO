@@ -133,6 +133,10 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
             case InputAction::PASS: {
                 return std::make_pair(InputAction::PASS, -1);
             }
+            case InputAction::QUIT: {
+                std::cout << "Bye." << std::endl;
+                std::exit(0);
+            }
             default: assert(0);
         }
     }
