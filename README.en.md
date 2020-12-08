@@ -68,7 +68,6 @@ It's recommended to use VSCode built-in terminal. There might be an annoying bli
 ### Start your first game
 
 ```shell
-cd build/src
 ./uno -c 8.133.165.59:20020 -u username
 ```
 

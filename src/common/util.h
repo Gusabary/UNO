@@ -51,6 +51,12 @@ public:
     static int GetIndexInSegment(int handcardIndex);
 
     /**
+     * Hide the terminal cursor for better player experience, 
+     * especially when clean screen without using cls
+     */
+    static void HideTerminalCursor();
+
+    /**
      * Dynamically cast a unique_ptr to one with another type.
      */
     template<typename DstInfoT, typename SrcInfoUp>

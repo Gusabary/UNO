@@ -32,7 +32,7 @@ public:
     /**
      * Print view with color rendering.
      */
-    void PrintView(const View &view) const;
+    void PrintView(const View &view, bool useCls = true) const;
 
     /**
      * Print the hint text shown below the view. Only appear in player's turn.
@@ -45,7 +45,7 @@ private:
 
     std::string ToColorEscape(CardColor color) const;
 
-    void ClearScreen() const;
+    void ClearScreen(bool useCls = true) const;
 
 private:
     std::unique_ptr<GameStat> &mGameStat;

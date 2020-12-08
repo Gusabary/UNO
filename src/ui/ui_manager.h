@@ -40,7 +40,7 @@ public:
     /**
      * Render view in the main game loop.
      */
-    void Render();
+    void Render(bool useCls = true);
 
     /**
      * Get the player's action.
@@ -71,7 +71,7 @@ public:
 private:
     void TimerThreadLoop();
 
-    void Print() const;
+    void Print(bool useCls = true) const;
 
     void ResetCursor() { MoveCursorTo(0); }
 

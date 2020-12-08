@@ -1,3 +1,7 @@
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #include "outputter.h"
 
 namespace UNO { namespace UI {
@@ -32,9 +36,9 @@ void Outputter::PrintRawView(const View &view) const
     }
 }
 
-void Outputter::PrintView(const View &view) const
+void Outputter::PrintView(const View &view, bool useCls) const
 {
-    ClearScreen();
+    ClearScreen(useCls);
     auto [baseHeight, width] = ViewFormatter::GetBaseScaleOfView();
     int height = baseHeight + view.GetExtraRowNum();
 
@@ -132,10 +136,18 @@ std::vector<RenderInfo> Outputter::GetRenderInfos() const
     return renderInfos;
 }
 
-void Outputter::ClearScreen() const
+void Outputter::ClearScreen(bool useCls) const
 {
 #ifdef _WIN32
-    system("cls");
+    if (useCls) {
+        system("cls");
+    }
+    else {
+        // not use system('cls') for better player experience
+        static HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+        static COORD coord = {0, 0};
+        SetConsoleCursorPosition(hOutput, coord);
+    }
 #else
     system("clear");
 #endif

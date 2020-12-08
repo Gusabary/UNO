@@ -63,4 +63,20 @@ char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
 #endif
     return 0;
 }
+
+void Util::HideTerminalCursor()
+{
+#if defined(_WIN32)
+    HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cinfo;
+    cinfo.bVisible = 0;
+    cinfo.dwSize = 1;
+    SetConsoleCursorInfo(hOutput, &cinfo);
+#elif defined(__unix__) || defined(__APPLE__)
+    // the hidden terminal cursor won't recover automatically,
+    // so it's not a good choice to do that on Linux
+    // std::cout << "\033[?25l" << std::endl;
+#endif
+}
+
 }}

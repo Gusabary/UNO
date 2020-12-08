@@ -68,7 +68,6 @@ make install
 ### 开始第一场对局
 
 ```shell
-cd build/src
 ./uno -c 8.133.165.59:20020 -u username
 ```
 

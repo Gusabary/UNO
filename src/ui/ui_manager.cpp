@@ -11,6 +11,7 @@ UIManager::UIManager(std::unique_ptr<GameStat> &gameStat,
     mView.reset(new View());
     mInputter.reset(new Inputter());
     mOutputter.reset(new Outputter(gameStat, playerStats, handCards));
+    Common::Util::HideTerminalCursor();
 }
 
 void UIManager::RunTimerThread()
@@ -37,7 +38,7 @@ void UIManager::TimerThreadLoop()
         /// XXX: race condition. it may print before main thread prints first time, 
         /// in which case some states are not initialized yet such as mExtraRowNum of View.
         /// current workaround: init mExtraRowNum with 0
-        Print();
+        Print(false);
     }
 }
 
@@ -48,7 +49,7 @@ void UIManager::RenderWhenInitWaiting(const std::vector<std::string> &usernames,
     mOutputter->PrintRawView(*mView);
 }
 
-void UIManager::Render()
+void UIManager::Render(bool useCls)
 {
     std::lock_guard<std::mutex> lock(mMutex);
     // before render, mView should be cleared first
@@ -64,7 +65,7 @@ void UIManager::Render()
     }
     mView->DrawLastPlayedCard(mGameStat->GetLastPlayedCard());
 
-    Print();
+    Print(useCls);
 }
 
 void UIManager::NextTurn()
@@ -79,14 +80,14 @@ void UIManager::NextTurn()
     mView->Clear(true);
 }
 
-void UIManager::Print() const
+void UIManager::Print(bool useCls) const
 {
     // get value only once, for atomicity
     auto isMyTurn = mGameStat->IsMyTurn();
     if (isMyTurn) {
         mView->DrawSelfTimeIndicatorIfNot();
     }
-    mOutputter->PrintView(*mView);
+    mOutputter->PrintView(*mView, useCls);
 
     if (isMyTurn) {
         mOutputter->PrintHintText(mIsSpecifyingNextColor, mLastCardCanBePlayed, 
@@ -99,8 +100,10 @@ std::pair<InputAction, int> UIManager::GetAction(bool lastCardCanBePlayed,
 {
     mLastCardCanBePlayed = lastCardCanBePlayed;
     mHasChanceToPlayAfterDraw = hasChanceToPlayAfterDraw;
+    bool isFirstRender = true;
     while (true) {
-        Render();
+        Render(isFirstRender);
+        isFirstRender = false;
 
         InputAction action;
         ExecuteWithTimePassing([this, &action] {
