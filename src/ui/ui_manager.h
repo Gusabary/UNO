@@ -75,7 +75,7 @@ private:
 
     void ResetCursor() { MoveCursorTo(0); }
 
-    void ResetTimeLeft() { mTimeLeft = Common::Common::mTimeoutPerTurn * 1000; }
+    void ResetTimeLeft() { mTimeLeft = Common::Common::mTimeoutPerTurn * 1000 + 500; }
 
     int PlayerNum() const { return mPlayerStats.size(); }
 

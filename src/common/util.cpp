@@ -51,6 +51,7 @@ char Util::GetCharWithTimeout(int milliseconds, bool autoFlush)
         return c;
     }
 #elif defined(_WIN32)
+    FlushConsoleInputBuffer(GetStdHandle(STD_INPUT_HANDLE));
     auto ret = WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), milliseconds);
 
     if (ret == WAIT_TIMEOUT) {
