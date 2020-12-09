@@ -99,6 +99,7 @@ bool Card::CanBePlayedAfter(Card lastPlayedCard, bool isUno)
 
 void Deck::Init()
 {
+    this->Clear();
     mDiscardPile.Clear();
     for (auto color : CardSet::NonWildColors) {
         for (auto text : CardSet::NonWildTexts) {
