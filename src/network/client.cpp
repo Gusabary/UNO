@@ -28,6 +28,11 @@ void Client::Connect()
         );
 
         mContext.run();
+        if (!mSession) {
+            // connection failure
+            std::cout << "Service not found, connection failure." << std::endl;
+            std::exit(-1);
+        }
         OnConnect();
     }
 }

@@ -144,7 +144,7 @@ void Config::ParseCmdlineOpts()
         throw std::runtime_error("must specify either -l or -c option");
     }
     if (mCmdlineOpts->count(CMD_OPT_LONG_CONNECT) && !mCmdlineOpts->count(CMD_OPT_LONG_USERNAME)
-        && !(*mClientNode)[FILE_OPT_USERNAME].IsDefined()) {
+        && (!mClientNode || !(*mClientNode)[FILE_OPT_USERNAME].IsDefined())) {
         throw std::runtime_error("must specify -u option if -c option is specified");
     }
     if (mCmdlineOpts->count(CMD_OPT_LONG_CONNECT) && mCmdlineOpts->count(CMD_OPT_LONG_PLAYERS)) {
