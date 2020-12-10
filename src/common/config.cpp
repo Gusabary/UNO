@@ -42,6 +42,9 @@ const std::string Config::CMD_OPT_LONG_LOGFILE = "log";
 const std::string Config::CMD_OPT_SHORT_VERSION = "v";
 const std::string Config::CMD_OPT_LONG_VERSION = "version";
 const std::string Config::CMD_OPT_BOTH_VERSION = CMD_OPT_SHORT_VERSION + ", " + CMD_OPT_LONG_VERSION;
+const std::string Config::CMD_OPT_SHORT_HELP = "h";
+const std::string Config::CMD_OPT_LONG_HELP = "help";
+const std::string Config::CMD_OPT_BOTH_HELP = CMD_OPT_SHORT_HELP + ", " + CMD_OPT_LONG_HELP;
 const std::string Config::FILE_OPT_SERVER = "server";
 const std::string Config::FILE_OPT_CLIENT = "client";
 const std::string Config::FILE_OPT_LISTEN = "listenOn";
@@ -63,9 +66,17 @@ Config::Config(int argc, const char **argv)
         (CMD_OPT_BOTH_PLAYERS, "the number of players", cxxopts::value<int>())
         (CMD_OPT_BOTH_CFGFILE, "the path of config file", cxxopts::value<std::string>())
         (CMD_OPT_LONG_LOGFILE, "the path of log file", cxxopts::value<std::string>())
-        (CMD_OPT_BOTH_VERSION, "the version of application", cxxopts::value<bool>());
+        (CMD_OPT_BOTH_VERSION, "show version of application", cxxopts::value<bool>())
+        (CMD_OPT_BOTH_HELP, "show help info", cxxopts::value<bool>());
     
-    mCmdlineOpts = std::make_unique<cxxopts::ParseResult>(mOptions->parse(argc, argv));
+    try {
+        mCmdlineOpts = std::make_unique<cxxopts::ParseResult>(mOptions->parse(argc, argv));
+    }
+    catch (std::exception &e) {
+        std::cout << mOptions->help() << std::endl;
+        std::cout << e.what() << std::endl;
+        std::exit(-1);
+    }
     std::string configFile;
     if (mCmdlineOpts->count(CMD_OPT_LONG_CFGFILE)) {
         auto configFile = (*mCmdlineOpts)[CMD_OPT_LONG_CFGFILE].as<std::string>();
@@ -81,6 +92,7 @@ Config::Config(int argc, const char **argv)
 
 std::unique_ptr<GameConfigInfo> Config::Parse()
 {
+    HandleImmediateConfig();
     // options from command line takes precedence over ones from config file
     ParseFileOpts();
     try {
@@ -89,7 +101,7 @@ std::unique_ptr<GameConfigInfo> Config::Parse()
     catch (std::exception &e) {
         std::cout << mOptions->help() << std::endl;
         std::cout << e.what() << std::endl;
-        exit(-1);
+        std::exit(-1);
     }
 
     // handle common config here
@@ -97,6 +109,18 @@ std::unique_ptr<GameConfigInfo> Config::Parse()
 
     // the main function will handle game config
     return std::move(mGameConfigInfo);
+}
+
+void Config::HandleImmediateConfig()
+{
+    if (mCmdlineOpts->count(CMD_OPT_LONG_HELP)) {
+        std::cout << mOptions->help() << std::endl;
+        std::exit(0);
+    }
+    if (mCmdlineOpts->count(CMD_OPT_LONG_VERSION)) {
+        std::cout << "uno version 1.0" << std::endl;
+        std::exit(0);
+    }
 }
 
 void Config::ParseFileOpts()
@@ -130,12 +154,6 @@ void Config::ParseFileOpts()
 
 void Config::ParseCmdlineOpts()
 {
-    // -v
-    if (mCmdlineOpts->count(CMD_OPT_LONG_VERSION)) {
-        mGameConfigInfo->mDoShowVersion = true;
-        return;
-    }
-    
     // check options
     if (mCmdlineOpts->count(CMD_OPT_LONG_LISTEN) && mCmdlineOpts->count(CMD_OPT_LONG_CONNECT)) {
         throw std::runtime_error("cannot specify both -l and -c options at the same time");

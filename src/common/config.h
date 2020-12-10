@@ -13,7 +13,6 @@ namespace UNO { namespace Common {
  * which is outside the \c Config class
  */
 struct GameConfigInfo {
-    bool mDoShowVersion{false};
     bool mIsServer;
     std::string mHost;
     std::string mPort;
@@ -44,6 +43,10 @@ public:
     std::unique_ptr<GameConfigInfo> Parse();
 
 private:
+    /**
+     * Handle immediate config in a short cut, like -v and -h.
+     */
+    void HandleImmediateConfig();
     /**
      * Parse the config info from yaml file.
      */
@@ -89,6 +92,9 @@ private:
     const static std::string CMD_OPT_SHORT_VERSION;
     const static std::string CMD_OPT_LONG_VERSION;
     const static std::string CMD_OPT_BOTH_VERSION;
+    const static std::string CMD_OPT_SHORT_HELP;
+    const static std::string CMD_OPT_LONG_HELP;
+    const static std::string CMD_OPT_BOTH_HELP;
 
     const static std::string FILE_OPT_SERVER;
     const static std::string FILE_OPT_CLIENT;

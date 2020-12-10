@@ -26,11 +26,6 @@ int main(int argc, char **argv)
     spdlog::info("hello, spdlog");
 #endif
 
-    if (configInfo->mDoShowVersion) {
-        std::cout << "uno version 1.0" << std::endl;
-        std::exit(0);
-    }
-
     if (configInfo->mIsServer) {
         auto serverSp = Game::GameBoard::CreateServer(configInfo->mPort);
         Game::GameBoard gameBoard(serverSp);
