@@ -12,12 +12,64 @@ declare -A end_num
 declare -A player_num_by_port
 declare -A bot_num_by_port
 
+bot_num_filter=-1
+player_num_filter=-1
+days_filter=100
+
+parse_arg()
+{
+    # -v: show version
+    # -n x/y: x is bot num, y is total player num
+    # -d x: just show logs of recent x days
+    while getopts ":vn:d:" options; do
+        case "${options}" in
+            v)
+                echo "log_analyzer version 1.0"
+                exit 0
+                ;;
+            n)
+                bot_num_filter=$(echo $OPTARG | cut -d'/' -f1)
+                player_num_filter=$(echo $OPTARG | cut -d'/' -f2)
+                if [[ -z $bot_num_filter ]]; then
+                    bot_num_filter=-1
+                fi
+                if [[ -z $player_num_filter ]]; then
+                    player_num_filter=-1
+                fi
+                ;;
+            d)
+                days_filter=$OPTARG
+                ;;
+            :)
+                echo "Error: -${OPTARG} requires an argument."
+                exit -1
+                ;;
+            *)
+                exit -1
+                ;;
+        esac
+    done
+}
+
+satisfy_n_filter()
+{
+    if [[ $bot_num_filter != -1 && $bot_num_filter != $1 ]]; then
+        echo 0
+    elif [[ $player_num_filter != -1 && $player_num_filter != $2 ]]; then
+        echo 0
+    else
+        echo 1
+    fi
+}
+
 load_config()
 {
     while read port player_num bot_num
     do
-        player_num_by_port[$port]=$player_num
-        bot_num_by_port[$port]=$bot_num
+        if [[ $(satisfy_n_filter $bot_num $player_num) == 1 ]]; then
+            player_num_by_port[$port]=$player_num
+            bot_num_by_port[$port]=$bot_num
+        fi
     done < $conf_path
 }
 
@@ -25,28 +77,28 @@ load_hint()
 {
     for port in "${!player_num_by_port[@]}";
     do
-        # prepare_room $port ${player_num_by_port[$port]} ${bot_num_by_port[$port]}
         log_path=$log_dir"/server-"$port".log"
-        hint_list=$(cat $log_path | awk '{print $6}')
-        for hint in $hint_list
+        while read date _ _ _ _ hint
         do
-            if [[ $hint == "spdlog" ]]; then
-                ((restart_num[$port]+=1))
-            elif [[ $hint == "Starts." ]]; then
-                ((start_num[$port]+=1))
-            elif [[ $hint == "Ends." ]]; then
-                ((end_num[$port]+=1))
+            date=$(echo $date | cut -d'[' -f2)
+            # date is in format of yyyy-mm-dd
+            seconds_diff=$(( $(date -d 'now' +%s) - $(date -d $date +%s) ))
+            day_diff=$(( $seconds_diff / (60*60*24) ))
+            if [[ $day_diff -lt $days_filter ]]; then
+                if [[ $hint == "spdlog" ]]; then
+                    ((restart_num[$port]+=1))
+                elif [[ $hint == "Starts." ]]; then
+                    ((start_num[$port]+=1))
+                elif [[ $hint == "Ends." ]]; then
+                    ((end_num[$port]+=1))
+                fi
             fi
-        done
+        done < $log_path
     done
 }
 
 print()
 {
-    echo "Times of service restart: $restart_num"
-    echo "Times of game start: $start_num"
-    echo "Times of game over: $end_num"
-
     echo -e "  port\t      restart  start    end"
     echo -e "-----------------------------------"
     for port in "${!player_num_by_port[@]}";
@@ -61,6 +113,7 @@ print()
     sort
 }
 
+parse_arg $@
 load_config
 load_hint
 print
