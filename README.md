@@ -51,6 +51,8 @@ chmod +x ./build.sh
 
 构建完成后，`uno` 可执行文件会在 `build/src` 目录下。
 
+（如果在构建过程中遇到有关 git 子模块的配置问题，可以参考该 [issue](https://github.com/Gusabary/UNO/issues/1)）
+
 可选地，将 `uno` 可执行文件安装到 `PATH` 路径下：
 
 ```shell

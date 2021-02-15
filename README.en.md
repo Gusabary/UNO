@@ -4,7 +4,7 @@
 
 ![](https://img.shields.io/badge/version-v1.0-9cf)
 
-Hooray！Card game **UNO**！
+Hooray! Card game **UNO**!
 
 ## Demo
 
@@ -50,6 +50,8 @@ chmod +x ./build.sh
 ```
 
 After the build process, `uno` executable will be under `build/src` directory.
+
+(If encounter some problems related to git submodule when building, take this [issue](https://github.com/Gusabary/UNO/issues/1) for a reference)
 
 Optionally, `uno` can be installed by running:
 
